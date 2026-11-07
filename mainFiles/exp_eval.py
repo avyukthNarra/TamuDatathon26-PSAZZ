@@ -19,6 +19,7 @@ from slot_forecasting.experiments import episode_folds, subset_score
 from slot_forecasting.io import load_inputs, read_labels, read_rows, read_submission, read_targets
 from slot_forecasting.pair_logistic import PairLogisticForecaster
 from slot_forecasting.rounds import round_metadata
+from slot_forecasting.shape_head import ShapeHeadForecaster
 
 CANDIDATES = {
     "pooled_recent": lambda: FrequencyForecaster("pooled_recent"),
@@ -28,6 +29,13 @@ CANDIDATES = {
     "e1_hl64": lambda: PairLogisticForecaster(half_life=64),
     "e1_C1": lambda: PairLogisticForecaster(C=1.0),
     "e1_C10": lambda: PairLogisticForecaster(C=10.0),
+    "e1_C10_ref": lambda: PairLogisticForecaster(C=10.0),
+    "e5_prior_only": lambda: ShapeHeadForecaster(C=10.0, shape_strength=1e9),
+    "e5_s5": lambda: ShapeHeadForecaster(C=10.0, shape_strength=5),
+    "e5_s20": lambda: ShapeHeadForecaster(C=10.0, shape_strength=20),
+    "e5_s50": lambda: ShapeHeadForecaster(C=10.0, shape_strength=50),
+    "e5_s20_hl64": lambda: ShapeHeadForecaster(C=10.0, shape_strength=20, shape_half_life=64),
+    "e5_s20_size": lambda: ShapeHeadForecaster(C=10.0, shape_strength=20, size_inputs=True),
 }
 
 
