@@ -16,7 +16,7 @@ You have just been dropped into this repo with a task. The project may be early-
 under-documented, so **do not assume anything is set up.** Run this loop before touching code.
 
 ### A. Orient (read-only, ~2 minutes)
-1. Read this file, then skim: `README*`, `CHANGELOG.md`, the file tree, and whatever manifest exists
+1. Read this file, then skim: `README*`, `docs/` (skip `AGENT_KIT.md`, it only describes the agent files), `CHANGELOG.md`, the file tree, and whatever manifest exists
    (`requirements.txt`, `pyproject.toml`, `package.json`, `Makefile`, `.github/workflows/`).
 2. `git status`, `git branch --show-current`, `git log --oneline -10`. If the working tree is dirty
    with changes you did not make, stop and ask; never stash or discard them.
@@ -106,7 +106,7 @@ step B, and open questions. Then stop. Don't poll CI.
 
 ## 1. Golden rules (non-negotiable)
 
-1. **Never commit or push directly to `main`.** Every change lands through a PR/MR: branch, work, PR, approval, merge. **GitHub does not enforce this** (the repo is private on a free plan, so there is no branch protection), which makes it a rule you must follow yourself, not one the platform will stop you from breaking.
+1. **Never commit or push directly to `main`.** Every change lands through a PR: branch, work, PR, approval, merge. **GitHub does not enforce this** (the repo is private on a free plan, so there is no branch protection), which makes it a rule you must follow yourself, not one the platform will stop you from breaking.
 2. **One branch = one feature/fix = one PR.** No drive-by unrelated changes.
 3. **`main` must always be demo-able.** If it is broken, fixing it beats everything else.
 4. **Every PR updates `CHANGELOG.md` → `## [Unreleased]`** (unless it is purely `chore`/`ci`/`docs` with no user-visible effect, and even then adding a line is welcome).
@@ -130,7 +130,7 @@ git pull --ff-only origin main
 ```
 
 ### Step 1: Claim the work
-- Find or create an issue (GitHub Issue / GitLab Issue). Assign yourself.
+- Find or create an issue (GitHub Issue). Assign yourself.
 - If no issue tracker is in use, post in the team channel: "I'm taking X".
 
 ### Step 2: Create a branch
@@ -182,14 +182,11 @@ Add one line per user-visible change under `## [Unreleased]` in `CHANGELOG.md`, 
 - [ ] Commits follow Conventional Commits
 - [ ] If you learned something non-obvious → added to §12/§13 of this file
 
-### Step 7: Push and open the PR/MR
+### Step 7: Push and open the PR
 ```bash
 git push -u origin HEAD
 
-# GitHub
 gh pr create --base main --fill --title "feat: add Genie dashboard" --body-file .github/pull_request_template.md
-# GitLab
-glab mr create --target-branch main --fill --title "feat: add Genie dashboard"
 ```
 - **PR title = a Conventional Commit header** (it becomes the squash-merge commit).
 - Fill the PR template: what, why, how tested, changelog line, semver impact.
@@ -198,7 +195,7 @@ glab mr create --target-branch main --fill --title "feat: add Genie dashboard"
 
 ### Step 8: Wait for approval
 - Wait for **one approval** (a teammate's, or the human's own is fine) and **CI green** if CI exists.
-- **Agents:** after opening the PR, report the PR/MR link, CI status, and anything left for a human, then **stop**. Don't merge, and don't poll for minutes. If asked to check later: `gh pr checks` / `gh pr view --comments` (or `glab mr view`).
+- **Agents:** after opening the PR, report the PR link, CI status, and anything left for a human, then **stop**. Don't merge, and don't poll for minutes. If asked to check later: `gh pr checks` / `gh pr view --comments`.
 - Address review comments with **new commits** (don't rewrite history mid-review), reply to each comment, re-request review.
 - If CI fails: read the log (`gh run view --log-failed`), fix on the same branch, push.
 
@@ -242,7 +239,7 @@ conflict markers to make it go away, and never resolve by guessing.
 ## 4. Agent behavior rules
 - Read this file before starting any task. Re-read §2 before pushing.
 - State the plan briefly, then act. Work on **one** feature branch per task.
-- **Allowed without asking:** creating a feature branch, committing to it, running tests/linters, pushing the feature branch, opening a PR/MR.
+- **Allowed without asking:** creating a feature branch, committing to it, running tests/linters, pushing the feature branch, opening a PR.
 - **Ask first:** merging (only on the human's "merge" in chat, with approval and no conflicts, §2 Step 9), tagging/releasing, deleting branches, force-pushing, changing CI, adding a new dependency, touching another person's owned area, anything that costs money (cloud clusters, paid APIs), editing secrets/config.
 - **Never:** push to `main`, approve your own work, merge without the human's go-ahead, commit secrets, disable tests or CI checks, rewrite published history, run destructive commands on shared data (`DROP TABLE`, `rm -rf`, `DELETE` without `WHERE`) without explicit approval.
 - When done, report: branch name, PR link, test results (actual output summary), changelog line added, semver impact, open questions.
@@ -405,10 +402,12 @@ A task is done only when **all** are true:
 │   └── pull_request_template.md
 ├── .claude/commands/         ← /ship, /release, /changelog for Claude Code
 ├── CHANGELOG.md
+├── docs/
+│   └── AGENT_KIT.md          ← what each agent file is for
 ├── scripts/
 │   ├── next-version.sh       ← computes next semver from commits
 │   └── release.sh            ← rolls [Unreleased] into a version
-└── TODO: src/, notebooks/, pipelines/, tests/, docs/
+└── TODO: README.md, src/, notebooks/, pipelines/, tests/, docs/DEMO.md
 ```
 
 ---

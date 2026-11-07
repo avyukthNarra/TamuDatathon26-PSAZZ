@@ -1,5 +1,5 @@
 ---
-description: Ship a feature end-to-end (branch, implement, test, changelog, push, PR/MR) per AGENTS.md
+description: Ship a feature end-to-end (branch, implement, test, changelog, push, PR) per AGENTS.md
 argument-hint: <short description of the feature or fix>
 ---
 
@@ -13,5 +13,5 @@ Ship this change following AGENTS.md §2 exactly: **$ARGUMENTS**
 6. **Changelog:** add user-facing line(s) under `## [Unreleased]` in `CHANGELOG.md` in the right subsection. Commit as `docs(changelog): ...` or include in the feature commit.
 7. **Semver impact:** run `scripts/next-version.sh` and note what the next release would be.
 8. **Sync again:** `git fetch origin && git rebase origin/main` (resolve CHANGELOG conflicts by keeping both sides), re-run tests if anything changed.
-9. **Push + PR/MR:** `git push -u origin HEAD`, then `gh pr create` (GitHub) or `glab mr create` (GitLab) with a Conventional-Commit title and the filled `.github/pull_request_template.md`. Request a reviewer from the ownership table.
-10. **Stop.** Report: branch, PR/MR link, CI status (`gh pr checks` once), test output summary, changelog line, semver impact, open questions. Do **not** merge or tag.
+9. **Push + PR:** `git push -u origin HEAD`, then `gh pr create` with a Conventional-Commit title and the filled `.github/pull_request_template.md`. Request a reviewer from the ownership table.
+10. **Stop.** Report: branch, PR link, CI status (`gh pr checks` once), test output summary, changelog line, semver impact, open questions. Do **not** merge or tag.
