@@ -1,58 +1,44 @@
-# R0 train-only prior evaluation
+# R0 baseline
 
-Source scored: `avyukth/exp-r0-baseline` at `7261af44ededf71eeea10d9dbd3f461a88c18002`.
-The original `COMBINED_SOLUTIONS` route is PairMixer-only; its entry does not include a
-zhill rule blend. Its `run_pair_mixer.py` reads `validation/targets.csv` to derive priors,
-and `entry_template/predict.py` also reads those targets at runtime (lines 33–42) or loads
-the packaged validation-derived `priors.json` fallback. The score script uses the
-validation labels as intended for evaluation. R0 makes train histories the default source;
-validation priors remain available only as an explicit diagnostic option.
+Branch: `avyukth/exp-r0-baseline`; scored source: `7261af4`; original base: `COMBINED_SOLUTIONS@81d4fff`. Original predictions reproduced exactly (maximum difference 0). That branch contains a mixer, without zhill's rule blend.
 
-`slot_forecasting/train_priors.py` estimates win-prior centers using the discovered
-training lag-pair list: each machine contributes its strongest supported parity contrast
-with at least 20 observations in each cell and a smoothed separation of at least 0.3; the
-two mixture centers are medians across at least three qualifying machines. Size modes are
-estimated by selecting lag/orientation on one actual-tick parity and adding raw counts from
-the other parity, swapping halves; type distributions use 0.5 pseudocounts per class and
-are omitted if either held-out mode has no counts. This is a deliberately approximate
-cross-fit, not a guarantee that sparse or regime-mixed training histories recover the
-validation target modes. On this dataset the train win centers were 0.1398/0.7563, versus
-historical target-derived 0.0435/0.898.
-
-The original prediction CSV replayed with maximum probability difference 0 and exact
-55.337655509346384 / 60. Four frozen variants were compared against that cached historical
-mixer CSV; all used 1,000 condition-stratified episode bootstrap draws (seed 314159).
-
-| Variant | Full | Tuning | Audit | Tuning paired delta (95% CI) |
+| Priors / model | Full /60 | Tuning | Audit | Seconds |
 |---|---:|---:|---:|---:|
-| Historical priors, mixer | 55.338 | 55.026 | 55.704 | 0 (exact replay) |
-| Historical priors, 20% zhill blend | 55.578 | 55.256 | 55.956 | +0.230 [+0.012, +0.475] |
-| Train priors, mixer | 53.849 | 53.805 | 53.905 | -1.221 [-1.696, -0.689] |
-| Train priors, 20% zhill blend | 54.241 | 54.185 | 54.311 | -0.841 [-1.372, -0.252] |
+| Validation / mixer | 55.338 | 55.026 | 55.704 | 14.15 |
+| Validation / 20% rule blend | 55.578 | 55.256 | 55.956 | 33.92 |
+| Train / mixer | 53.849 | 53.805 | 53.905 | 13.89 |
+| Train / 20% rule blend | 54.241 | 54.185 | 54.311 | 33.44 |
 
-Full-validation raw probability errors by condition:
+Raw full-validation errors:
 
-| Variant | Stable | Short history | Drift | Shared change |
+| Same row order | Stable | Short | Drift | Shared |
 |---|---:|---:|---:|---:|
-| Historical priors, mixer | 0.013540 | 0.022982 | 0.012267 | 0.015171 |
-| Historical priors, 20% zhill blend | 0.011531 | 0.021370 | 0.012490 | 0.015048 |
-| Train priors, mixer | 0.019459 | 0.022385 | 0.022898 | 0.022800 |
-| Train priors, 20% zhill blend | 0.016210 | 0.022183 | 0.021188 | 0.021661 |
+| Validation mixer | .013540 | .022982 | .012267 | .015171 |
+| Validation blend | .011531 | .021370 | .012490 | .015048 |
+| Train mixer | .019459 | .022385 | .022898 | .022800 |
+| Train blend | .016210 | .022183 | .021188 | .021661 |
 
-Commands, per-variant full/tuning/audit condition metrics, bootstrap intervals and prediction
-CSVs are recorded in ignored `runs/harness_results.jsonl` and `runs/r0-comparison/`.
-The source baseline and priors are preserved in `runs/r0-original/`. The harness was run as:
+Originally, `entry_template/predict.py:33–42` read `validation/targets.csv` or validation-derived `priors.json`; `run_pair_mixer.py` also derived priors from validation targets. The new default, `--prior-source train`, uses training histories exclusively. Validation mode remains explicit and diagnostic; its constants are injected outside the model.
+
+Train win centers are .1398/.7563 versus validation-derived .0435/.898. Size modes cross-fit lag selection and counts across alternating training ticks. The train-only estimates lose performance; full-history regime averaging is a possible explanation, untested here.
+
+Each half contains 48 episodes. Paired bootstrap uses 1,000 condition-stratified draws, recomputing reference denominators. Validation-blend gains: tuning +.230 [95% CI +.012,+.475], audit +.252 [+.035,+.490]. All configurations were frozen before audit scoring.
+
+From `mainFiles`:
 
 ```sh
-PYTHONPATH=runs/r0-original python exp_harness.py --candidate validation_factories:make_historical_model --baseline-predictions runs/r0-original/validation_predictions.csv --data public --name r0-historical-mixer --out runs/r0-comparison/historical_mixer.csv --results runs/harness_results.jsonl
-PYTHONPATH=runs/r0-original python exp_harness.py --candidate validation_factories:make_historical_blend --baseline-predictions runs/r0-original/validation_predictions.csv --data public --name r0-historical-blend-20pct-rule --out runs/r0-comparison/historical_blend.csv --results runs/harness_results.jsonl
-python exp_harness.py --candidate r0_model:make_model --baseline-predictions runs/r0-original/validation_predictions.csv --data public --name r0-safe-mixer --out runs/r0-comparison/safe_mixer.csv --results runs/harness_results.jsonl
-python exp_harness.py --candidate r0_model:make_blend --baseline-predictions runs/r0-original/validation_predictions.csv --data public --name r0-safe-blend --out runs/r0-comparison/safe_blend.csv --results runs/harness_results.jsonl
+python exp_harness.py --candidate r0_model:make_blend --baseline r0_model:make_model --data public --name r0-safe-blend --out runs/r0-safe-blend.csv
 ```
 
-Historical factories inject the saved `original_priors.json` outside `CombinedForecaster`.
-The copied `rule_model.py` is byte-identical to `origin/zhill-branch@3bdf336`. Validation
-audit scores were computed only after the four settings were frozen; no test labels were
-read. Tests: 23 passed, including train-only target-read guard and isolated entry import.
-No lint configuration, CI workflow, or dependency manifest is present; the implementation
-uses the existing standard-library-only runtime. Tests ran with `python -m unittest discover -s tests`.
+Pipeline files (relative to `mainFiles`):
+
+- `r0_model.py`: fits mixer and optional blend.
+- `slot_forecasting/train_priors.py`: estimates training-only priors.
+- `slot_forecasting/pair_mixer.py`: online win/size experts.
+- `rule_model.py`: exact zhill rules from `3bdf336`.
+- `slot_forecasting/baseline.py`: rule-model frequency fallback.
+- `entry_template/predict.py`: submission CLI and prior-source switch.
+- `run_pair_mixer.py`: scores and packages entries.
+- `exp_harness.py`: scoring, bootstrap, JSONL logging.
+
+All split/condition metrics and intervals: `runs/harness_results.jsonl`; CSVs: `runs/r0-comparison/`. Tests: 23 passed; compile/diff checks passed. No lint/CI/manifest; standard-library only. Changelog updated; patch impact. Draft PR: https://github.com/avyukthNarra/TamuDatathon26-PSAZZ/pull/16
