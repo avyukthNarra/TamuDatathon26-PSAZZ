@@ -98,6 +98,64 @@ as the check. Upload runs/pair-mixer/submission.csv and runs/pair-mixer/entry.zi
 The shortcut, if the branch `COMBINED_SOLUTIONS` is available, is to check it out and
 run the VERIFY commands. The prompt above is for rebuilding without it.
 
+## What changed on `COMBINED_SOLUTIONS` (53.75 -> 54.21)
+
+Source: another team's write-up of their "rule model v4" (52.89 / 60). It scored worse than ours
+overall but better on **stable** (0.068 vs our 0.096). Every idea it had that our model didn't
+was scored with `tune_pair_mixer.py --val`. An idea was kept only if it improved BOTH
+train labels at the cutoff AND validation.
+
+**Kept: payout-size experts read the EXACT earlier payout, not just win/loss.**
+- Before: size experts keyed on `()`, `(1,)`, `(1,2)`, each cell = won/lost at those lags.
+- After: size experts keyed on `()`, `(1,)`, `(1,2)`, `(2,)`, `(2,3)`, each cell = the payout
+  class (0 / 1x / 2x / 5x / 20x) at those lags. New `PairMixer(size_cell=...)` option:
+  `"win"`, `"big"` (lost / 1-2x / 5-20x) or `"class"` (the default), or one per size key.
+- Why it works: once a machine wins, the SIZE of the win tends to follow the sizes of its
+  last one or two wins. Won/lost cells throw that information away.
+
+| Condition | Before | After | Their model |
+|---|---|---|---|
+| stable | 0.096 | **0.083** | 0.068 |
+| short_history | 0.151 | 0.151 | 0.208 |
+| drift | 0.104 | **0.093** | 0.130 |
+| shared_change | 0.114 | **0.100** | 0.132 |
+| **Points** | 53.75 | **54.21** | 52.89 |
+
+The steps that got there (train cutoff dR, negative = better; then validation):
+
+| Setting tried | Train dR [95% interval] | Validation |
+|---|---|---|
+| size cells = lost/small/big | +0.0082 [+0.001, +0.016] | 53.80 (rejected) |
+| size cells = exact payout | -0.0053 [-0.018, +0.009] | 54.07 |
+| + extra size key (2,) | -0.0119 [-0.026, +0.001] | 54.18 |
+| + extra size key (2,3) | **-0.0145 [-0.029, -0.001]** | **54.21** (kept: first interval clear of zero) |
+
+Not kept (no gain on both checks): single-lag experts (lag 7 / 7+8 / all 8), never-forget
+memory (half-life 1e9 or 200), blending 2-cell + 4-cell win experts, a stronger size prior
+(`k_machine` 80), size half-life 200. About 10 settings were scored on validation in this
+round, so 54.21 is slightly optimistic. The train-cutoff interval is the stronger evidence.
+
+Rebuild and check it (from `mainFiles/`):
+```sh
+python run_pair_mixer.py --out runs/combined
+python check_submission.py runs/combined/validation_predictions.csv --split validation   # 54.21
+python check_submission.py runs/combined/submission.csv   # SHA-256 068259d6...
+```
+
+### Reusable prompt: learn from another solution
+
+````text
+Here is another team's write-up of their solution: <path>. Compare it with our model
+(mainFiles/slot_forecasting/pair_mixer.py, current validation <score>). First list, per
+condition, where theirs beats ours. Then list every idea they use that we don't. Test each
+one with mainFiles/tune_pair_mixer.py '<json settings>' --val, adding an option to PairMixer
+if needed. Keep a change only if it improves BOTH the train-cutoff dR (ideally with the 95%
+interval below zero) AND validation. Stop when the next tweaks are within noise. Don't copy
+ideas that only help on validation. Work on a new branch, never main. Then update
+docs/MODEL_PROMPTS.md, CHANGELOG.md and AGENTS.md section 12, rebuild with run_pair_mixer.py,
+run the tests and check_submission.py, and commit and push.
+````
+
 ## What moved the score (in order)
 
 | # | Prompt / instruction that worked | What it led to | Validation |
