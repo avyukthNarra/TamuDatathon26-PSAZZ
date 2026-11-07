@@ -23,6 +23,7 @@ How to add an entry (every PR):
 
 ### Changed
 - Model outputs go to `mainFiles/runs/<name>/`, which is git-ignored, so prediction files are no longer committed; run docs updated to match
+- Playbook requires agents to delete branches with merged PRs (local and origin) after each merge (#6)
 - Playbook spells out PR flow: no pushes to `main`, one approval (own is fine), merge only when approved with no conflicts
 - Agents no longer flag unfilled project snapshot `TODO`s before kickoff; whoever adds a piece of the stack fills its row
 
