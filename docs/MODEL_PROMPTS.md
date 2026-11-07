@@ -57,6 +57,19 @@ especially in round two. Validation points are out of 60; the pooled baseline is
 
 ## For round two (the relationships change)
 
-Ask: "Re-run the lag-pair discovery on the round-two train data: which pairs are
-most common now? Refit the pair-mixer's pair list and half-life on round-two train
-outcomes, score on round-two validation once, then package."
+The entry already adapts: `predict.py` rediscovers the lag pairs on `/data/train`
+and picks match/differ vs 4-cell experts by train cutoff Brier. At 9 PM:
+
+```sh
+cd mainFiles
+python run_pair_mixer.py --data /path/to/round2/public --out runs/round2
+```
+
+It prints the pairs it found, the per-condition validation table, and builds a
+verified `runs/round2/entry.zip` plus `submission.csv`. Then prompt:
+
+- "Re-run the pair-count table on round-two train: is there still a clear gap after the
+  top pairs? Are the cells still match/differ (HLLH / LHHL)?"
+- "Use tune_pair_mixer.py on round-two data to re-check half_life and the size experts;
+  keep a change only if train cutoff dR and validation both improve."
+- "Split round-two validation error into win vs size part per condition before changing anything."

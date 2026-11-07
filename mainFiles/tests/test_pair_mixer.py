@@ -2,13 +2,13 @@
 import random
 import unittest
 
-from slot_forecasting.pair_mixer import CLASS_INDEX, PairMixer, discover_pairs
+from slot_forecasting.pair_mixer import CLASS_INDEX, PairMixer, adapt, choose_pairs, discover_pairs
 from slot_forecasting.schema import PAYOUTS, Play, Query
 
 MACHINES = ("e1-m0", "e1-m1", "e1-m2")
 
 
-def make_data(seed=1, cutoff=60, skip=(), rule=None):
+def make_data(seed=1, cutoff=60, skip=(), rule=None, lags=(1, 3)):
     rng = random.Random(seed)
     queries = tuple(Query(f"{m}-next", "e1", m, ("steady", "balanced", "jackpot")[i], (-1, 0, 1)[i], cutoff)
                     for i, m in enumerate(MACHINES))
@@ -16,8 +16,8 @@ def make_data(seed=1, cutoff=60, skip=(), rule=None):
     for m in MACHINES:
         won = {}
         for t in range(cutoff):
-            if rule and t >= 4:
-                win = (won[t - 1] == won[t - 3]) if rng.random() < 0.95 else rng.random() < 0.5
+            if rule and t >= max(lags):
+                win = (won[t - lags[0]] == won[t - lags[1]]) if rng.random() < 0.95 else rng.random() < 0.5
             else:
                 win = rng.random() < 0.5
             won[t] = win
@@ -86,6 +86,17 @@ class PairMixerTest(unittest.TestCase):
         expected = own[199] == own[197]
         self.assertGreater(predicted_win if expected else 1 - predicted_win, 0.8)
         self.assertEqual(discover_pairs(queries, history, top=1)[0][0], (1, 3))
+
+    def test_adapts_to_new_lag_pairs(self):
+        """Round two may use different pairs: rediscovery must find them and the mixer must use them."""
+        queries, history = make_data(seed=7, cutoff=220, rule=True, lags=(2, 6))
+        self.assertEqual(choose_pairs(queries, history), ((2, 6),))
+        labels = {q.query_id: 0 for q in queries}
+        model = adapt(queries, history, labels, log=lambda *_: None)
+        self.assertEqual(model.pairs, ((2, 6),))
+        won = {p.tick: p.payout > 0 for p in history if p.machine_id == "e1-m1"}
+        predicted_win = 1 - model.predict(queries, history)["e1-m1-next"][0]
+        self.assertGreater(predicted_win if won[218] == won[214] else 1 - predicted_win, 0.8)
 
 
 if __name__ == "__main__":

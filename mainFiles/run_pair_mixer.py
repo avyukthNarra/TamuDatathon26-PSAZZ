@@ -18,8 +18,8 @@ from pathlib import Path
 from time import perf_counter
 
 from slot_forecasting.contest import score_contest_files
-from slot_forecasting.io import load_inputs, read_submission, read_targets, write_json, write_submission
-from slot_forecasting.pair_mixer import PairMixer
+from slot_forecasting.io import load_inputs, read_labels, read_submission, read_targets, write_json, write_submission
+from slot_forecasting.pair_mixer import adapt
 from slot_forecasting.rounds import VERSION, round_metadata
 from slot_forecasting.starter import public_directory
 from slot_forecasting.submission_contract import package_code
@@ -37,7 +37,7 @@ public = public_directory(args.data)
 out = Path(args.out).expanduser().resolve()
 out.mkdir(parents=True, exist_ok=True)
 train_queries, train_history = load_inputs(public / "train")
-model = PairMixer().fit(train_queries, train_history)
+model = adapt(train_queries, train_history, read_labels(public / "train/labels.csv", train_queries))
 files = {"validation": out / "validation_predictions.csv", "test": out / "submission.csv"}
 for split, path in files.items():
     queries, history = load_inputs(public / split)
@@ -100,9 +100,10 @@ Run from the archive root:
 python predict.py --data /data --out /output/submission.csv
 ```
 
-- What it does: fits payout-size priors per machine type on `/data/train`, then
-  predicts every `/data/test` query with a per-machine online mixture of lag-pair
-  experts. Each expert tracks, with exponential forgetting, how often the machine
+- What it does: on `/data/train` it rediscovers which lag pairs drive wins, picks
+  match/differ (2-cell) vs 4-cell experts by Brier on `train/labels.csv` at the
+  cutoff, and fits payout-size priors per machine type; then it predicts every
+  `/data/test` query with a per-machine online mixture of lag-pair experts. Each expert tracks, with exponential forgetting, how often the machine
   won when its results at two earlier lags matched vs differed; experts are
   weighted by their recent squared error. Only ticks before each cutoff are read.
 - Model files: none (the command refits in about a second).

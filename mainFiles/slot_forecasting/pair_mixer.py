@@ -274,3 +274,32 @@ def discover_pairs(queries, history, top=None):
         if best is not None:
             winners[best] += 1
     return winners.most_common(top)
+
+
+def choose_pairs(queries, history, min_share=0.3):
+    """Lag pairs used by many machines: count >= min_share x the most common pair's count."""
+    found = discover_pairs(queries, history)
+    if not found:
+        return DEFAULT_PAIRS
+    top = found[0][1]
+    return tuple(sorted(pair for pair, count in found if count >= min_share * top))
+
+
+def cutoff_brier(model, queries, history, labels):
+    """Mean 5-class Brier vs labels.csv outcomes at each query's cutoff tick."""
+    predictions = model.predict(queries, history)
+    return math.fsum(math.fsum((p - (1.0 if PAYOUTS[k] == labels[q] else 0.0)) ** 2
+                               for k, p in enumerate(predictions[q])) for q in labels) / len(labels)
+
+
+def adapt(queries, history, labels=None, log=print):
+    """Round-two helper: rediscover the lag pairs and pick the cell mode on this round's train data."""
+    pairs = choose_pairs(queries, history)
+    log(f"lag pairs found on train: {pairs}")
+    candidates = [PairMixer(pairs=pairs, cell_mode=mode).fit(queries, history) for mode in ("parity", "full")]
+    if labels is None:
+        return candidates[0]
+    scores = [cutoff_brier(model, queries, history, labels) for model in candidates]
+    for model, score in zip(candidates, scores):
+        log(f"cell_mode={model.cell_mode[0]}: train cutoff Brier {score:.5f}")
+    return candidates[scores.index(min(scores))]
