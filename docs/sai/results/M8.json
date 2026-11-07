@@ -1,0 +1,69 @@
+{
+ "id": "M8",
+ "owner": "claude-w2",
+ "description": "HMM regime posterior as ridge row weights",
+ "params": {
+  "K": 3,
+  "stay": 0.995,
+  "power": 1,
+  "floor": 0.1,
+  "mode": "hmm*b3"
+ },
+ "scope": "dev",
+ "points": 44.88695466041362,
+ "ci95": [
+  43.62509148273444,
+  46.03733968245694
+ ],
+ "condition_ratios": {
+  "stable": 0.1467574811254007,
+  "short_history": 0.34395158520941843,
+  "drift": 0.44310353929769297,
+  "shared_change": 0.4129524359188378
+ },
+ "R": 0.3366912603878375,
+ "class_error_shares": {
+  "p_0": 0.5962980556963321,
+  "p_1": 0.22514468209300498,
+  "p_2": 0.1338228433705254,
+  "p_5": 0.04104160613159364,
+  "p_20": 0.0036928127085438314
+ },
+ "runtime_seconds": 0.12664133400539868,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": 0.0,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "extra": {
+  "vs_B3": {
+   "diff": -0.9355299571780265,
+   "ci95": [
+    -1.3187163045066013,
+    -0.6233714262498883
+   ]
+  },
+  "blend_gain": {
+   "points": 45.82248461759165,
+   "ci95": [
+    44.74847632985979,
+    46.90060343816345
+   ],
+   "vs_base": {
+    "diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ]
+   },
+   "w_mean": 0.0
+  },
+  "cond_ratio_diff_vs_B3": {
+   "stable": 0.028894305529556463,
+   "short_history": 0.0,
+   "drift": 0.04419242241433202,
+   "shared_change": 0.036074940440264824
+  },
+  "grid_cells_completed": 34
+ }
+}

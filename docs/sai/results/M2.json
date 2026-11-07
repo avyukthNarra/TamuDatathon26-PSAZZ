@@ -1,0 +1,69 @@
+{
+ "id": "M2",
+ "owner": "claude-w2",
+ "description": "fixed-share over half-life experts replacing holdout argmin",
+ "params": {
+  "pool": "B3",
+  "window": 180,
+  "eta": 2,
+  "a": 0.01,
+  "out": "argmax"
+ },
+ "scope": "dev",
+ "points": 46.08305442181729,
+ "ci95": [
+  45.03977783062122,
+  47.05689527273868
+ ],
+ "condition_ratios": {
+  "stable": 0.09038972469581336,
+  "short_history": 0.34395158520941843,
+  "drift": 0.39891111688336095,
+  "shared_change": 0.37473569403301316
+ },
+ "R": 0.3019970302054015,
+ "class_error_shares": {
+  "p_0": 0.5851029340811387,
+  "p_1": 0.22783717987807242,
+  "p_2": 0.13938687482576428,
+  "p_5": 0.043637399705528115,
+  "p_20": 0.004035611509496357
+ },
+ "runtime_seconds": 0.4200559579912806,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": 0.0,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "extra": {
+  "vs_B3": {
+   "diff": 0.26056980422563925,
+   "ci95": [
+    0.022474973827234023,
+    0.6855391319045134
+   ]
+  },
+  "blend_gain": {
+   "points": 46.07621027580042,
+   "ci95": [
+    45.0285413926024,
+    47.05546311532196
+   ],
+   "vs_base": {
+    "diff": 0.25372565820877213,
+    "ci95": [
+     0.02252910433167301,
+     0.6633187022458805
+    ]
+   },
+   "w_mean": 0.9833333333333334
+  },
+  "cond_ratio_diff_vs_B3": {
+   "stable": -0.027473450900030894,
+   "short_history": 0.0,
+   "drift": 0.0,
+   "shared_change": -0.00214180144555981
+  },
+  "grid_cells_completed": 240
+ }
+}

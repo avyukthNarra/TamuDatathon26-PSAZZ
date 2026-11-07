@@ -83,3 +83,16 @@ not help, so the late-tick bias hypothesis from entry 6 is NOT confirmed (p_0 bi
 may be episode-level base-rate shift between train and validation). Combining all three was worse
 than LAGRESP alone, likely noise-level (~0.2) or the weighting hurting. Keep LAGRESP, drop TICK/WEIGHT.
 Not checked: multiple seeds. Differences under ~0.2 should be treated as noise.
+
+## 2026-11-07 master test (docs/sai, branch sai/master-test). Scope dev (72 episodes); B3 = 45.82 [44.75,46.90]
+
+### W2 memory (M1-M10), worker report reviewed, M2/M3/M8/M9 re-scored by the lead through the harness
+- M2 fixed-share and M3 DMA: 46.08 / 46.09, +0.26 [+0.02,+0.69] vs B3, all of it in stable (0.118 -> 0.090). The gain
+  comes from a 180-tick window (almost the whole history), i.e. picking hl=inf more often. Verdict helps, marginal
+  (best cell picked on dev). M2 and M3 are one effect.
+- Nothing else beats B3's holdout memory. Hard change-point windows (BOCPD MAP 36.8, ADWIN 34.6) are far worse; they
+  only reach B3 when multiplied onto its weights. HMM hurts every condition (-0.94). Half-lives 4-12 hurt again at every holdout.
+- M9 (episode-shared BOCPD): shared_change 0.375 -> 0.350 (0.303 in pure-survival cells) but drift 0.40 -> 0.63 in those
+  cells. Alive; follow-up is a peer-agreement gate.
+- M10 Kalman half-life disagrees with B3's choice (corr 0.00) yet B3's choice is what scores well; no corroboration.
+- Takeaway: B3's memory is near a plateau. Verdicts: helps M2,M3; alive M9; neutral M1,M4,M5,M7; hurts M6,M8,M10.
