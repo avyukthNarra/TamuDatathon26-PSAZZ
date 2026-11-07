@@ -24,6 +24,7 @@ from harness.scoring import scope_episodes, _prep
 from harness.stack_w5 import parts, combine
 
 OUT = HERE / 'combos'
+PREDOUT = HERE / 'preds'
 POOL = ['TM_RULE', 'TM_MIXER3', 'TM_MIXER4', 'TM_ZPOOL', 'TM_AVYCOMBO',
         'C1', 'C2', 'M9b_B4', 'S5_B4', 'TM_E67', 'TM_COMBINED3']
 STDLIB = {'TM_RULE', 'TM_MIXER3', 'TM_MIXER4', 'TM_ZPOOL', 'TM_COMBINED3'}
@@ -160,14 +161,16 @@ def dev():
         results.append({'id': f'{family}:' + '+'.join(members), 'family': family, 'members': members,
                         'weights': weights_dict(members, family, x), 'weight_vector': x.tolist(),
                         'fold_weights': per_fold, 'dev': evaluate(p, v, 'dev', bootstrap=0),
-                        'stdlib_only': set(members) <= STDLIB})
+                        'stdlib_only': {n for j, n in enumerate(members) if x[j] > 1e-8 or (family == 'factorised' and x[j+len(members)] > 1e-8)} <= STDLIB})
         oofs.append(p)
         if i % 30 == 0:
             print('OOF', i, '/', len(specs), flush=True)
     order = sorted(range(len(results)), key=lambda i: (-results[i]['dev']['points'], results[i]['id']))
     best = oofs[order[0]]
     # CIs from the shared harness, not uncertainty across machine rows.
-    for i in order:
+    for position, i in enumerate(order):
+        if position % 100 == 0:
+            print('bootstrap', position, '/', len(order), flush=True)
         results[i]['dev'] = evaluate(oofs[i], v, 'dev')
         results[i]['vs_reference'] = diff_ci(oofs[i], reference, v, 'dev')
         results[i]['vs_best'] = diff_ci(oofs[i], best, v, 'dev')
@@ -196,13 +199,12 @@ def dev():
         print('nested fold', f, 'selected', results[chosen]['id'], flush=True)
     top = []
     # Suppress numerical copies caused by zero-weight extra members. Keep
-    # distinct structures whose actual OOF or deployed forecasts differ.
+    # distinct deployed forecasts, retaining every structure in the record.
     finals = []
     for i in order:
         family, sub = specs[i]
         full = forecast(A[list(sub)], family, np.array(results[i]['weight_vector']))
-        duplicate = any(np.max(np.abs(oofs[i][rr]-oofs[j][rr])) < 1e-5 and
-                        np.max(np.abs(full[rr]-p[rr])) < 1e-5 for j, p in finals)
+        duplicate = any(np.max(np.abs(full[rr]-p[rr])) < 1e-5 for j, p in finals)
         if duplicate:
             continue
         finals.append((i, full))
@@ -211,10 +213,10 @@ def dev():
             break
     for rank, (i, p) in enumerate(finals, 1):
         results[i]['rank'] = rank
-        to_csv(HERE / 'preds' / f'COMBO_{rank}_validation.csv', v, p)
+        to_csv(PREDOUT / f'COMBO_{rank}_validation.csv', v, p)
         to_csv(OUT / f'COMBO_{rank}_oof_validation.csv', v, oofs[i])
     source_hashes = {n: hashlib.sha256((HERE / 'preds' / f'{n}_validation.csv').read_bytes()).hexdigest() for n in names}
-    hashes = {str(rank): hashlib.sha256((HERE / 'preds' / f'COMBO_{rank}_validation.csv').read_bytes()).hexdigest() for rank in range(1, 11)}
+    hashes = {str(rank): hashlib.sha256((PREDOUT / f'COMBO_{rank}_validation.csv').read_bytes()).hexdigest() for rank in range(1, 11)}
     doc = {'seed': SEED, 'folds': fold, 'members': names, 'missing_members': sorted(set(POOL)-set(names)),
            'source_sha256': source_hashes, 'prediction_sha256': hashes,
            'reference_dev': evaluate(reference, v, 'dev'),
@@ -234,7 +236,7 @@ def audit():
     for n, h in doc['source_sha256'].items():
         assert hashlib.sha256((HERE / 'preds' / f'{n}_validation.csv').read_bytes()).hexdigest() == h
     for rank, h in doc['prediction_sha256'].items():
-        assert hashlib.sha256((HERE / 'preds' / f'COMBO_{rank}_validation.csv').read_bytes()).hexdigest() == h
+        assert hashlib.sha256((PREDOUT / f'COMBO_{rank}_validation.csv').read_bytes()).hexdigest() == h
     log = HERE / 'results/audit_access.log'
     if log.exists() and any(line.rstrip().endswith('\tCOMBO_TOP10') for line in log.read_text().splitlines()):
         raise RuntimeError('COMBO_TOP10 audit already appears in access log.')
@@ -244,7 +246,7 @@ def audit():
     v = load_split('validation')
     scores = {}
     for name in ['TM_COMBINED3'] + [f'COMBO_{i}' for i in range(1, 11)]:
-        p = read_pred_csv(HERE / 'preds' / f'{name}_validation.csv', v)
+        p = read_pred_csv((PREDOUT if name.startswith('COMBO_') else HERE / 'preds') / f'{name}_validation.csv', v)
         scores[name] = evaluate(p, v, 'audit', who='COMBO_TOP10')
         print(name, scores[name]['points'], flush=True)
         (OUT / 'audit.partial.json').write_text(json.dumps(scores, indent=2) + '\n')
@@ -258,5 +260,10 @@ if __name__ == '__main__':
             raise RuntimeError(f'Set {key}=1 for shared-machine jobs.')
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=['dev', 'audit'])
+    parser.add_argument('--out', type=Path, default=OUT, help='New directory for dev replay; frozen default refuses changes after audit.')
     args = parser.parse_args()
+    OUT = args.out.resolve()
+    PREDOUT = HERE / 'preds' if OUT == HERE / 'combos' else OUT / 'preds'
+    OUT.mkdir(parents=True, exist_ok=True)
+    PREDOUT.mkdir(parents=True, exist_ok=True)
     (dev if args.mode == 'dev' else audit)()

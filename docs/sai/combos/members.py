@@ -5,6 +5,7 @@ Run each mode in a fresh process to isolate teammate module names.
 """
 import argparse
 import json
+import signal
 import sys
 from pathlib import Path
 
@@ -16,6 +17,11 @@ def main():
     mode = argparse.ArgumentParser()
     mode.add_argument('member', choices=['mixer4', 'zpool', 'autotune', 'avycombo'])
     args = mode.parse_args()
+    if args.member == 'avycombo':
+        def timed_out(*_):
+            raise TimeoutError('Optional adaptive combo exceeded the 15-minute limit.')
+        signal.signal(signal.SIGALRM, timed_out)
+        signal.alarm(900)
     sys.path.insert(0, str(ROOT / 'worktrees/_tm' / args.member / 'mainFiles'))
     sys.path.insert(1, str(HERE))
     import numpy as np
