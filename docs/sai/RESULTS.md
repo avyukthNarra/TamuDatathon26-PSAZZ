@@ -67,6 +67,8 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | L1 | claude-w1 | 50.87 | 49.77-51.90 | 0.107 | 0.225 | 0.203 | 0.183 | 0 | 0.0 |
 | L6 | claude-w1 | 50.77 | 49.75-51.74 | 0.108 | 0.216 | 0.214 | 0.189 | 0 | 0.0 |
 | L9 | claude-w1 | 50.77 | 49.75-51.74 | 0.108 | 0.216 | 0.214 | 0.189 | 0 | 0.0 |
+| TM_E67 | teammates | 50.02 | 48.87-51.10 | 0.173 | 0.222 | 0.215 | 0.187 | 0 | None |
+| TM_E7 | teammates | 49.42 | 48.13-50.76 | 0.203 | 0.225 | 0.217 | 0.211 | 0 | None |
 | L7 | claude-w1 | 49.34 | 47.54-50.80 | 0.106 | 0.201 | 0.299 | 0.258 | 1 | 0.0 |
 | TM_E6 | teammates | 47.69 | 46.32-49.00 | 0.207 | 0.327 | 0.277 | 0.222 | 0 | None |
 | S2 | codex | 46.77 | 45.66-47.86 | 0.115 | 0.329 | 0.357 | 0.331 | 25 | 0.0 |
@@ -182,5 +184,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | TM_MIXER | Pranav pair mixer | teammates | helps | results/TM_MIXER.json; dev 53.87 [52.8,54.9], +1.79 [+0.98,+2.63] vs our C2; audit 55.20; stdlib only; their win model (p0 share .45 vs our .54) is much better on drift (.096 vs .184) and shared_change |
 | TM_RULE | zhill rule model v4 | teammates | helps | results/TM_RULE.json; dev 52.89, +0.81 [-0.19,+1.76] vs C2; best stable (.057); audit 52.85 |
 | TM_E6 | Avyukth E6 signed-L1 logistic | teammates | neutral | results/TM_E6.json; dev 47.69, below B4; adds +0.22 [+0.02,+0.41] to C2 as a blend member (w .17); his E7 neural net not run (no torch locally); his blend claims 50.02 on a different 48-episode audit split |
+| TM_E7 | Avyukth E7 neural context | teammates | neutral | results/TM_E7.json; dev 49.42 [48.2,50.7]; -4.72 vs TM_COMBINED; adds +0.03 [-0.04,+0.11] to it (w .09); short_history .225 much better than his E6 (.327) as he claimed; needs torch |
+| TM_E67 | Avyukth final entry: E6+E7 50/50 | teammates | neutral | results/TM_E67.json; dev 50.02 [49.0,51.1] (his own audit claim 50.02 on a different split); -4.12 vs TM_COMBINED; blend weight 0 into it; needs torch==2.9.1 |
 
-Counts: alive 10, baseline 5, helps 18, hurts 7, neutral 28
+Counts: alive 10, baseline 5, helps 18, hurts 7, neutral 30

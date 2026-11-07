@@ -395,5 +395,17 @@
   "teammates",
   "neutral",
   "dev 47.69, below B4; adds +0.22 [+0.02,+0.41] to C2 as a blend member (w .17); his E7 neural net not run (no torch locally); his blend claims 50.02 on a different 48-episode audit split"
+ ],
+ "TM_E7": [
+  "Avyukth E7 neural context",
+  "teammates",
+  "neutral",
+  "dev 49.42 [48.2,50.7]; -4.72 vs TM_COMBINED; adds +0.03 [-0.04,+0.11] to it (w .09); short_history .225 much better than his E6 (.327) as he claimed; needs torch"
+ ],
+ "TM_E67": [
+  "Avyukth final entry: E6+E7 50/50",
+  "teammates",
+  "neutral",
+  "dev 50.02 [49.0,51.1] (his own audit claim 50.02 on a different split); -4.12 vs TM_COMBINED; blend weight 0 into it; needs torch==2.9.1"
  ]
 }

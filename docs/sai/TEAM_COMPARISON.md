@@ -12,7 +12,7 @@ ours on dev only, so the comparison slightly favors them.
 | TM_RULE (zhill rule model v4) | `zhill-branch` | 52.89 | 52.85 | best on stable (.057 dev) |
 | Our W5 stack | `sai/master-test` | 52.32 (OOF) | 54.09 [53.08,54.90] | needs numpy/scipy |
 | Our C2 | `sai/master-test` | 52.09 | 53.77 | |
-| TM_E6 (Avyukth signed-L1 logistic) | `avyukth/entry-final` | 47.69 | 50.37 | his E7 neural net not run (no torch here) |
+| TM_E67 (Avyukth final: 50/50 E6 + E7 neural) | `avyukth/entry-final` | 50.02 [49.0,51.1] | not scored | E7 alone 49.42, E6 alone 47.69 (audit 50.37); torch 2.9.1 (installed in an isolated venv) |
 
 TM_COMBINED minus our C2 on audit: +1.59 (CI +0.91, +2.24). Our team stack (members of both) is only +0.15 over TM_COMBINED on dev OOF (CI -0.05,+0.34).
 **The teammates' combined model is the best model found so far, not ours.**
@@ -20,7 +20,7 @@ TM_COMBINED minus our C2 on audit: +1.59 (CI +0.91, +2.24). Our team stack (memb
 ## Who found what (self-reported unless marked re-scored)
 - **Pranav (`pranav/*`, `COMBINED_SOLUTIONS`)**: lag-feature model (superseded) then the *pair mixer*: rediscovers lag pairs on each round's train (found (1,3),(2,5),(4,7), same as ours), one "did the two lags match or differ" cell per pair (pools XOR evidence, half the data), two memories (half-lives 12 and 40), size experts keyed on exact earlier payouts. Self: 53.35 -> 53.75 -> 54.21. Re-scored 53.87 dev / 55.20 audit.
 - **zhill (`zhill-branch`)**: rule model (searches all 37 lag rules per machine, size rules): 52.89 self, re-scored 52.89 dev (matches). Blended 20/80 with the mixer: 54.45 self, re-scored 54.14 dev / 55.37 audit. Weight chosen on validation; independent train-Brier check preferred the mixer alone.
-- **Avyukth (`avyukth/*`, `avy` docs)**: E1-E11 experiments on a different 48/48 split. E6 signed-L1 interaction logistic 48.2 audit (+8 over 0/1 coding, same structure insight), E7 neural hypernetwork over prefix statistics 49.0 audit, blend 50.0. E1-E5, E8-E11 (0/1 pair logistic, trees, memory selection, shape head) 36-40, not re-run. Re-scored E6 only: 47.69 dev on our split (his 48.5 tuning on his split). Entry `entry-final` needs torch; his own results are below the other two lineages.
+- **Avyukth (`avyukth/*`, `avy` docs)**: E1-E11 experiments on a different 48/48 split. E6 signed-L1 interaction logistic 48.2 audit (+8 over 0/1 coding, same structure insight), E7 neural hypernetwork over prefix statistics 49.0 audit, blend 50.0. E1-E5, E8-E11 (0/1 pair logistic, trees, memory selection, shape head) 36-40, not re-run. Re-scored E6 (47.69 dev, 50.37 audit) and E7 (49.42 dev) and his final E6+E7 blend (50.02 dev) on our split after installing torch: all about 4 points below TM_COMBINED, and they add nothing to it as blend members (weights 0 to 0.09). His E1-E5, E8-E11 were not re-run (self-reported 36-40).
 - **Codex (our W3/W4, `codex/w3-w4`)**: E1-E5, S1-S8 on the old B3 base, none adds to B4; a B4-based rerun (S5_B4 soft-target distillation) was pushed late and is not analysed here.
 
 ## Why theirs beats ours (hypotheses, partly tested)
