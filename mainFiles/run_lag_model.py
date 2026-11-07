@@ -1,6 +1,6 @@
 """Train the lag-feature model on every past spin, score it on validation, write a submission.
 
-Usage:  python run_lag_model.py --out lag-run [--blend 0.8] [--learning-rate 0.01] [--epochs 6]
+Usage:  python run_lag_model.py --out runs/lag-model [--blend 0.8] [--learning-rate 0.01] [--epochs 6]
 Prints the validation score per condition next to the pooled baseline's.
 """
 import argparse
@@ -16,7 +16,7 @@ from slot_forecasting.starter import public_directory
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", default=str(Path(__file__).resolve().parent / "public"))
-parser.add_argument("--out", default="lag-run")
+parser.add_argument("--out", default="runs/lag-model")
 parser.add_argument("--epochs", type=int, default=6)
 parser.add_argument("--learning-rate", type=float, default=0.01)
 parser.add_argument("--l2", type=float, default=1e-5)
