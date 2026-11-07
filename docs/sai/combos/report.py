@@ -102,7 +102,7 @@ def main():
         'Ranking is fixed on dev; numerical copies from zero-weight padding are suppressed only when full-fit dev predictions differ by <1e-5 in every probability. Among deployment-equivalent structures, the highest OOF structure represents the group. '
         'All 660 structures, including copies, remain in results.json.',
         '',
-        f"A separate genuinely nested selector uses three inner episode folds to choose a structure within each of the six outer training sets, "
+        f"A separate nested selector uses three inner episode folds to choose a structure within each of the six outer training sets, "
         f"then fits that structure there and scores the untouched outer fold. Its dev result is {score(data['selection']['dev'])}, "
         f"delta {difference(data['selection']['vs_reference'])}. This evaluates the selection procedure; it is not substituted for any fixed structure’s OOF number. "
         'Inherited member training/tuning is not rerun inside these folds, so neither number removes member-level leakage. '
