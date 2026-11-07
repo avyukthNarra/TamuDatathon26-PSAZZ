@@ -21,6 +21,23 @@ class AdaptiveMemorySelectorTests(unittest.TestCase):
         self.assertEqual(diagnostics["eligible_rows"], 28)
         self.assertLess(max(diagnostics["prequential_ticks"]), 28)
 
+    def test_prequential_prediction_does_not_use_its_current_label(self):
+        ticks = np.arange(40)
+        X = np.column_stack((np.ones(40), ticks / 40))
+        y = (ticks % 3 == 0).astype(int)
+        selector = AdaptiveMemorySelector(half_lives=(None,), Cs=(1,), min_train=8)
+
+        _, original = selector.predict_win(X, y, ticks, [1, 1], cutoff=40)
+        changed = y.copy()
+        changed[20] = 1 - changed[20]
+        _, altered = selector.predict_win(X, changed, ticks, [1, 1], cutoff=40)
+        prediction_at_20 = lambda result: next(
+            row["probabilities"]["half_life=none,C=1"]
+            for row in result["prequential_predictions"] if row["tick"] == 20
+        )
+
+        self.assertEqual(prediction_at_20(original), prediction_at_20(altered))
+
     def test_recency_weights_use_tick_distance_across_gaps(self):
         ticks = np.array([1, 3, 8, 10])
         X = np.column_stack((np.ones(4), np.arange(4)))
@@ -45,6 +62,24 @@ class AdaptiveMemorySelectorTests(unittest.TestCase):
         self.assertTrue(np.isfinite(probability))
         self.assertAlmostEqual(probability, (3 + 2 * 0.25) / 5)
         self.assertTrue(diagnostics["fallback"])
+
+    def test_forecaster_uses_train_prior_and_filters_future_ticks(self):
+        from mainFiles.slot_forecasting.adaptive_memory import AdaptiveMemoryForecaster
+
+        model = AdaptiveMemoryForecaster(
+            lags=2, pairs=False, half_lives=(None,), Cs=(1,), min_train=4,
+            max_eval_rows=8, eval_stride=1,
+        )
+        model.base.global_prior = (0.25, 0.25, 0.2, 0.2, 0.1)
+        history = {tick: (tick % 2) for tick in range(20)}
+        extended = {**history, 20: 1, 21: 1}
+
+        first = model.win_probability(history, 20)
+        second = model.win_probability(extended, 20)
+
+        self.assertEqual(first, second)
+        key = (20, tuple(sorted(history.items())))
+        self.assertEqual(model.selection_diagnostics[key]["eligible_rows"], 18)
 
 
 if __name__ == "__main__":
