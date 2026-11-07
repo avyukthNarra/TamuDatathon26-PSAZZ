@@ -19,6 +19,7 @@ How to add an entry (every PR):
 ## [Unreleased]
 
 ### Added
+- Episode-pooled PairMixer memory option for the zhill blend experiment (tuning-only)
 - Lag-pair mixer forecaster with a verified, reproducible entry ZIP (`mainFiles/run_pair_mixer.py`); validation 53.75 / 60
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 - House Edge rule model (v4): per-machine lag-pair win rules plus payout-size rules, 52.89 / 60 on validation vs 30.83 for the best starter, with a one-command entry builder for main and round two
