@@ -286,5 +286,50 @@
   "claude",
   "helps",
   "+0.25 [+0.12,+0.40] (lead re-scored 46.07); 298-cell search so ~0.25 selection optimism; drift -0.009 [-0.014,-0.003], shared_change -0.020 [-0.036,-0.006], stable 0.000; k=3 +0.21, k=1,4 weaker; validate on audit"
+ ],
+ "B4": [
+  "B4 = L2 structure (lam 0.05, lag 7 + 3 pairs); new base for all further tests",
+  "claude",
+  "baseline"
+ ],
+ "A9": [
+  "severity-given-win with lag features on the B4 base (new, from L-report finding that size is ~half the error)",
+  "claude",
+  "alive"
+ ],
+ "M1_B4": [
+  "holdout-selected half-life variants (holdout length, grid, floor) rebased onto B4",
+  "claude",
+  "alive"
+ ],
+ "M2_B4": [
+  "fixed-share over half-lives rebased onto B4",
+  "claude",
+  "alive"
+ ],
+ "M3_B4": [
+  "dynamic model averaging rebased onto B4",
+  "claude",
+  "alive"
+ ],
+ "M9b_B4": [
+  "M9b rebased onto B4",
+  "claude",
+  "alive"
+ ],
+ "A1_B4": [
+  "type-level Dirichlet smoothing, alpha 2/8/24/64 rebased onto B4",
+  "claude",
+  "alive"
+ ],
+ "A4_B4": [
+  "class-specific half-life and alpha rebased onto B4",
+  "claude",
+  "alive"
+ ],
+ "A6_B4": [
+  "prior strength scaled by effective sample size rebased onto B4",
+  "claude",
+  "alive"
  ]
 }

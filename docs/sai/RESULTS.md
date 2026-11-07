@@ -8,6 +8,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | ID | owner | points | CI95 | stable | short | drift | shared | sec | det |
 |---|---|---|---|---|---|---|---|---|---|
 | L5 | claude-w1 | 51.09 | 50.03-52.04 | 0.109 | 0.206 | 0.201 | 0.181 | 0 | 0.0 |
+| B4 | claude-w1 | 50.89 | 49.85-51.87 | 0.106 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
 | L2 | claude-w1 | 50.89 | 49.85-51.87 | 0.106 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
 | L3 | claude-w1 | 50.88 | 49.84-51.86 | 0.106 | 0.216 | 0.211 | 0.184 | 0 | 0.0 |
 | L1 | claude-w1 | 50.87 | 49.77-51.90 | 0.107 | 0.225 | 0.203 | 0.183 | 0 | 0.0 |
@@ -50,10 +51,15 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | A6 | prior strength scaled by effective sample size | claude | neutral | results/A6.json; +0.16 [+0.07,+0.27] ties fixed alpha 64; best at grid edge (a0=32, g=-1); a0>32 untested |
 | A7 | factorized win-rate x severity blended with direct 5-class | claude | neutral | results/A7.json; factorized B3 split is already the best; blending direct 5-class hurts (43.1 at w=0.25) |
 | A8 | leave-one-out episode / episode-type shrinkage | claude | neutral | results/A8.json; peer shares only hurt as weight grows; best cell is the no-peer alpha 64 control |
+| A9 | severity-given-win with lag features on the B4 base (new, from L-report finding that size is ~half the error) | claude | alive | - |
+| A1_B4 | type-level Dirichlet smoothing, alpha 2/8/24/64 rebased onto B4 | claude | alive | - |
+| A4_B4 | class-specific half-life and alpha rebased onto B4 | claude | alive | - |
+| A6_B4 | prior strength scaled by effective sample size rebased onto B4 | claude | alive | - |
 | B0 | starter pooled (reference) | claude | baseline | results/B0.json |
 | B1 | pooled_recent | claude | baseline | - |
 | B2 | GB, HL 4/16/64/128 + LAGRESP (mainFiles/experiments/gb_proto.py) | claude | baseline | - |
 | B3 | pair-model prototype | claude | baseline | results/B3.json |
+| B4 | B4 = L2 structure (lam 0.05, lag 7 + 3 pairs); new base for all further tests | claude | baseline | results/B4.json |
 | E1 | recent residual pooling across peer machines | codex | alive | - |
 | E2 | cosine-similarity subgroup pooling; pool by type and signal | codex | alive | - |
 | E3 | episode-level drift stats as features | codex | alive | - |
@@ -79,6 +85,10 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | M9 | changepoints shared across an episode's machines | claude | helps | results/M9.json; helps only in one condition (rule 5): shared_change -0.074 [-0.110,-0.042] at h=1/5000 but drift +0.236 [+0.052,+0.453] when ungated; superseded by M9b |
 | M9b | M9b: episode-shared BOCPD gated by k-of-others peer shift (W=80, k=2-3), B3 fallback | claude | helps | results/M9b.json; +0.25 [+0.12,+0.40] (lead re-scored 46.07); 298-cell search so ~0.25 selection optimism; drift -0.009 [-0.014,-0.003], shared_change -0.020 [-0.036,-0.006], stable 0.000; k=3 +0.21, k=1,4 weaker; validate on audit |
 | M10 | half-life implied by Kalman gain (sanity check) | claude | hurts | results/M10.json; diagnostic only: -7.2; corr(log hl, B3's) = 0.00, does not corroborate hl 16 |
+| M1_B4 | holdout-selected half-life variants (holdout length, grid, floor) rebased onto B4 | claude | alive | - |
+| M2_B4 | fixed-share over half-lives rebased onto B4 | claude | alive | - |
+| M3_B4 | dynamic model averaging rebased onto B4 | claude | alive | - |
+| M9b_B4 | M9b rebased onto B4 | claude | alive | - |
 | P1 | simplex projection vs divide-by-sum vs softmax | claude | alive | - |
 | P2 | temperature / Dirichlet calibration, episodes held out | claude | alive | - |
 | P3 | affine 5x5 calibration per (type, signal) | claude | alive | - |
@@ -95,4 +105,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | S7 | regularized multinomial logistic on full feature set | codex | alive | - |
 | S8 | small MLP | codex | alive | - |
 
-Counts: alive 21, baseline 4, helps 7, hurts 4, neutral 16
+Counts: alive 29, baseline 5, helps 7, hurts 4, neutral 16
