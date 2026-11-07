@@ -1,0 +1,9 @@
+{
+ "id": "E4",
+ "smoke": true,
+ "cells": 10,
+ "points": 32.234654438642984,
+ "seconds": 0.10105304200260434,
+ "n_episodes": 24,
+ "scope": "24 dev episodes; no audit"
+}
