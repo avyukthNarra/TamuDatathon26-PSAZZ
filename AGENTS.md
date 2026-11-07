@@ -208,7 +208,18 @@ Merge only when **all** are true: approved, CI green (if any), and no conflicts
   sides first (§3), then rebase or merge `main` into the branch, re-run tests, push, and get approval
   again if the resolution changed more than `CHANGELOG.md`.
 - **Squash merge** (default) so `main` gets one Conventional Commit per PR.
-- Delete the branch after merge (needs the human's OK for an agent, §4).
+- **Clean up branches after every merge** (and whenever asked to tidy). Squash merges leave the branch
+  looking unmerged to git, so `git branch --merged` won't find it; check the PR instead
+  (`gh pr list --state merged --json headRefName`). For each branch whose PR is `MERGED`, delete it
+  locally and on origin, listing the names explicitly (zsh won't word-split a variable):
+  ```bash
+  git checkout main && git pull --ff-only origin main
+  git push origin --delete sai/foo sai/bar
+  git branch -D sai/foo sai/bar
+  git fetch --prune
+  ```
+  Only delete branches with a merged PR. Leave anything else (open PR, no PR, someone else's, a
+  checked-out worktree branch) and mention it in your report.
 - Everyone else: `git pull` on `main` and rebase their branches when convenient.
 
 ### Step 10: Release (release captain, §7)
@@ -240,7 +251,7 @@ conflict markers to make it go away, and never resolve by guessing.
 - Read this file before starting any task. Re-read §2 before pushing.
 - State the plan briefly, then act. Work on **one** feature branch per task.
 - **Allowed without asking:** creating a feature branch, committing to it, running tests/linters, pushing the feature branch, opening a PR.
-- **Ask first:** merging (only on the human's "merge" in chat, with approval and no conflicts, §2 Step 9), tagging/releasing, deleting branches, force-pushing, changing CI, adding a new dependency, touching another person's owned area, anything that costs money (cloud clusters, paid APIs), editing secrets/config.
+- **Ask first:** merging (only on the human's "merge" in chat, with approval and no conflicts, §2 Step 9), tagging/releasing, deleting branches that don't have a merged PR (merged ones are cleanup, §2 Step 9), force-pushing, changing CI, adding a new dependency, touching another person's owned area, anything that costs money (cloud clusters, paid APIs), editing secrets/config.
 - **Never:** push to `main`, approve your own work, merge without the human's go-ahead, commit secrets, disable tests or CI checks, rewrite published history, run destructive commands on shared data (`DROP TABLE`, `rm -rf`, `DELETE` without `WHERE`) without explicit approval.
 - When done, report: branch name, PR link, test results (actual output summary), changelog line added, semver impact, open questions.
 - If the instructions here conflict with a direct request from a human teammate, follow the human, and suggest updating this file.
@@ -419,3 +430,4 @@ A task is done only when **all** are true:
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->
 - YYYY-MM-DD (@handle): _example: squash-merge only, so `main` history maps 1:1 to changelog lines._
+- 2026-11-07 (@Saibot913): agents delete branches whose PR is merged (local + origin) after each merge, without asking again; squash merges hide merged status from git, so check `gh pr list --state merged`.
