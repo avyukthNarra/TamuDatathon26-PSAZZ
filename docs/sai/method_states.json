@@ -356,6 +356,13 @@
  "C1": [
   "B4 + A9 severity + alpha-64 size prior (+ best memory later)",
   "claude",
-  "alive"
+  "helps",
+  "B4 + A9 severity + alpha-64 size prior: 51.72 [50.78,52.67], +0.83 [+0.53,+1.16] vs B4, +0.25 vs A9 alone; gains add as predicted (p1/p2 from A9, p5/p20 from alpha); plain pre-declared cell 51.715; 15 cells"
+ ],
+ "C2": [
+  "C2: win prob from M9b_B4 + size shares from C1 (composition, no new fitted knobs)",
+  "claude",
+  "helps",
+  "52.09 [51.16,52.97], +1.19 vs B4, +0.36 [+0.16,+0.57] vs C1; drift .184 shared .142 stable .090 short .191; selection optimism of members carries over"
  ]
 }

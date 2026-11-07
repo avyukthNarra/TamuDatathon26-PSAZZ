@@ -165,3 +165,10 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
 - M2_B4 +0.22 [-0.01,+0.53] (one cell, window 190 = grid max) and M3_B4 +0.20 [-0.03,+0.51]: the B3 "helps" does not hold up on B4 (CI includes 0). Neutral.
 - M1_B4 = B4 exactly: holdout-40 B3-grid memory is at a plateau; half-lives 4-12, floors, longer holdouts still hurt with the near-OLS ridge.
 - Lambda 0.05/0.5/2 does not reopen gains for any memory method.
+
+### C1 (B4 + A9 severity + alpha-64 size prior) and C2 (composition with M9b_B4), lead re-scored
+- C1 = 51.72 [50.78,52.67], +0.83 [+0.53,+1.16] vs B4, +0.25 [+0.09,+0.45] vs A9 alone: the two gains add (predicted +0.85, got +0.82).
+  Plain pre-declared combo (alpha 64, A9 lam 20) 51.715. Re-screening severity with lag 7 / pairs adds <= 0.006. 15 cells.
+- C2 = win probability of M9b_B4 + size shares of C1: 52.09 [51.16,52.97], +1.19 vs B4, +0.36 [+0.16,+0.57] vs C1.
+  Conditions: stable .090, short .191, drift .184, shared .142 (B4 .106/.216/.211/.183). No new fitted parameters; the
+  win model and the size model are independent so their gains compose. Members were each selected on dev (optimism carries over).

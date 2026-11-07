@@ -7,6 +7,8 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 
 | ID | owner | points | CI95 | stable | short | drift | shared | sec | det |
 |---|---|---|---|---|---|---|---|---|---|
+| C2 | claude | 52.08 | 51.15-52.96 | 0.090 | 0.191 | 0.184 | 0.142 | 0 | 0.0 |
+| C1 | claude-w1 | 51.72 | 50.76-52.67 | 0.090 | 0.191 | 0.200 | 0.159 | 0 | 0.0 |
 | A9 | claude-w1 | 51.47 | 50.50-52.38 | 0.090 | 0.203 | 0.203 | 0.167 | 0 | 0.0 |
 | M9b_B4 | claude-w2 | 51.22 | 50.22-52.15 | 0.105 | 0.216 | 0.197 | 0.168 | 0 | 0.0 |
 | A6_B4 | claude-w1 | 51.16 | 50.13-52.14 | 0.105 | 0.200 | 0.212 | 0.174 | 0 | 0.0 |
@@ -85,7 +87,8 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | B2 | GB, HL 4/16/64/128 + LAGRESP (mainFiles/experiments/gb_proto.py) | claude | baseline | - |
 | B3 | pair-model prototype | claude | baseline | results/B3.json |
 | B4 | B4 = L2 structure (lam 0.05, lag 7 + 3 pairs); new base for all further tests | claude | baseline | results/B4.json |
-| C1 | B4 + A9 severity + alpha-64 size prior (+ best memory later) | claude | alive | - |
+| C1 | B4 + A9 severity + alpha-64 size prior (+ best memory later) | claude | helps | results/C1.json; B4 + A9 severity + alpha-64 size prior: 51.72 [50.78,52.67], +0.83 [+0.53,+1.16] vs B4, +0.25 vs A9 alone; gains add as predicted (p1/p2 from A9, p5/p20 from alpha); plain pre-declared cell 51.715; 15 cells |
+| C2 | C2: win prob from M9b_B4 + size shares from C1 (composition, no new fitted knobs) | claude | helps | results/C2.json; 52.09 [51.16,52.97], +1.19 vs B4, +0.36 [+0.16,+0.57] vs C1; drift .184 shared .142 stable .090 short .191; selection optimism of members carries over |
 | E1 | recent residual pooling across peer machines | codex | neutral | results/E1.json; 45.75, vs B3 -0.07 [-0.15,+0.01]; blend over B4 0.00 [-0.04,+0.04]; lead re-scored via harness; built on the old B3 base |
 | E2 | cosine-similarity subgroup pooling; pool by type and signal | codex | neutral | results/E2.json; 45.77, vs B3 -0.05 [-0.17,+0.07]; blend over B4 -0.02; lead re-scored via harness; built on the old B3 base |
 | E3 | episode-level drift stats as features | codex | neutral | results/E3.json; 45.81, vs B3 -0.01 [-0.20,+0.15]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base |
@@ -131,4 +134,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | S7 | regularized multinomial logistic on full feature set | codex | neutral | results/S7.json; 44.73 (-1.09 vs B3), blend over B4 +0.09 [-0.02,+0.22]; built on old B3; lead re-scored via harness |
 | S8 | small MLP | codex | hurts | results/S8.json; 39.92 (-5.90 vs B3), blend over B4 +0.05; hit iteration cap; built on old B3; lead re-scored via harness |
 
-Counts: alive 12, baseline 5, helps 12, hurts 7, neutral 26
+Counts: alive 11, baseline 5, helps 14, hurts 7, neutral 26
