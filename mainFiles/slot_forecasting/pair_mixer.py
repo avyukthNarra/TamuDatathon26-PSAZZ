@@ -28,15 +28,17 @@ CLASSES = len(PAYOUTS)
 CLASS_INDEX = {value: index for index, value in enumerate(PAYOUTS)}
 ALL_PAIRS = tuple(itertools.combinations(range(1, 9), 2))
 DEFAULT_PAIRS = ((1, 3), (4, 7), (2, 5))
-DEFAULT_SIZE_KEYS = ((),)  # lag-keyed size tables did not help (size mode looks random)
+DEFAULT_SIZE_KEYS = ((), (1,), (1, 2))  # machine-level, lag-1 and lag-(1,2) payout-size experts
 MIN_PROBABILITY = 1e-4
 
 
 class PairMixer:
-    # Defaults = best on train cutoff labels, confirmed once on validation (53.35 / 60).
-    def __init__(self, pairs=DEFAULT_PAIRS, pair_prior=None, half_life=14.0, k_win=0.25, eta=16.0,
-                 size_keys=DEFAULT_SIZE_KEYS, size_half_life=40.0, k_size=32.0, k_machine=32.0,
-                 size_eta=8.0, type_size_priors=None, rate_prior=(1.0, 2.0), cell_mode="parity"):
+    # Defaults: kept only if better on BOTH train cutoff labels (tune_pair_mixer.py) and
+    # validation truth. half_life (12, 40) = a fast and a slow expert per pair.
+    def __init__(self, pairs=DEFAULT_PAIRS, pair_prior=None, half_life=(12.0, 40.0), k_win=0.25, eta=16.0,
+                 size_keys=DEFAULT_SIZE_KEYS, size_half_life=80.0, k_size=16.0, k_machine=32.0,
+                 size_eta=8.0, type_size_priors=None, rate_prior=(1.0, 2.0), cell_mode="parity",
+                 decay_missing=True, alpha=0.0):
         self.pairs = tuple(tuple(p) for p in pairs)
         self.pair_prior = list(pair_prior) if pair_prior is not None else [0.0] * len(self.pairs)
         self.k_win = k_win
@@ -53,6 +55,12 @@ class PairMixer:
         if not modes or any(m not in ("parity", "full", "sym") for m in modes):
             raise ValidationError("cell_mode must use parity, full and/or sym.")
         self.cell_mode = modes
+        # decay_missing=False: memory only fades on observed ticks, so the 24 sampled
+        # older ticks of a short history are not wiped out by the gap before the recent window.
+        self.decay_missing = decay_missing
+        # alpha > 0: Fixed-Share (Herbster & Warmuth 1998); every expert keeps at least
+        # alpha of its prior weight, so a machine that switches pair/rule can switch experts.
+        self.alpha = alpha
         # half_life may be one number or several; each becomes its own set of experts.
         self.half_lives = tuple(half_life) if isinstance(half_life, (list, tuple)) else (half_life,)
 
@@ -155,10 +163,21 @@ class PairMixer:
                 won = 1.0 if value > 0 else 0.0
                 for i, p in enumerate(win_preds):
                     logw[i] -= self.eta * (p - won) ** 2
+                if self.alpha > 0:
+                    top = max(logw)
+                    raw = [math.exp(v - top) for v in logw]
+                    total = math.fsum(raw)
+                    ptop = max(prior)
+                    praw = [math.exp(v - ptop) for v in prior]
+                    ptotal = math.fsum(praw)
+                    logw = [math.log((1 - self.alpha) * r / total + self.alpha * q / ptotal)
+                            for r, q in zip(raw, praw)]
                 if value > 0:
                     for i, sp in enumerate(size_preds):
                         size_logw[i] -= self.size_eta * math.fsum(
                             (q - (1.0 if k == value - 1 else 0.0)) ** 2 for k, q in enumerate(sp))
+            if value is None and not self.decay_missing:
+                continue
             for (_, _, decay), tab in zip(experts, win_tab):
                 for c in tab.values():
                     c[0] *= decay

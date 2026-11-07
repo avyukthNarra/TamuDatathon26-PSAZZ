@@ -17,6 +17,8 @@ especially in round two. Validation points are out of 60; the pooled baseline is
 | 6 | **"Print the 4-cell win rates of each machine's best pair and look for a shape"** | Cells are HLLH or LHHL: the machine wins when the two lags *match* (or *differ*), 96-100% vs 2-4%. Experts switched to 2 cells (match/differ) | **52.92** |
 | 7 | **"Train and validation disagree on the best half-life; find out why before trusting either"** | Ticks *inside* the history prefer short memory (6), but the *cutoff tick* prefers longer (10-14), on train labels.csv and validation truth alike. Tune on train labels at the cutoff | **53.35** |
 | 8 | "Split the remaining error into win part vs size part per condition" | Now ~50/50. Payout size has exactly two shapes per machine type and the mode isn't predictable from history, so sizes are near their floor | (diagnosis) |
+| 9 | **"Build a tuning harness that scores on train labels at the cutoff, per condition, as an estimated change in R with an episode-bootstrap interval; keep a change only if it ALSO improves validation"** | Two memory lengths per pair (half-lives 12 and 40) | 53.56 |
+| 10 | **"Re-test ideas you rejected on history ticks, now at the cutoff"** | Payout-size experts keyed on lag 1 and lags (1,2), rejected earlier, actually help at cutoffs | **53.75** |
 
 ## Prompt patterns that work
 
@@ -40,8 +42,13 @@ especially in round two. Validation points are out of 60; the pooled baseline is
 
 ## Prompts that did NOT help much
 
-- Lag-keyed payout-size tables and a 2-state hidden "size mode" tracker: no real gain
-  (the size mode looks random from the machine's own history).
+- A 2-state hidden "size mode" tracker: no real gain. (Lag-keyed size tables looked useless
+  on history ticks but DID help at cutoffs; see row 10.)
+- Fixed-Share switching (alpha > 0) between pair experts: much worse (+0.10 to +0.14 in R).
+  Machines don't switch pairs, so any weight left on a confidently wrong expert costs.
+- A short extra half-life (8) and "don't decay on missing ticks": better on train, worse on
+  validation, so not kept. A win-chance recalibration for streaks: predictions were already
+  calibrated by bin and by streak length, so it was skipped.
 
 - "Tune the learning rate / blend weight" on the logistic model: +0.2 to +0.5 points.
 - "Add neighbour-machine lag features": neighbour lagged effects were noise.
