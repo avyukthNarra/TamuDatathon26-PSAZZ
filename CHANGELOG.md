@@ -19,6 +19,9 @@ How to add an entry (every PR):
 ## [Unreleased]
 
 ### Added
+- Shared experiment harness, master test plan, and results leaderboard under docs/sai (reproduces pooled 30.00 and pair prototype 46.07)
+
+### Added
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 
 ### Changed
