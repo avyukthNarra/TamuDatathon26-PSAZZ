@@ -14,3 +14,7 @@ mainFiles/experiments/
 mainFiles/experiments-*/
 mainFiles/entry*.zip
 mainFiles/*-entry.zip
+# Same folders when a script is run from the repo root
+/runs/
+/outputs/
+/experiments/

@@ -90,7 +90,7 @@ mainFiles/runs/my-model-v2/      your own script
 ```
 
 - **`runs/` is git-ignored.** Predictions, model files, JSON reports, and ZIPs stay on your machine and are not pushed to `main` or your feature branch. Only commit code, settings, and documentation.
-- **Always pass `--out runs/<name>`.** The scripts default to `outputs/` or `experiments/`, which would scatter results. Choose a new name for each run; the scripts won't overwrite an existing folder.
+- **Always pass `--out runs/<name>`.** The scripts default to `outputs/` or `experiments/`, which would scatter results. Choose a new name for each run: `run_experiments.py` and `build_entry.py` refuse to reuse an existing path, but `run_starter.py` overwrites an existing folder without warning.
 - **To share a result with the team,** write the exact command, method, and settings in your README or PR description. Don't commit the CSVs.
 - **To compare runs,** check each folder's validation file: `python check_submission.py runs/<name>/validation_predictions.csv --split validation`.
 
@@ -416,7 +416,7 @@ After each cutoff, organizers select each team's latest response and validate it
 | `query_id mismatch` | Check the round and split. Validation files need `--split validation`; uploads need test IDs. |
 | Probabilities don't add up to one | Check column order, normalize each row, and avoid rounding too much. Find the cause of any NaNs. |
 | Extra columns | Remove dataframe indices. With pandas, use `index=False`. |
-| Output folder already exists | Pick a new `runs/<name>` folder for each run. The scripts won't overwrite one. |
+| Output folder already exists | Pick a new `runs/<name>` folder for each run. `run_experiments.py` and `build_entry.py` refuse to reuse an existing path; `run_starter.py` overwrites it, so pick a new name each time. |
 | Points differ from the `score` field | Use `technical_points` for the round score. The older diagnostic has a different scale. |
 | Can I use coding assistants or automated tuning? | Yes. You're responsible for the results and for following the data rules. |
 | Do I need RL, a neural network, or a GPU? | No. Any model that produces the required probabilities can compete. |
