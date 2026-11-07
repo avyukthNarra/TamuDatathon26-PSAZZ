@@ -20,6 +20,7 @@ How to add an entry (every PR):
 
 ### Added
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
+- House Edge rule model (v4): per-machine lag-pair win rules plus payout-size rules, 52.89 / 60 on validation vs 30.83 for the best starter, with a one-command entry builder for main and round two
 
 ### Changed
 - Model outputs go to `mainFiles/runs/<name>/`, which is git-ignored, so prediction files are no longer committed; run docs updated to match (#7)
