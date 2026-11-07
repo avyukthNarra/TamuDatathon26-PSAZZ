@@ -7,7 +7,10 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 
 | ID | owner | points | CI95 | stable | short | drift | shared | sec | det |
 |---|---|---|---|---|---|---|---|---|---|
+| A9 | claude-w1 | 51.46 | 50.50-52.37 | 0.091 | 0.205 | 0.199 | 0.168 | 0 | 0.0 |
+| M2_B4 | claude-w2 | 51.11 | 50.10-52.01 | 0.089 | 0.216 | 0.208 | 0.183 | 0 | 0.0 |
 | L5 | claude-w1 | 51.09 | 50.03-52.04 | 0.109 | 0.206 | 0.201 | 0.181 | 0 | 0.0 |
+| M1_B4 | claude-w2 | 50.89 | 49.85-51.87 | 0.105 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
 | B4 | claude-w1 | 50.89 | 49.85-51.87 | 0.106 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
 | L2 | claude-w1 | 50.89 | 49.85-51.87 | 0.106 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
 | L3 | claude-w1 | 50.88 | 49.84-51.86 | 0.106 | 0.216 | 0.211 | 0.184 | 0 | 0.0 |
@@ -15,8 +18,12 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | L6 | claude-w1 | 50.77 | 49.75-51.74 | 0.108 | 0.216 | 0.214 | 0.189 | 0 | 0.0 |
 | L9 | claude-w1 | 50.77 | 49.75-51.74 | 0.108 | 0.216 | 0.214 | 0.189 | 0 | 0.0 |
 | L7 | claude-w1 | 49.34 | 47.54-50.80 | 0.106 | 0.201 | 0.299 | 0.258 | 1 | 0.0 |
+| S2 | codex | 46.77 | 45.66-47.86 | 0.115 | 0.329 | 0.357 | 0.331 | 25 | 0.0 |
+| S2 | codex | 46.77 | 45.66-47.86 | 0.115 | 0.329 | 0.357 | 0.331 | 18 | 0.0 |
 | L4 | claude-w1 | 46.71 | 44.58-48.71 | 0.151 | 0.437 | 0.280 | 0.269 | 4 | 0.0 |
 | S1 | codex | 46.59 | 45.28-47.80 | 0.162 | 0.354 | 0.339 | 0.297 | 17 | 0.0 |
+| S1 | codex | 46.59 | 45.28-47.80 | 0.162 | 0.354 | 0.339 | 0.297 | 62 | 0.0 |
+| S5 | codex | 46.40 | 45.27-47.51 | 0.118 | 0.335 | 0.378 | 0.342 | 1 | 0.0 |
 | M3 | claude-w2 | 46.09 | 45.04-47.04 | 0.091 | 0.344 | 0.398 | 0.375 | 0 | 0.0 |
 | M2 | claude-w2 | 46.08 | 45.04-47.06 | 0.090 | 0.344 | 0.399 | 0.375 | 0 | 0.0 |
 | M9b | claude-w2 | 46.07 | 44.98-47.15 | 0.118 | 0.344 | 0.390 | 0.357 | 0 | 0.0 |
@@ -40,9 +47,16 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | E1 | codex | 45.75 | 44.68-46.81 | 0.118 | 0.351 | 0.404 | 0.372 | 1 | 0.0 |
 | M4 | claude-w2 | 45.72 | 44.59-46.80 | 0.136 | 0.344 | 0.398 | 0.372 | 0 | 0.0 |
 | M6 | claude-w2 | 45.52 | 44.46-46.54 | 0.154 | 0.344 | 0.399 | 0.376 | 0 | 0.0 |
+| S4 | codex | 45.02 | 44.05-46.08 | 0.137 | 0.349 | 0.439 | 0.405 | 1 | 0.0 |
 | M8 | claude-w2 | 44.89 | 43.63-46.04 | 0.147 | 0.344 | 0.443 | 0.413 | 0 | 0.0 |
+| S7 | codex | 44.73 | 43.65-45.85 | 0.156 | 0.408 | 0.413 | 0.388 | 1 | 0.0 |
+| S1 | codex | 44.01 | 42.47-45.34 | 0.224 | 0.428 | 0.423 | 0.378 | 46 | 0.0 |
 | L8 | claude-w1 | 43.12 | 42.45-43.77 | 0.120 | 0.992 | 0.237 | 0.217 | 6 | 0.0 |
+| S3 | codex | 41.91 | 40.77-43.00 | 0.271 | 0.657 | 0.430 | 0.367 | 1 | 0.0 |
+| S8 | codex | 39.92 | 38.68-41.15 | 0.288 | 0.538 | 0.645 | 0.541 | 12 | 0.0 |
 | M10 | claude-w2 | 38.59 | 37.29-39.93 | 0.144 | 0.344 | 0.976 | 0.754 | 0 | 0.0 |
+| S6 | codex | 34.74 | 34.25-35.19 | 0.618 | 0.774 | 0.799 | 0.717 | 1 | 0.0 |
+| S8 | codex | 32.41 | 31.23-33.58 | 0.558 | 0.924 | 0.932 | 0.991 | 2 | 0.0 |
 | B0 | claude | 30.00 | 30.00-30.00 | 1.000 | 1.000 | 1.000 | 1.000 | 1 | 0.0 |
 
 ## Method status (every catalog ID)
@@ -57,7 +71,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | A6 | prior strength scaled by effective sample size | claude | neutral | results/A6.json; +0.16 [+0.07,+0.27] ties fixed alpha 64; best at grid edge (a0=32, g=-1); a0>32 untested |
 | A7 | factorized win-rate x severity blended with direct 5-class | claude | neutral | results/A7.json; factorized B3 split is already the best; blending direct 5-class hurts (43.1 at w=0.25) |
 | A8 | leave-one-out episode / episode-type shrinkage | claude | neutral | results/A8.json; peer shares only hurt as weight grows; best cell is the no-peer alpha 64 control |
-| A9 | severity-given-win with lag features on the B4 base (new, from L-report finding that size is ~half the error) | claude | alive | - |
+| A9 | severity-given-win with lag features on the B4 base (new, from L-report finding that size is ~half the error) | claude | alive | results/A9.json |
 | A1_B4 | type-level Dirichlet smoothing, alpha 2/8/24/64 rebased onto B4 | claude | alive | - |
 | A4_B4 | class-specific half-life and alpha rebased onto B4 | claude | alive | - |
 | A6_B4 | prior strength scaled by effective sample size rebased onto B4 | claude | alive | - |
@@ -91,8 +105,8 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | M9 | changepoints shared across an episode's machines | claude | helps | results/M9.json; helps only in one condition (rule 5): shared_change -0.074 [-0.110,-0.042] at h=1/5000 but drift +0.236 [+0.052,+0.453] when ungated; superseded by M9b |
 | M9b | M9b: episode-shared BOCPD gated by k-of-others peer shift (W=80, k=2-3), B3 fallback | claude | helps | results/M9b.json; +0.25 [+0.12,+0.40] (lead re-scored 46.07); 298-cell search so ~0.25 selection optimism; drift -0.009 [-0.014,-0.003], shared_change -0.020 [-0.036,-0.006], stable 0.000; k=3 +0.21, k=1,4 weaker; validate on audit |
 | M10 | half-life implied by Kalman gain (sanity check) | claude | hurts | results/M10.json; diagnostic only: -7.2; corr(log hl, B3's) = 0.00, does not corroborate hl 16 |
-| M1_B4 | holdout-selected half-life variants (holdout length, grid, floor) rebased onto B4 | claude | alive | - |
-| M2_B4 | fixed-share over half-lives rebased onto B4 | claude | alive | - |
+| M1_B4 | holdout-selected half-life variants (holdout length, grid, floor) rebased onto B4 | claude | alive | results/M1_B4.json |
+| M2_B4 | fixed-share over half-lives rebased onto B4 | claude | alive | results/M2_B4.json |
 | M3_B4 | dynamic model averaging rebased onto B4 | claude | alive | - |
 | M9b_B4 | M9b rebased onto B4 | claude | alive | - |
 | P1 | simplex projection vs divide-by-sum vs softmax | claude | alive | - |
@@ -102,13 +116,13 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | P5 | stack all helps members (episode-OOF) | claude | alive | - |
 | P6 | shrink ensemble toward the type prior | claude | alive | - |
 | P7 | clip bounds | claude | alive | - |
-| S1 | GB / HistGB second stage on B3 output + features | codex | helps | results/S1.json; HistGB residual on B3: 46.59, +0.77 [+0.07,+1.51] vs B3; drift .399->.339, shared .377->.297 but stable .118->.162; on B4 base blend only +0.06 [-0.06,+0.19] (w .12): must be rebased onto B4 (S1_B4) |
-| S2 | CatBoost / LightGBM | codex | alive | - |
-| S3 | latent condition classifier + gating of specialists | codex | alive | - |
-| S4 | rolling virtual cutoffs (row multiplication) | codex | alive | - |
-| S5 | soft-target distillation from validation true q (episode-OOF) | codex | alive | - |
-| S6 | smoothed pseudo-targets from a future window (train only) | codex | alive | - |
-| S7 | regularized multinomial logistic on full feature set | codex | alive | - |
-| S8 | small MLP | codex | alive | - |
+| S1 | GB / HistGB second stage on B3 output + features | codex | alive | results/S1.json; 46.59 (+0.77 vs B3) but blend over B4 +0.06 [-0.07,+0.19]; rebase pending (S1_B4); built on old B3; lead re-scored via harness |
+| S2 | CatBoost / LightGBM | codex | alive | results/S2.json; CatBoost/LightGBM residual on B3: 46.77 (+0.94 vs B3, best learner) but blend over B4 +0.01 [-0.07,+0.09]; stable fixed (.115); rebase pending; built on old B3; lead re-scored via harness |
+| S3 | latent condition classifier + gating of specialists | codex | hurts | results/S3.json; 41.91 (-3.91 vs B3), blend over B4 +0.03; built on old B3; lead re-scored via harness |
+| S4 | rolling virtual cutoffs (row multiplication) | codex | neutral | results/S4.json; 45.02 (-0.80 vs B3), blend over B4 -0.02; rolling-cutoff row multiplication gave nothing on B3; built on old B3; lead re-scored via harness |
+| S5 | soft-target distillation from validation true q (episode-OOF) | codex | alive | results/S5.json; validation true-q distillation: 46.40 (+0.58 vs B3), nested diagnostic 46.31, blend over B4 0.00; rebase pending; built on old B3; lead re-scored via harness |
+| S6 | smoothed pseudo-targets from a future window (train only) | codex | hurts | results/S6.json; 34.74 (-11.08 vs B3): future-window pseudo-targets average through drift; built on old B3; lead re-scored via harness |
+| S7 | regularized multinomial logistic on full feature set | codex | neutral | results/S7.json; 44.73 (-1.09 vs B3), blend over B4 +0.09 [-0.02,+0.22]; built on old B3; lead re-scored via harness |
+| S8 | small MLP | codex | hurts | results/S8.json; 39.92 (-5.90 vs B3), blend over B4 +0.05; hit iteration cap; built on old B3; lead re-scored via harness |
 
-Counts: alive 23, baseline 5, helps 8, hurts 4, neutral 21
+Counts: alive 19, baseline 5, helps 7, hurts 7, neutral 23

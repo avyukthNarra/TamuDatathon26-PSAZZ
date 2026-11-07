@@ -214,43 +214,50 @@
  "S1": [
   "GB / HistGB second stage on B3 output + features",
   "codex",
-  "helps",
-  "HistGB residual on B3: 46.59, +0.77 [+0.07,+1.51] vs B3; drift .399->.339, shared .377->.297 but stable .118->.162; on B4 base blend only +0.06 [-0.06,+0.19] (w .12): must be rebased onto B4 (S1_B4)"
+  "alive",
+  "46.59 (+0.77 vs B3) but blend over B4 +0.06 [-0.07,+0.19]; rebase pending (S1_B4); built on old B3; lead re-scored via harness"
  ],
  "S2": [
   "CatBoost / LightGBM",
   "codex",
-  "alive"
+  "alive",
+  "CatBoost/LightGBM residual on B3: 46.77 (+0.94 vs B3, best learner) but blend over B4 +0.01 [-0.07,+0.09]; stable fixed (.115); rebase pending; built on old B3; lead re-scored via harness"
  ],
  "S3": [
   "latent condition classifier + gating of specialists",
   "codex",
-  "alive"
+  "hurts",
+  "41.91 (-3.91 vs B3), blend over B4 +0.03; built on old B3; lead re-scored via harness"
  ],
  "S4": [
   "rolling virtual cutoffs (row multiplication)",
   "codex",
-  "alive"
+  "neutral",
+  "45.02 (-0.80 vs B3), blend over B4 -0.02; rolling-cutoff row multiplication gave nothing on B3; built on old B3; lead re-scored via harness"
  ],
  "S5": [
   "soft-target distillation from validation true q (episode-OOF)",
   "codex",
-  "alive"
+  "alive",
+  "validation true-q distillation: 46.40 (+0.58 vs B3), nested diagnostic 46.31, blend over B4 0.00; rebase pending; built on old B3; lead re-scored via harness"
  ],
  "S6": [
   "smoothed pseudo-targets from a future window (train only)",
   "codex",
-  "alive"
+  "hurts",
+  "34.74 (-11.08 vs B3): future-window pseudo-targets average through drift; built on old B3; lead re-scored via harness"
  ],
  "S7": [
   "regularized multinomial logistic on full feature set",
   "codex",
-  "alive"
+  "neutral",
+  "44.73 (-1.09 vs B3), blend over B4 +0.09 [-0.02,+0.22]; built on old B3; lead re-scored via harness"
  ],
  "S8": [
   "small MLP",
   "codex",
-  "alive"
+  "hurts",
+  "39.92 (-5.90 vs B3), blend over B4 +0.05; hit iteration cap; built on old B3; lead re-scored via harness"
  ],
  "P1": [
   "simplex projection vs divide-by-sum vs softmax",

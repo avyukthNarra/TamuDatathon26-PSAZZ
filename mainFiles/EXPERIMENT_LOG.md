@@ -144,3 +144,10 @@ with B3's pairs (1,3),(2,5),(4,7) and single lag 7.
   latent factor): 45.75-45.81 on dev, within noise of B3; blend over B4 gains 0.00. Verdict neutral (built on old B3).
 - S1 HistGB residual on B3: 46.59, +0.77 [+0.07,+1.51] vs B3; drift .399->.339, shared .377->.297, stable worse
   (.118->.162). Against B4 it adds only +0.06 [-0.06,+0.19]. Needs rebase onto B4 (note in docs/sai/CODEX_REBASE.md).
+
+### Codex W4 complete (S1-S8, 2464 declared cells), merged and re-scored by the lead (values reproduce). ALL on the old B3 base.
+Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5 46.40, S6 34.74, S7 44.73, S8 39.92 (B3 45.82, B4 50.89).
+- As blend members over B4 none adds anything: S1 +0.06, S2 +0.01, S3 +0.03, S4 -0.02, S5 0.00, S6 -0.02, S7 +0.09, S8 +0.05 (all CIs include 0).
+- S2 fixes stable (.162->.115 vs S1) and S1/S2 improve drift/shared vs B3, but B4 already beats them in every condition.
+- S3 (condition classifier gating), S6 (future-window targets average through drift), S8 (MLP) clearly hurt; S4 row multiplication did nothing.
+- Learners on B3 output cannot rescue a weak base; the question is whether residual learning on B4 keeps any gain. Rebase pending in Codex.
