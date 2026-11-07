@@ -1,0 +1,92 @@
+{
+ "id": "TEAM_VOLATILITY_CONTROL",
+ "owner": "codex",
+ "description": "Causal score memory and variance-normalized innovation gate; cached combined severity",
+ "params": {
+  "half_life": [
+   12.0,
+   40.0
+  ]
+ },
+ "scope": "dev",
+ "points": 54.1395500151847,
+ "ci95": [
+  53.071273132159796,
+  55.11533076882959
+ ],
+ "condition_ratios": {
+  "stable": 0.07668532635805103,
+  "short_history": 0.15612014586587936,
+  "drift": 0.09432649894724529,
+  "shared_change": 0.1058564805741085
+ },
+ "R": 0.10824711293632104,
+ "class_error_shares": {
+  "p_0": 0.45949196226462913,
+  "p_1": 0.2557359392718667,
+  "p_2": 0.1997605371502791,
+  "p_5": 0.07717309737138621,
+  "p_20": 0.007838463941838954
+ },
+ "runtime_seconds": 99.38397729099961,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": 0.0,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "extra": {
+  "vs_TM_COMBINED": {
+   "diff": 7.105427357601002e-15,
+   "ci95": [
+    0.0,
+    7.105427357601002e-15
+   ]
+  },
+  "vs_TM_MIXER": {
+   "diff": 0.26768802432933114,
+   "ci95": [
+    0.10204273275614924,
+    0.453342851979615
+   ]
+  },
+  "source_commit": "6a8098c06837d23b9f6b904ed5b8a9e0b5904569",
+  "grid_variants": 18,
+  "zero_change_controls": 1,
+  "blend_gain": {
+   "w_per_fold": [
+    0.0,
+    0.2,
+    0.0,
+    0.2,
+    0.8500000000000001,
+    0.30000000000000004
+   ],
+   "w_mean": 0.25833333333333336,
+   "points": 54.139550015184696,
+   "ci95": [
+    53.071273132159796,
+    55.11533076882959
+   ],
+   "condition_ratios": {
+    "stable": 0.07668532635805106,
+    "short_history": 0.15612014586587936,
+    "drift": 0.09432649894724532,
+    "shared_change": 0.1058564805741085
+   },
+   "vs_base": {
+    "diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ]
+   }
+  },
+  "memory_family_controls": 3,
+  "synthetic_tests": {
+   "run": 4,
+   "passed": 4,
+   "seconds": 0.011
+  },
+  "selection_caveat": "Best cell selected on these dev episodes from18 variants; bootstrapCI does not adjust for grid selection."
+ }
+}

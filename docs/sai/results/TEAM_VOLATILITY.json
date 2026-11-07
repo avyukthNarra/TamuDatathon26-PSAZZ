@@ -1,0 +1,93 @@
+{
+ "id": "TEAM_VOLATILITY",
+ "owner": "codex",
+ "description": "Causal score memory and variance-normalized innovation gate; cached combined severity",
+ "params": {
+  "half_life": [
+   12.0,
+   40.0
+  ],
+  "score_half_life": 40.0
+ },
+ "scope": "dev",
+ "points": 54.22152682239277,
+ "ci95": [
+  53.16687145924146,
+  55.20043578762466
+ ],
+ "condition_ratios": {
+  "stable": 0.07409139784096777,
+  "short_history": 0.1519619740475186,
+  "drift": 0.09433198047462442,
+  "shared_change": 0.10590092294116916
+ },
+ "R": 0.10657156882606998,
+ "class_error_shares": {
+  "p_0": 0.4549324877393641,
+  "p_1": 0.2594532089480553,
+  "p_2": 0.20125996795857498,
+  "p_5": 0.07658444953435836,
+  "p_20": 0.007769885819647314
+ },
+ "runtime_seconds": 99.38397729099961,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": 0.0,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "extra": {
+  "vs_TM_COMBINED": {
+   "diff": 0.08197680720807199,
+   "ci95": [
+    0.013376993508192925,
+    0.18490211824808145
+   ]
+  },
+  "vs_TM_MIXER": {
+   "diff": 0.349664831537396,
+   "ci95": [
+    0.17943071738395897,
+    0.5453806702601636
+   ]
+  },
+  "source_commit": "6a8098c06837d23b9f6b904ed5b8a9e0b5904569",
+  "grid_variants": 18,
+  "zero_change_controls": 1,
+  "blend_gain": {
+   "w_per_fold": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "w_mean": 1.0,
+   "points": 54.22152682239277,
+   "ci95": [
+    53.16687145924146,
+    55.20043578762466
+   ],
+   "condition_ratios": {
+    "stable": 0.07409139784096777,
+    "short_history": 0.1519619740475186,
+    "drift": 0.09433198047462442,
+    "shared_change": 0.10590092294116916
+   },
+   "vs_base": {
+    "diff": 0.08197680720807199,
+    "ci95": [
+     0.013376993508192925,
+     0.18490211824808145
+    ]
+   }
+  },
+  "memory_family_controls": 3,
+  "synthetic_tests": {
+   "run": 4,
+   "passed": 4,
+   "seconds": 0.011
+  },
+  "selection_caveat": "Best cell selected on these dev episodes from18 variants; bootstrapCI does not adjust for grid selection."
+ }
+}
