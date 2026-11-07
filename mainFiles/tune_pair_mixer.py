@@ -11,7 +11,8 @@ condition the difference is divided by that condition's frozen-baseline error
 (taken from validation/reference.csv vs targets), giving an estimated change
 in R, the score that sets points = 60 / (1 + R). Negative = better.
 A 95% interval comes from resampling whole episodes within each condition.
---val also scores each candidate once on validation truth (use sparingly).
+--val also scores each candidate once on validation truth (use sparingly), on the
+whole split and on the kit's tuning / audit halves; a real gain should hold on both.
 """
 import argparse
 import csv
@@ -21,8 +22,9 @@ from collections import defaultdict
 from pathlib import Path
 
 from slot_forecasting.contest import score_contest_files
-from slot_forecasting.io import load_inputs, read_labels, read_targets, write_submission
-from slot_forecasting.pair_mixer import PairMixer
+from slot_forecasting.experiments import episode_folds, subset_score
+from slot_forecasting.io import load_inputs, read_labels, read_submission, read_targets, write_submission
+from slot_forecasting.pair_mixer import PairMixer, size_modes_from_targets
 from slot_forecasting.rounds import VERSION, round_metadata
 from slot_forecasting.schema import PAYOUTS
 
@@ -49,8 +51,16 @@ for t in read_targets(val / "targets.csv"):
 baseline_error = {c: sum(v) / len(v) for c, v in ref_err.items()}
 
 
+def build(settings):
+    """PairMixer from JSON settings; "size_modes": "val" = the two size mixes per type read from validation targets."""
+    settings = dict(settings)
+    if settings.get("size_modes") == "val":
+        settings["size_modes"] = size_modes_from_targets(read_targets(val / "targets.csv"), load_inputs(val)[0])
+    return PairMixer(**settings).fit(train_q, train_h)
+
+
 def cutoff_brier(settings):
-    preds = PairMixer(**settings).fit(train_q, train_h).predict(train_q, train_h)
+    preds = build(settings).predict(train_q, train_h)
     return {q: sum((p - (1.0 if PAYOUTS[k] == labels[q] else 0.0)) ** 2 for k, p in enumerate(preds[q]))
             for q in preds}
 
@@ -63,6 +73,8 @@ def delta_r(diff, groups):
     return sum(sum(v) / len(v) / baseline_error[c] for c, v in by_cond.items()) / len(by_cond)
 
 
+val_targets = read_targets(val / "targets.csv")
+val_halves = episode_folds(val_targets, val_cond)
 base = cutoff_brier({})
 event = {"max_points": round_metadata(public)["max_points"], "version": VERSION}
 scratch = Path(args.scratch)
@@ -81,8 +93,13 @@ for settings in json.loads(args.candidates):
     line = f"{json.dumps(settings)}  dR={point:+.4f} [{boot[10]:+.4f},{boot[389]:+.4f}]  per-cond {per}"
     if args.val:
         vq, vh = load_inputs(val)
-        write_submission(scratch / "val.csv", PairMixer(**settings).fit(train_q, train_h).predict(vq, vh))
+        write_submission(scratch / "val.csv", build(settings).predict(vq, vh))
         report = score_contest_files(scratch / "val.csv", val / "targets.csv", val / "queries.csv",
                                      val / "conditions.csv", val / "reference.csv", **event)
         line += f"  VAL {report['technical_points']:.2f} R={report['mean_loss_ratio']:.4f}"
+        # The kit's tuning / audit halves (48 episodes each): a real gain should show on both.
+        preds = read_submission(scratch / "val.csv")
+        halves = [subset_score(preds, val_targets, val_cond, reference, half, event["max_points"])
+                  for half in val_halves]
+        line += f" (halves {halves[0]['technical_points']:.2f} / {halves[1]['technical_points']:.2f})"
     print(line, flush=True)
