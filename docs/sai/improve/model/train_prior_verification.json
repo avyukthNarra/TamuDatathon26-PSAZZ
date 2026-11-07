@@ -1,0 +1,18 @@
+{
+  "original_v4_walk_max_abs_diff": 1.1102230246251565e-16,
+  "n_direct_comparisons": 6,
+  "files": [
+    {
+      "id": "IMP_M4V4ALL",
+      "rows": 768
+    },
+    {
+      "id": "IMP_M4V4JACKPOT",
+      "rows": 768
+    },
+    {
+      "id": "IMP_M4V4SWAP",
+      "rows": 768
+    }
+  ]
+}
