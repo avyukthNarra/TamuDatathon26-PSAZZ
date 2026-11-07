@@ -172,3 +172,8 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
 - C2 = win probability of M9b_B4 + size shares of C1: 52.09 [51.16,52.97], +1.19 vs B4, +0.36 [+0.16,+0.57] vs C1.
   Conditions: stable .090, short .191, drift .184, shared .142 (B4 .106/.216/.211/.183). No new fitted parameters; the
   win model and the size model are independent so their gains compose. Members were each selected on dev (optimism carries over).
+
+### L10 payout-level features in the win model (B4 base), worker report reviewed
+- Best cell is L5's coding (centred log1p at lag 7): 51.10, +0.21 [-0.03,+0.45] vs B4; composed with C1 shares 51.90, -0.18 vs C2.
+- Payout-level lags 1,2,4 (which drive severity in A9) carry NO win signal; every extra feature set hurt (47.6-50.6).
+  Win lags {7, pairs} and size lags {1,2,4} are disjoint, which is why the two gains compose independently.

@@ -15,6 +15,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | A1_B4 | claude-w1 | 51.16 | 50.13-52.13 | 0.105 | 0.200 | 0.212 | 0.174 | 0 | 0.0 |
 | A4_B4 | claude-w1 | 51.15 | 50.13-52.13 | 0.103 | 0.203 | 0.210 | 0.176 | 0 | 0.0 |
 | M2_B4 | claude-w2 | 51.11 | 50.10-52.01 | 0.089 | 0.216 | 0.208 | 0.183 | 0 | 0.0 |
+| L10 | claude | 51.10 | 49.98-52.07 | 0.107 | 0.208 | 0.202 | 0.179 | 0 | 0.0 |
 | L5 | claude-w1 | 51.09 | 50.03-52.04 | 0.109 | 0.206 | 0.201 | 0.181 | 0 | 0.0 |
 | M3_B4 | claude-w2 | 51.09 | 50.07-52.00 | 0.091 | 0.216 | 0.208 | 0.183 | 0 | 0.0 |
 | M1_B4 | claude-w2 | 50.89 | 49.85-51.87 | 0.105 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
@@ -103,7 +104,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | L7 | per-machine sparse feature selection from the screen | claude | alive | results/L7.json; 49.34; vs L2 standalone -1.55 but blend over L2 +0.25 [-0.02,+0.55] w .79; better short_history (.201 vs .216), worse drift/shared_change: possible complement |
 | L8 | mixture transition distribution (MTD) lags | claude | hurts | results/L8.json; -2.70 [-3.49,-1.87] vs B3; blend over L2 +0.05; short_history 0.99 (not investigated) |
 | L9 | signal x lag and type x lag interactions | claude | neutral | results/L9.json; relative to L2: no signal/type x lag prior cell beats its control; effect magnitude is smaller at signal +1 (diagnostic), sign-free interaction untested |
-| L10 | win model with payout-level features at the severity-screened lags 1,2,4 on B4 (idea from A9's finding) | claude | alive | - |
+| L10 | win model with payout-level features at the severity-screened lags 1,2,4 on B4 (idea from A9's finding) | claude | neutral | results/L10.json; best cell = L5 coding (log lag 7), 51.10, +0.21 [-0.03,+0.45] vs B4; composed with C1 shares 51.90, -0.18 vs C2; every other payout-level feature set hurt (47.6-50.6); win signal is lag 7 only, so win and size use disjoint lag structure (lags 1,2,4 carry severity, not win); 24 cells |
 | M1 | holdout-selected half-life variants (holdout length, grid, floor) | claude | neutral | results/M1.json; +0.01 [-0.01,+0.02]; 90 cells; hl 4-12 hurt at every holdout; floors hurt |
 | M2 | fixed-share over half-lives | claude | helps | results/M2.json; marginal: +0.26 [+0.02,+0.69], stable only (0.118->0.090); one cell (window 180 ~ whole history), dev-selected so optimistic; confirm on audit; on B4 (M2_B4) +0.22 [-0.01,+0.53], CI includes 0 |
 | M3 | dynamic model averaging | claude | helps | results/M3.json; same effect as M2 (+0.26 [+0.02,+0.69]); two methods agree, one effect, not two; on B4 (M3_B4) +0.20 [-0.03,+0.51], CI includes 0 |
@@ -135,4 +136,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | S7 | regularized multinomial logistic on full feature set | codex | neutral | results/S7.json; 44.73 (-1.09 vs B3), blend over B4 +0.09 [-0.02,+0.22]; built on old B3; lead re-scored via harness |
 | S8 | small MLP | codex | hurts | results/S8.json; 39.92 (-5.90 vs B3), blend over B4 +0.05; hit iteration cap; built on old B3; lead re-scored via harness |
 
-Counts: alive 11, baseline 5, helps 15, hurts 7, neutral 26
+Counts: alive 10, baseline 5, helps 15, hurts 7, neutral 27

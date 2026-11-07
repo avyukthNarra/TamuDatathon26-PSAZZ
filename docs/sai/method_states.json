@@ -369,6 +369,7 @@
  "L10": [
   "win model with payout-level features at the severity-screened lags 1,2,4 on B4 (idea from A9's finding)",
   "claude",
-  "alive"
+  "neutral",
+  "best cell = L5 coding (log lag 7), 51.10, +0.21 [-0.03,+0.45] vs B4; composed with C1 shares 51.90, -0.18 vs C2; every other payout-level feature set hurt (47.6-50.6); win signal is lag 7 only, so win and size use disjoint lag structure (lags 1,2,4 carry severity, not win); 24 cells"
  ]
 }
