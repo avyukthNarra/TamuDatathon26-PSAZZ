@@ -1,0 +1,102 @@
+{
+ "id": "L5",
+ "owner": "claude-w1",
+ "description": "3-state / log-level coding of lag features vs win-loss flag (ridge win model) | best cell log_flag_lagsstrict_lam1",
+ "params": {
+  "lags": [
+   7
+  ],
+  "pairs": [
+   [
+    1,
+    3
+   ],
+   [
+    2,
+    5
+   ],
+   [
+    4,
+    7
+   ]
+  ],
+  "coding": "log",
+  "big_thr": 5,
+  "pair_coding": "flag",
+  "lam": 1.0
+ },
+ "scope": "dev",
+ "points": 51.09359983658213,
+ "ci95": [
+  50.02903992042607,
+  52.042538937039005
+ ],
+ "condition_ratios": {
+  "stable": 0.10913635016738162,
+  "short_history": 0.20646403315581863,
+  "drift": 0.20100065194744685,
+  "shared_change": 0.1806604763005958
+ },
+ "R": 0.1743153778928107,
+ "class_error_shares": {
+  "p_0": 0.48764057308916814,
+  "p_1": 0.2523362135974527,
+  "p_2": 0.18865605784491027,
+  "p_5": 0.06497669396849673,
+  "p_20": 0.006390461499972371
+ },
+ "runtime_seconds": 0.25847137499658857,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": 0.0,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "best_label": "log_flag_lagsstrict_lam1",
+ "n_grid_cells": 144,
+ "vs_B3": {
+  "diff": 5.271115218990481,
+  "ci95": [
+   4.417031748206559,
+   6.100018084775712
+  ]
+ },
+ "blend_gain_vs_B3": {
+  "points": 51.09359983658213,
+  "ci95": [
+   50.02903992042607,
+   52.042538937039005
+  ],
+  "w_mean": 1.0,
+  "vs_base": {
+   "diff": 5.271115218990481,
+   "ci95": [
+    4.417031748206559,
+    6.100018084775712
+   ]
+  },
+  "condition_ratios": {
+   "stable": 0.10913635016738162,
+   "short_history": 0.20646403315581863,
+   "drift": 0.20100065194744687,
+   "shared_change": 0.1806604763005959
+  }
+ },
+ "vs_L2": {
+  "diff": 0.20314146329950944,
+  "ci95": [
+   -0.0463164322388165,
+   0.4713875600270514
+  ]
+ },
+ "blend_gain_vs_L2": {
+  "points": 51.09656855056183,
+  "vs_base": {
+   "diff": 0.2061101772792071,
+   "ci95": [
+    0.007883566626174066,
+    0.41810103129112663
+   ]
+  },
+  "w_mean": 0.7666666666666666
+ }
+}

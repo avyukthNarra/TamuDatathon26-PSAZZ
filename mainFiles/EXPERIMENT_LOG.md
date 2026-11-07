@@ -118,3 +118,17 @@ Each A method tested (1) as B3's payout-size split / win prior with the pair-rid
   0.377->0.357, stable unchanged. 298 cells searched, so expect ~0.25 selection optimism; neighbours k=3 +0.21.
 - Falling back to a machine's OWN BOCPD weights is terrible (drift 1.15); B3's holdout memory is the right fallback.
 - Verdicts: M9 helps (one condition, superseded), M9b helps (marginal, to validate on audit).
+
+### W1-L lag structure (L1-L9), worker report reviewed, L2/L5/L7/L4/L8 re-scored by the lead through the harness
+**Headline: L2 = 50.89 [49.8,51.9] on dev, +5.07 [+4.22,+5.89] over B3 (45.82).** Engine checked: reads only grid[:cutoff],
+no truth/ref/condition/outcome. Lags and pairs are learned from train histories with null controls (9-16), they coincide
+with B3's pairs (1,3),(2,5),(4,7) and single lag 7.
+- B3's extra single lags 1-5 hurt, and lam=20 over-shrinks the real pair effects: lower lambda was monotonically better
+  and plateaus at 0.05-0.5 (near-OLS). Conditions: stable .106, short .216, drift .211, shared .183 (B3 .118/.344/.399/.377).
+- More structure does not help: all 28 pairs 41.9, all triples 41.4, null pairs 9-16 each cost several points, one-hot
+  lags without pairs 31.3, logistic worse than linear, per-machine selection (L7) 49.3, MTD 43.1, conditional-lift NB 46.7.
+- Pooling coefficients to the type mean (L6) and signal/type x lag priors (L9) add nothing: effect signs differ per machine.
+- L5: centred log1p of the lag-7 payout with flag pairs 51.09, +0.20 over L2 (marginal).
+- Error shares on L2: p0 0.49, p1 0.25, p2 0.19, p5 0.07: the SIZE side is now ~half the remaining error, so size/severity
+  work (A methods, lag effects on severity) is worth much more on this base than it was on B3.
+- All earlier M and A results were measured on the weak B3 lam-20 model and must be re-tested on L2 (= "B4").

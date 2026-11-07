@@ -70,47 +70,56 @@
  "L1": [
   "one-hot lags 1-8 + missing flag, regularized multinomial",
   "claude",
-  "alive"
+  "neutral",
+  "vs L2 -0.02: one-hot lags + missing flag matches L2 only when pairs present; one-hot lags alone 31.3; logistic worse than linear"
  ],
  "L2": [
   "per-machine ridge on lags + pairs (B3 variants: lambda, lag set, pair set)",
   "claude",
-  "alive"
+  "helps",
+  "BIG: 50.89 [49.8,51.9], +5.07 [+4.22,+5.89] vs B3 (lead re-scored). lam 0.05 (near-OLS), lag 7 only + pairs (1,3),(2,5),(4,7); B3's lags 1-5 hurt and lam=20 over-shrinks. New base B4. Conditions .106/.216/.211/.183"
  ],
  "L3": [
   "all pairs among lags 1-8 with null controls (9-16); triples",
   "claude",
-  "alive"
+  "neutral",
+  "best = the same top-3 pairs as L2 (50.88); all 28 pairs 41.9, all triples 41.4, null pairs cost several points each"
  ],
  "L4": [
   "per-machine single-lag conditional lift",
   "claude",
-  "alive"
+  "neutral",
+  "46.71; vs L2 standalone -4.18, blend over L2 +0.07 [-0.16,+0.30]; only pair-joint cells work"
  ],
  "L5": [
   "3-state conditioning / log(1+y) levels vs win flag",
   "claude",
-  "alive"
+  "helps",
+  "51.09; vs L2 +0.20 [-0.05,+0.47], blend over L2 +0.21 [+0.01,+0.42]: centred log1p of lag-7 payout + flag pairs; marginal on top of L2"
  ],
  "L6": [
   "partial pooling of coefficients to the type mean",
   "claude",
-  "alive"
+  "neutral",
+  "relative to L2: pooling to type mean gives nothing (50.74 pooled vs 50.77 control); effect signs differ per machine"
  ],
  "L7": [
   "per-machine sparse feature selection from the screen",
   "claude",
-  "alive"
+  "alive",
+  "49.34; vs L2 standalone -1.55 but blend over L2 +0.25 [-0.02,+0.55] w .79; better short_history (.201 vs .216), worse drift/shared_change: possible complement"
  ],
  "L8": [
   "mixture transition distribution (MTD) lags",
   "claude",
-  "alive"
+  "hurts",
+  "-2.70 [-3.49,-1.87] vs B3; blend over L2 +0.05; short_history 0.99 (not investigated)"
  ],
  "L9": [
   "signal x lag and type x lag interactions",
   "claude",
-  "alive"
+  "neutral",
+  "relative to L2: no signal/type x lag prior cell beats its control; effect magnitude is smaller at signal +1 (diagnostic), sign-free interaction untested"
  ],
  "M1": [
   "holdout-selected half-life variants (holdout length, grid, floor)",

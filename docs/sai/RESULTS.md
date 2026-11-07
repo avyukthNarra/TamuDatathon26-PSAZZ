@@ -59,15 +59,15 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | E3 | episode-level drift stats as features | codex | alive | - |
 | E4 | peer lagged associations vs null controls | codex | alive | - |
 | E5 | latent factor model for episode state | codex | alive | - |
-| L1 | one-hot lags 1-8 + missing flag, regularized multinomial | claude | alive | results/L1.json |
-| L2 | per-machine ridge on lags + pairs (B3 variants: lambda, lag set, pair set) | claude | alive | results/L2.json |
-| L3 | all pairs among lags 1-8 with null controls (9-16); triples | claude | alive | results/L3.json |
-| L4 | per-machine single-lag conditional lift | claude | alive | results/L4.json |
-| L5 | 3-state conditioning / log(1+y) levels vs win flag | claude | alive | results/L5.json |
-| L6 | partial pooling of coefficients to the type mean | claude | alive | results/L6.json |
-| L7 | per-machine sparse feature selection from the screen | claude | alive | results/L7.json |
-| L8 | mixture transition distribution (MTD) lags | claude | alive | results/L8.json |
-| L9 | signal x lag and type x lag interactions | claude | alive | results/L9.json |
+| L1 | one-hot lags 1-8 + missing flag, regularized multinomial | claude | neutral | results/L1.json; vs L2 -0.02: one-hot lags + missing flag matches L2 only when pairs present; one-hot lags alone 31.3; logistic worse than linear |
+| L2 | per-machine ridge on lags + pairs (B3 variants: lambda, lag set, pair set) | claude | helps | results/L2.json; BIG: 50.89 [49.8,51.9], +5.07 [+4.22,+5.89] vs B3 (lead re-scored). lam 0.05 (near-OLS), lag 7 only + pairs (1,3),(2,5),(4,7); B3's lags 1-5 hurt and lam=20 over-shrinks. New base B4. Conditions .106/.216/.211/.183 |
+| L3 | all pairs among lags 1-8 with null controls (9-16); triples | claude | neutral | results/L3.json; best = the same top-3 pairs as L2 (50.88); all 28 pairs 41.9, all triples 41.4, null pairs cost several points each |
+| L4 | per-machine single-lag conditional lift | claude | neutral | results/L4.json; 46.71; vs L2 standalone -4.18, blend over L2 +0.07 [-0.16,+0.30]; only pair-joint cells work |
+| L5 | 3-state conditioning / log(1+y) levels vs win flag | claude | helps | results/L5.json; 51.09; vs L2 +0.20 [-0.05,+0.47], blend over L2 +0.21 [+0.01,+0.42]: centred log1p of lag-7 payout + flag pairs; marginal on top of L2 |
+| L6 | partial pooling of coefficients to the type mean | claude | neutral | results/L6.json; relative to L2: pooling to type mean gives nothing (50.74 pooled vs 50.77 control); effect signs differ per machine |
+| L7 | per-machine sparse feature selection from the screen | claude | alive | results/L7.json; 49.34; vs L2 standalone -1.55 but blend over L2 +0.25 [-0.02,+0.55] w .79; better short_history (.201 vs .216), worse drift/shared_change: possible complement |
+| L8 | mixture transition distribution (MTD) lags | claude | hurts | results/L8.json; -2.70 [-3.49,-1.87] vs B3; blend over L2 +0.05; short_history 0.99 (not investigated) |
+| L9 | signal x lag and type x lag interactions | claude | neutral | results/L9.json; relative to L2: no signal/type x lag prior cell beats its control; effect magnitude is smaller at signal +1 (diagnostic), sign-free interaction untested |
 | M1 | holdout-selected half-life variants (holdout length, grid, floor) | claude | neutral | results/M1.json; +0.01 [-0.01,+0.02]; 90 cells; hl 4-12 hurt at every holdout; floors hurt |
 | M2 | fixed-share over half-lives | claude | helps | results/M2.json; marginal: +0.26 [+0.02,+0.69], stable only (0.118->0.090); one cell (window 180 ~ whole history), dev-selected so optimistic; confirm on audit |
 | M3 | dynamic model averaging | claude | helps | results/M3.json; same effect as M2 (+0.26 [+0.02,+0.69]); two methods agree, one effect, not two |
@@ -95,4 +95,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | S7 | regularized multinomial logistic on full feature set | codex | alive | - |
 | S8 | small MLP | codex | alive | - |
 
-Counts: alive 29, baseline 4, helps 5, hurts 3, neutral 11
+Counts: alive 21, baseline 4, helps 7, hurts 4, neutral 16
