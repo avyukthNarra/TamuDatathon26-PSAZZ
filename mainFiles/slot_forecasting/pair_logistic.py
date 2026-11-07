@@ -57,6 +57,8 @@ class PairLogisticForecaster:
             return None
         rows, ys, ws = [], [], []
         for tick, pay in seq.items():
+            if tick >= cutoff:  # guard: never train on the predicted spin or later
+                continue
             x = _lag_vector(seq, tick, self.lags)
             if x is None:
                 continue
