@@ -148,7 +148,7 @@ Scores are tuning /60 unless marked. Condition values are **loss ratios** (lower
 - **Method:**
   - For each machine, score candidate half-lives {None, 16, 32, 64} prequentially on its own trailing spins.
   - Each trailing spin t is predicted from spins < t only, with Brier loss, every `eval_stride`-th of the last `max_eval_rows`.
-  - The candidates are combined with soft weights exp(−loss/T), T = 128.
+  - The candidates are combined with soft weights. The code computes exp(−(loss − best_loss) × T) with T = 128 (`adaptive_memory.py:194`), so a LARGER T means SHARPER selection, and T = 128 is close to a hard pick.
 - **Results:**
 
   | Comparison | E2 | Fixed | Gain |
