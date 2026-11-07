@@ -19,6 +19,7 @@ How to add an entry (every PR):
 ## [Unreleased]
 
 ### Added
+- Lag-pair mixer forecaster with a verified, reproducible entry ZIP (`mainFiles/run_pair_mixer.py`); validation 53.35 / 60
 - Lag-feature forecaster trained on every past spin (`mainFiles/run_lag_model.py`); validation 31.96 / 60 vs. the pooled baseline's 30
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 
