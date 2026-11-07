@@ -331,40 +331,7 @@ Breaking changes: prefix with **BREAKING:**.
 
 ## 7. Semantic Versioning 2.0.0: how versions are decided
 
-Version = `MAJOR.MINOR.PATCH`. **Git tags (`vX.Y.Z`) are the source of truth.** The version is computed from the Conventional Commits since the last tag. Never pick it by hand.
-
-### Bump rules (take the highest that applies)
-
-| Since last tag there is… | If current ≥ 1.0.0 | If current is 0.y.z (pre-1.0) |
-|---|---|---|
-| any breaking change (`!` / `BREAKING CHANGE:`) | MAJOR (`1.4.2 → 2.0.0`) | MINOR (`0.4.2 → 0.5.0`) |
-| any `feat` | MINOR (`1.4.2 → 1.5.0`) | MINOR (`0.4.2 → 0.5.0`) |
-| any `fix` / `perf` | PATCH (`1.4.2 → 1.4.3`) | PATCH (`0.4.2 → 0.4.3`) |
-| only docs/chore/ci/test/refactor | no release needed | no release needed |
-
-- Bumping MINOR resets PATCH to 0; bumping MAJOR resets MINOR and PATCH to 0.
-- First release is `v0.1.0`. Cut **`v1.0.0` for the final demo/submission** (the "public API" is now what the judges saw).
-- Pre-releases if needed: `v1.0.0-rc.1`, `v1.0.0-rc.2` → `v1.0.0`.
-
-### Compute it (don't do it in your head)
-```bash
-scripts/next-version.sh            # prints e.g. 0.5.0 and why
-scripts/next-version.sh --quiet    # prints only 0.5.0
-```
-
-### Release procedure (release captain)
-```bash
-git checkout main && git pull --ff-only
-V=$(scripts/next-version.sh --quiet)
-git checkout -b release/v$V
-scripts/release.sh                 # moves [Unreleased] → [V] - YYYY-MM-DD in CHANGELOG.md and commits
-git push -u origin HEAD && gh pr create --fill --title "chore(release): v$V"
-# after the release PR is merged:
-git checkout main && git pull --ff-only
-git tag -a v$V -m "v$V" && git push origin v$V
-gh release create v$V --notes-from-tag   # optional (GitHub) — or paste the changelog section
-```
-Suggested cadence during a hackathon: release after each meaningful merge batch, and always right before demo freeze.
+Version = `MAJOR.MINOR.PATCH`, computed from the Conventional Commits since the last tag (git tags `vX.Y.Z` are the source of truth). **Never pick it by hand:** run `scripts/next-version.sh`. First release `v0.1.0`; cut `v1.0.0` at demo freeze. Bump table and the release-captain procedure: [`docs/RELEASING.md`](docs/RELEASING.md).
 
 ---
 
@@ -388,38 +355,13 @@ A task is done only when **all** are true:
 
 ---
 
-## 10. Project-specific notes: Databricks (delete if not used)
-- Use **Databricks Git folders (Repos)** connected to this repo; work on your feature branch inside it, never edit `main` in the workspace.
-- Store notebooks in **source format** (`.py` with `# COMMAND ----------` / `# MAGIC %sql`) so diffs and reviews work. Clear outputs before committing `.ipynb`.
-- **Always use 3-level names**: `catalog.schema.table`. Agree on one catalog/schema per team (e.g. `hack.team_x`), and per-person dev schemas for experiments (`hack.dev_<name>`).
-- **Medallion layout**: `bronze_*` (raw, append-only), `silver_*` (cleaned, typed, deduped), `gold_*` (aggregates for dashboards/ML). Name tables accordingly.
-- Never `DROP`/`TRUNCATE`/`OVERWRITE` a shared `silver_`/`gold_` table without telling the team. Delta time travel (`RESTORE TABLE t TO VERSION AS OF n`) is the undo button.
-- Avoid `.toPandas()` / `.collect()` on large DataFrames; sample or aggregate first.
-- Log ML runs with **MLflow** (`mlflow.autolog()`); put the best run's link in the PR.
-- Data quality checks (row counts, nulls, uniqueness) belong in the pipeline/notebook and count as the "test" for data changes (§2 Step 4).
-- Never hardcode tokens: use `dbutils.secrets.get(scope, key)` or env vars.
-- Shut down/auto-terminate clusters; prefer serverless where available.
+## 10. Project-specific notes: Databricks
+Not used by this project yet. If that changes, read [`docs/DATABRICKS.md`](docs/DATABRICKS.md) first.
 
 ---
 
-## 11. Repo layout (update as it grows)
-```
-.
-├── AGENTS.md                 ← this file (all agents + humans)
-├── CLAUDE.md                 ← Claude Code entry (imports this)
-├── .cursor/rules/            ← Cursor rules (point here)
-├── .github/
-│   ├── copilot-instructions.md
-│   └── pull_request_template.md
-├── .claude/commands/         ← /ship, /release, /changelog for Claude Code
-├── CHANGELOG.md
-├── docs/
-│   └── AGENT_KIT.md          ← what each agent file is for
-├── scripts/
-│   ├── next-version.sh       ← computes next semver from commits
-│   └── release.sh            ← rolls [Unreleased] into a version
-└── TODO: README.md, src/, notebooks/, pipelines/, tests/, docs/DEMO.md
-```
+## 11. Repo layout
+Run `git ls-files` for the current layout. Agent files are explained in `docs/AGENT_KIT.md`.
 
 ---
 
