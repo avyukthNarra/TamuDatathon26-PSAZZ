@@ -18,9 +18,9 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-KIT_MODULES = ("__init__.py", "baseline.py", "schema.py", "io.py")
+KIT_MODULES = ("__init__.py", "baseline.py", "schema.py", "io.py", "pair_mixer.py")
 
-README = """# House Edge entry: per-machine lag-pair rule model
+README = """# House Edge entry: rule model + pair mixer blend
 
 - Round: {round}  ·  Season ID: {season}
 - Environment: `python` image (Python 3.13), **standard library only**. Tested locally on Python {pyver}.
@@ -53,7 +53,13 @@ toward its machine type's average mix, refined by per-machine size rules (same t
 rule search, applied to the sizes of past wins). The final forecast averages two variants: rules graded on
 the exact payout, and rules graded on win/lose only.
 
-Files: `predict.py` (entry point), `rule_model.py` (model), `slot_forecasting/` (kit I/O helpers).
+The final forecast is 30% this rule model + 70% the team's pair mixer
+(`slot_forecasting/pair_mixer.py`): a per-machine online mixture of lag-pair experts
+(match/differ cells, fast and slow memory, weights from recent squared error), with lag pairs
+rediscovered on `/data/train`.
+
+Files: `predict.py` (entry point + blend), `rule_model.py` (rule model),
+`slot_forecasting/` (kit I/O helpers and `pair_mixer.py`).
 """
 
 

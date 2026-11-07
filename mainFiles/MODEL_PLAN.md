@@ -1,6 +1,11 @@
-# House Edge — Our Model (rule model v4)
+# House Edge — Our Model (rule model v4 + team pair mixer)
 
-> **TL;DR**
+> **Submitted entry = combined model: 54.48 / 60 on validation.**
+> It's a weighted average: **30% this rule model + 70% the team's pair mixer**
+> (`slot_forecasting/pair_mixer.py`, from the `COMBINED_SOLUTIONS` branch). See [§13](#13-the-combined-model).
+> Build it with `python3 make_entry.py --out runs/combined-v1`.
+
+> **TL;DR (rule model)**
 > - The slot machines follow hidden **rules**: whether a machine pays depends on whether it **won at two specific
 >   earlier spins** (for example, "pays when exactly one of the spins 1 and 3 back was a win").
 > - Each machine has its **own** rule. Our model tries every possible rule on each machine's own past and trusts
@@ -370,3 +375,37 @@ Round two is worth **40 points**. When the new kit is released (Saturday 9 PM Ce
   machine's history.
 - Getting to mid-50s needs R ≈ 0.09 (we're at 0.135). Each new idea has been worth less than the last
   (+18, +3.4, +0.6), and more tuning on validation risks fitting noise.
+
+---
+
+## 13. The combined model
+
+The team's **pair mixer** (`slot_forecasting/pair_mixer.py`) found the same simulator structure independently and
+builds it a bit differently. Both models make different mistakes, so we average them.
+
+| | Rule model (this doc) | Pair mixer (team) |
+|---|---|---|
+| Rules searched | All 37 (28 pairs, 8 single lags, none), with a head start for common ones | Only the common pairs rediscovered on train: (1,3), (2,5), (4,7) |
+| Cells | 4 cells (win/lose × win/lose) | 2 cells: "did the two lags match or differ?" (pools XOR evidence, so it needs half the data) |
+| Memory | Infinite and fast-fading (0.95/tick) | Half-lives of 12 and 40 ticks |
+| Rule weighting | Log-likelihood of past predictions | Recent squared error (exponential weights) |
+| Payout size | Type mix + big/small and win size rules | Size experts keyed on the exact earlier payouts |
+| Best at | **stable** (0.068) | **short_history, drift, shared_change** |
+
+### Scores on validation
+
+| Model | Points | tune / audit | stable | short_history | drift | shared_change |
+|---|---|---|---|---|---|---|
+| Rule model v4 | 52.89 | 53.08 / 52.68 | 0.068 | 0.208 | 0.130 | 0.132 |
+| Pair mixer | 54.21 | 54.08 / 54.39 | 0.083 | 0.151 | 0.093 | 0.100 |
+| **30% rule + 70% mixer** | **54.48** | **54.42 / 54.56** | **0.067** | **0.148** | **0.091** | **0.099** |
+
+Blend weights tried: 0.2 → 54.45, 0.3 → 54.48, 0.4 → 54.44, 0.5 → 54.33 (weight = rule model's share).
+A geometric average gave the same 54.48, so we kept the simpler straight average.
+Adding a very long memory to the mixer gave only +0.08, so the mixer's own settings are unchanged.
+
+### How it runs
+
+`predict.py` fits both models on `/data/train` (the mixer rediscovers its lag pairs there, so round two
+adapts automatically), predicts with each, and writes `0.3 × rule + 0.7 × mixer`. The weight is
+`RULE_WEIGHT` in `predict.py`. Total runtime is about 105 s per split, deterministic.
