@@ -6,6 +6,9 @@
 > (20% zhill rule model + 80% Pranav pair mixer): 55.37 [54.5,56.1] on our 24 audit episodes (dev 54.14), above our stack's 54.09.**
 > It is stdlib-only, deterministic and already packaged. Our stack adds only +0.15 (CI -0.05,+0.34) to it on dev. The sections below describe OUR models.
 
+> **UPDATE 3 (latest teammate push): Pranav's commit 6a8098c adds a two-mode payout-size model. The 20% rule + 80% mixer-v3 blend scores dev 54.77 [53.7,55.7] and
+> audit 55.90 [55.1,56.6] through our harness: the best model found. Our C2 adds +0.07 (CI includes 0) to it. Details: `TEAM_COMPARISON.md`.
+>
 > **UPDATE 2 (blending everything, volatility, gated/meta blends):** the full team stack (our members + teammates' models, simplex pw/shares weights fit on dev) scores
 > dev 54.29 (OOF) and **55.59 [54.89,56.17] on the 24 audit episodes**, vs 55.37 for the zhill combined model alone: a gain of about +0.2 that is within noise.
 > Volatility-gated blends (V1-V3), observable-evidence gates (G1), per-class/geometric pools (G2) and a tiny MLP meta-learner (G3) all land at 54.3-54.4 dev,
@@ -51,6 +54,8 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 
 | ID | owner | points | CI95 | stable | short | drift | shared | sec | det |
 |---|---|---|---|---|---|---|---|---|---|
+| TM_COMBINED3 | teammates | 54.77 | 53.74-55.71 | 0.066 | 0.149 | 0.076 | 0.091 | 0 | None |
+| TM_MIXER3 | teammates | 54.59 | 53.52-55.58 | 0.079 | 0.152 | 0.073 | 0.092 | 0 | None |
 | G3 | claude | 54.37 | 53.42-55.25 | 0.076 | 0.141 | 0.096 | 0.101 | 4 | None |
 | G1 | claude | 54.35 | 53.44-55.20 | 0.069 | 0.142 | 0.102 | 0.103 | 4 | None |
 | G2 | claude | 54.31 | 53.23-55.32 | 0.078 | 0.142 | 0.098 | 0.101 | 7 | None |
@@ -197,6 +202,8 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | TM_COMBINED | zhill-branch combined 20% rule + 80% mixer | teammates | helps | results/TM_COMBINED.json; BEST SINGLE MODEL: dev 54.14 [53.1,55.1], audit 55.37 [54.5,56.1] (+1.3 over our stack 54.09); stdlib, deterministic, entry already built; tuned on all validation so optimistic |
 | TM_MIXER | Pranav pair mixer | teammates | helps | results/TM_MIXER.json; dev 53.87 [52.8,54.9], +1.79 [+0.98,+2.63] vs our C2; audit 55.20; stdlib only; their win model (p0 share .45 vs our .54) is much better on drift (.096 vs .184) and shared_change |
 | TM_RULE | zhill rule model v4 | teammates | helps | results/TM_RULE.json; dev 52.89, +0.81 [-0.19,+1.76] vs C2; best stable (.057); audit 52.85 |
+| TM_COMBINED3 | 20% rule model + 80% mixer v3 | teammates | helps | results/TM_COMBINED3.json; BEST FOUND: dev 54.77 [53.7,55.7], +0.63 [+0.35,+0.90] vs old TM_COMBINED; audit 55.90 [55.1,56.6]; adding our C2 gives +0.07 [-0.03,+0.17] (nothing); stdlib |
+| TM_MIXER3 | Pranav pair mixer v3 (two-mode payout size) | teammates | helps | results/TM_MIXER3.json; dev 54.59 [53.5,55.6], +0.45 [+0.10,+0.82] vs old TM_COMBINED; audit 55.77; size = one of two exact mixes per type switched by big wins at lags 1,2,3,4 (same lags our A9 found); modes read from validation targets (6 constants shared by all episodes, so in-sample leak is negligible) |
 | TM_E6 | Avyukth E6 signed-L1 logistic | teammates | neutral | results/TM_E6.json; dev 47.69, below B4; adds +0.22 [+0.02,+0.41] to C2 as a blend member (w .17); his E7 neural net not run (no torch locally); his blend claims 50.02 on a different 48-episode audit split |
 | TM_E7 | Avyukth E7 neural context | teammates | neutral | results/TM_E7.json; dev 49.42 [48.2,50.7]; -4.72 vs TM_COMBINED; adds +0.03 [-0.04,+0.11] to it (w .09); short_history .225 much better than his E6 (.327) as he claimed; needs torch |
 | TM_E67 | Avyukth final entry: E6+E7 50/50 | teammates | neutral | results/TM_E67.json; dev 50.02 [49.0,51.1] (his own audit claim 50.02 on a different split); -4.12 vs TM_COMBINED; blend weight 0 into it; needs torch==2.9.1 |
@@ -204,4 +211,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | V2 | softmax-linear vol/history gate | claude | neutral | results/V2.json; dev 54.27-54.30, +0.13..+0.16 [-0.05,+0.34]; same conclusion, 20-36 params |
 | V3 | vol-scaled shrinkage of p_win toward longer memory | claude | neutral | results/V3.json; dev 54.13, 0.00 [-0.10,+0.06]; optimiser never shrinks: TM_COMBINED p_win is already calibrated w.r.t. volatility |
 
-Counts: alive 10, baseline 5, helps 18, hurts 7, neutral 36
+Counts: alive 10, baseline 5, helps 20, hurts 7, neutral 36

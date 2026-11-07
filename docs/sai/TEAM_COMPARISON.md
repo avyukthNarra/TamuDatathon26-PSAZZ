@@ -4,7 +4,16 @@ Pulled all 26 remote branches (2026-11-07). Models that run locally were re-scor
 (the audit set got extra logged looks for this comparison, `who=TEAM_COMPARE`). Teammates' models were tuned on all 96 validation episodes (or on train),
 ours on dev only, so the comparison slightly favors them.
 
-## Ranking (harness-scored; points /60)
+## UPDATE (Pranav's commit 6a8098c, "predict payout size as a two-mode switch")
+Payout size given a win is exactly one of TWO mixes per machine type (6 constants, read from validation targets), switched by whether the spin 1, 2, 3 or 4 back was a big win; the mixer estimates the mode by Bayes' rule. Same lags our A9 severity model found (1,2,4) - now exact.
+| Model | Dev | Audit |
+|---|---|---|
+| **20% rule + 80% mixer v3 (best found)** | **54.77** [53.7,55.7] | **55.90** [55.1,56.6] |
+| mixer v3 alone | 54.59 | 55.77 |
+| previous zhill combined (old mixer) | 54.14 | 55.37 |
+Our C2 adds +0.07 [-0.03,+0.17] to the new blend (nothing); error shares now p0 .52, p1 .24, p2 .17, p5 .06. Size is no longer the dominant error; win probability is again (52%).
+
+## Ranking (harness-scored; points /60), before that commit
 | Model | Branch | Dev | Audit | Notes |
 |---|---|---|---|---|
 | **TM_COMBINED** (20% rule model + 80% pair mixer) | `zhill-branch` | **54.14** [53.1,55.1] | **55.37** [54.5,56.1] | stdlib only, deterministic, entry already built (`make_entry.py`), ~30 s |

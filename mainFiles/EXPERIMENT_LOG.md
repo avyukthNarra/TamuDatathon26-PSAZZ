@@ -202,3 +202,8 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
 - Subset search over 12 models (298 subsets, dev OOF): best 1-member TM_COMBINED 54.14, best 2-member TM_COMBINED 79% + C2 21% = 54.27, best 3-member 54.28; composition (win prob TM_COMBINED, sizes avg(C1, TM)) 54.37.
 - Full team stack on audit (extra logged looks, who=W5_final / TEAM_COMPARE): 55.59 [54.89,56.17] vs TM_COMBINED 55.37 [54.5,56.1] vs our own stack 54.09.
 - Conclusion: blending is saturated near 54.3-54.4 dev / ~55.4-55.6 audit; the lever left is payout-size modelling (~54% of remaining error).
+
+### Pranav COMBINED_SOLUTIONS 6a8098c: two-mode payout size (re-scored through the harness)
+- Size given win is exactly one of two mixes per machine type (6 constants), switched by big wins at lags 1,2,3,4 (our A9 had found lags 1,2,4 statistically). Mixer v3: dev 54.59, audit 55.77.
+- 20% rule model + 80% mixer v3: dev 54.77 [53.7,55.7], audit 55.90 [55.1,56.6]; +0.63 [+0.35,+0.90] over the previous best (old TM_COMBINED 54.14). Our C2 adds +0.07 [-0.03,+0.17].
+- Error shares now p0 .52, p1 .24, p2 .17, p5 .06: win probability is the larger error again. Modes are read from validation targets (round two must re-derive them from the new kit's validation targets).
