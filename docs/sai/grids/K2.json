@@ -1,0 +1,125 @@
+[
+ {
+  "win": [
+   "TM_COMBINED3",
+   "TM_E7",
+   "M9b_B4"
+  ],
+  "shares": [
+   "TM_MIXER3",
+   "C1",
+   "C2"
+  ],
+  "points": 54.90747415419196
+ },
+ {
+  "win": [
+   "TM_COMBINED3",
+   "TM_E7",
+   "M9b_B4"
+  ],
+  "shares": [
+   "TM_MIXER3",
+   "C2"
+  ],
+  "points": 54.90747379682927
+ },
+ {
+  "win": [
+   "TM_COMBINED3",
+   "TM_E7",
+   "M9b_B4"
+  ],
+  "shares": [
+   "TM_MIXER3",
+   "C1"
+  ],
+  "points": 54.90747379451741
+ },
+ {
+  "win": [
+   "TM_COMBINED3",
+   "TM_E7",
+   "M9b_B4"
+  ],
+  "shares": [
+   "TM_COMBINED3",
+   "TM_MIXER3",
+   "C1"
+  ],
+  "points": 54.90601788065327
+ },
+ {
+  "win": [
+   "TM_COMBINED3",
+   "TM_E7",
+   "M9b_B4"
+  ],
+  "shares": [
+   "TM_COMBINED3",
+   "TM_MIXER3",
+   "C2"
+  ],
+  "points": 54.90601787449771
+ },
+ {
+  "win": [
+   "TM_COMBINED3",
+   "TM_E7",
+   "M9b_B4"
+  ],
+  "shares": [
+   "TM_MIXER3",
+   "C2",
+   "TM_RULE"
+  ],
+  "points": 54.905885528406415
+ },
+ {
+  "win": [
+   "TM_COMBINED3",
+   "TM_E7",
+   "M9b_B4"
+  ],
+  "shares": [
+   "TM_MIXER3",
+   "C1",
+   "TM_RULE"
+  ],
+  "points": 54.905885525171506
+ },
+ {
+  "win": [
+   "TM_COMBINED3",
+   "TM_E7"
+  ],
+  "shares": [
+   "TM_MIXER3",
+   "C2"
+  ],
+  "points": 54.90481531229382
+ },
+ {
+  "win": [
+   "TM_COMBINED3",
+   "TM_E7"
+  ],
+  "shares": [
+   "TM_MIXER3",
+   "C1"
+  ],
+  "points": 54.9048153121412
+ },
+ {
+  "win": [
+   "TM_COMBINED3",
+   "TM_E7"
+  ],
+  "shares": [
+   "TM_MIXER3",
+   "C1",
+   "C2"
+  ],
+  "points": 54.9048152786594
+ }
+]

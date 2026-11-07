@@ -202,14 +202,15 @@ doc = write_result("K2", "claude", f"K2 small-subset stack and observable gates;
 
 best_pts = doc["points"]
 lines = ["# K2 report (dev OOF, 6 folds, R-weighted; audit untouched)",
-         f"- Combos searched: step1 {len(step1)} two-stage (41 win x 41 size subsets), step2 {len(step2)} gate configs (6 pairs x 4 gate forms x 1 ungated baseline)",
-         "- Top 10 two-stage (dev OOF points):"]
-for d in top10[:10]:
+         f"- Searched: {len(step1)} two-stage (41 win x 41 size subsets) + {len(step2)} gate configs (6 pairs x ungated/obs/cutoff/type)",
+         "- Top 3 two-stage (dev OOF points), all win sets contain TM_COMBINED3:"]
+for d in top10[:3]:
     lines.append(f"  {d['points']:.3f} win={'+'.join(d['win'])} | shares={'+'.join(d['shares'])}")
+lines.append(f"- Top 10 table: grids/K2.json; BEST (TM_COMBINED3) dev points {evaluate(BEST, v, 'dev', bootstrap=0)['points']:.3f}")
 for d in top3_diff:
-    lines.append(f"- vs BEST (TM_COMBINED3, {BEST_NAME} dev points): {d['win']}/{d['shares']} diff {d['diff']:+.3f} CI [{d['ci95'][0]:.2f},{d['ci95'][1]:.2f}]")
-lines.append(f"- Gates: {'helped (>0.1 over ungated) in ' + str(len(gated_helped)) + ' configs' if gated_helped else 'no gate beat its ungated pair by >0.1 points'}; best gate OOF {best2['points']:.3f} ({best2['A']}+{best2['B']} {best2['gate']}, gain {best2['gain_vs_ungated']:+.3f})")
-lines.append(f"- Saved structure: {final_desc}, dev OOF points {best_pts:.3f}")
-lines.append(f"- Runtime {time.time() - t0:.0f}s")
+    lines.append(f"- vs BEST, #{top3_diff.index(d)+1}: diff {d['diff']:+.3f} CI [{d['ci95'][0]:.2f},{d['ci95'][1]:.2f}] (bootstrap 500)")
+lines.append(f"- Gates: {'helped (>0.1 over ungated) in ' + str(len(gated_helped)) + ' configs' if gated_helped else 'none beat their ungated pair by >0.1'}; best gate {best2['points']:.3f} ({best2['A']}+{best2['B']} {best2['gate']}, gain {best2['gain_vs_ungated']:+.3f})")
+lines.append(f"- Saved (preds/K2_validation.csv, results/K2.json): {final_desc}, dev OOF {best_pts:.3f}")
+lines.append(f"- Runtime {time.time() - t0:.0f}s; gate scale fit on dev rows; no audit scoring")
 (HERE / "reports" / "K2.md").write_text("\n".join(lines) + "\n")
 print("\n".join(lines))

@@ -55,6 +55,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | ID | owner | points | CI95 | stable | short | drift | shared | sec | det |
 |---|---|---|---|---|---|---|---|---|---|
 | Q3 | sai-worker | 54.95 | 53.93-55.84 | 0.068 | 0.144 | 0.067 | 0.088 | 4 | None |
+| K2 | claude | 54.91 | 53.97-55.78 | 0.067 | 0.135 | 0.080 | 0.089 | 45 | None |
 | K1 | sai-worker | 54.85 | 53.85-55.74 | 0.064 | 0.140 | 0.081 | 0.090 | 0 | None |
 | TM_COMBINED3 | teammates | 54.77 | 53.74-55.71 | 0.066 | 0.149 | 0.076 | 0.091 | 0 | None |
 | TM_MIXER3 | teammates | 54.59 | 53.52-55.58 | 0.079 | 0.152 | 0.073 | 0.092 | 0 | None |
@@ -163,6 +164,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | G2 | per-class / geometric pool | claude | neutral | results/G2.json; dev 54.31 saved (per-class geometric); pw/shares on 7 members 54.38 [+0.01,+0.45] vs TM_COMBINED; extra params hurt |
 | G3 | tiny MLP / boosted-tree meta-learner | claude | neutral | results/G3.json; dev 54.37, +0.23 [+0.06,+0.39] vs TM_COMBINED but unstable (alpha 1 vs 10 swings 0.4); trees overfit (train .0154 vs OOF .0200); ~250 weights |
 | K1 | extensive combination search around BEST (324 compositions, 154 blends, nested check) | claude | neutral | results/K1.json; BEST (TM_COMBINED3 54.77) is saturated: best composition 54.72, best blend 0.85 BEST + 0.15 C2 = 54.85 (+0.08 [-0.03,+0.17]); nested check over 478 combos: held-out gain +0.007, so the +0.08 is selection optimism; only C2 gets weight (stable 0.15) |
+| K2 | two-stage blends of small subsets (1681 structures) + observable gates | claude | neutral | results/K2.json; best 54.91, +0.13 [-0.00,+0.30] vs BEST: win = TM_COMBINED3+TM_E7+M9b_B4, shares = TM_MIXER3+C1+C2; top structures within 0.002 of each other; no gate (obs-fraction, cutoff, type) beats its ungated pair by >0.1; searching 1681 structures inflates this |
 | L1 | one-hot lags 1-8 + missing flag, regularized multinomial | claude | neutral | results/L1.json; vs L2 -0.02: one-hot lags + missing flag matches L2 only when pairs present; one-hot lags alone 31.3; logistic worse than linear |
 | L2 | per-machine ridge on lags + pairs (B3 variants: lambda, lag set, pair set) | claude | helps | results/L2.json; BIG: 50.89 [49.8,51.9], +5.07 [+4.22,+5.89] vs B3 (lead re-scored). lam 0.05 (near-OLS), lag 7 only + pairs (1,3),(2,5),(4,7); B3's lags 1-5 hurt and lam=20 over-shrinks. New base B4. Conditions .106/.216/.211/.183 |
 | L3 | all pairs among lags 1-8 with null controls (9-16); triples | claude | neutral | results/L3.json; best = the same top-3 pairs as L2 (50.88); all 28 pairs 41.9, all triples 41.4, null pairs cost several points each |
@@ -217,4 +219,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | V2 | softmax-linear vol/history gate | claude | neutral | results/V2.json; dev 54.27-54.30, +0.13..+0.16 [-0.05,+0.34]; same conclusion, 20-36 params |
 | V3 | vol-scaled shrinkage of p_win toward longer memory | claude | neutral | results/V3.json; dev 54.13, 0.00 [-0.10,+0.06]; optimiser never shrinks: TM_COMBINED p_win is already calibrated w.r.t. volatility |
 
-Counts: alive 10, baseline 5, helps 20, hurts 8, neutral 38
+Counts: alive 10, baseline 5, helps 20, hurts 8, neutral 39

@@ -473,5 +473,11 @@
   "claude",
   "neutral",
   "54.95, +0.18 [-0.00,+0.35] vs BEST; fitted coefficient is NEGATIVE (-0.146): BEST slightly over-shrinks toward the slow level; noise-level; vol-gated shrink never opens (as V3); 9 cells"
+ ],
+ "K2": [
+  "two-stage blends of small subsets (1681 structures) + observable gates",
+  "claude",
+  "neutral",
+  "best 54.91, +0.13 [-0.00,+0.30] vs BEST: win = TM_COMBINED3+TM_E7+M9b_B4, shares = TM_MIXER3+C1+C2; top structures within 0.002 of each other; no gate (obs-fraction, cutoff, type) beats its ungated pair by >0.1; searching 1681 structures inflates this"
  ]
 }

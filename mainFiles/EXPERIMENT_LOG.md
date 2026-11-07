@@ -217,3 +217,8 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
 - Q1 (per-machine grid filter, sigma per machine / pooled / BMA): 31.5 / 31.1 / 31.3 dev, ~23 points below BEST: no skill alone. Win flags carry little slow level-drift signal; the real structure is lag-pair parity.
 - Q3 (Q1 as a logit-blend member of BEST): 54.95, +0.18 [-0.00,+0.35]; fitted coefficient negative (BEST slightly over-shrinks toward the slow level). Noise-level. Vol-gated shrink never opens (same as V3).
 - Q2 (volatility-linked sigma, pair-cell filters) is running as a separate Haiku worker.
+
+### K2 two-stage small-subset blends and observable gates (Haiku worker, lead re-scored): 54.91 dev
+- 1681 pw-set x shares-set structures (each 1-3 members), 6-fold dev OOF: best 54.91, +0.13 [-0.00,+0.30] over BEST (54.77); the top structures are within 0.002 of each other.
+  win = TM_COMBINED3 + TM_E7 + M9b_B4, shares = TM_MIXER3 + C1 + C2. Searching 1681 structures inflates it, same as K1's nested check (held-out gain ~0).
+- No observable gate (observed-tick fraction, cutoff, machine type) beats its ungated pair by more than 0.1; some gate fits go unstable.
