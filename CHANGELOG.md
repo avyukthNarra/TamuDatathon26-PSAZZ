@@ -23,6 +23,7 @@ How to add an entry (every PR):
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 
 ### Changed
+- Model outputs go to `mainFiles/runs/<name>/`, which is git-ignored, so prediction files are no longer committed; run docs updated to match (#7)
 - Playbook requires agents to delete branches with merged PRs (local and origin) after each merge (#6)
 - Playbook spells out PR flow: no pushes to `main`, one approval (own is fine), merge only when approved with no conflicts
 - Agents no longer flag unfilled project snapshot `TODO`s before kickoff; whoever adds a piece of the stack fills its row

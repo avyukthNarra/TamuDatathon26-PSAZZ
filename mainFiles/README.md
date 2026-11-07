@@ -53,10 +53,10 @@ python --version
 If your system uses `python3` or `py`, use that instead of `python` below.
 
 ```sh
-python run_starter.py --out outputs
-python check_submission.py outputs/submission.csv
-python check_submission.py outputs/validation_predictions.csv --split validation
-python build_entry.py --starter outputs --out entry.zip
+python run_starter.py --method pooled --out runs/pooled
+python check_submission.py runs/pooled/submission.csv
+python check_submission.py runs/pooled/validation_predictions.csv --split validation
+python build_entry.py --starter runs/pooled --out runs/pooled/entry.zip
 ```
 
 ### What these commands do
@@ -65,7 +65,7 @@ The starter trains a baseline and compares six methods on validation data. **It 
 
 The two checker commands check your test file and score your validation file. A local check doesn't upload anything or reveal your final test score.
 
-The last command packages your saved starter model and code. Upload **`outputs/submission.csv` and `entry.zip`** as two separate files. The `--starter` option works with `run_starter.py` outputs. For your own model or the experiment runner, follow the packaging instructions in Section 7.
+The last command packages your saved starter model and code. Upload **`runs/pooled/submission.csv` and `runs/pooled/entry.zip`** as two separate files. The `--starter` option works with `run_starter.py` outputs. For your own model or the experiment runner, follow the packaging instructions in Section 7.
 
 | File | What it contains |
 | --- | --- |
@@ -76,7 +76,23 @@ The last command packages your saved starter model and code. Upload **`outputs/s
 | `validation_score.json` | Detailed validation scores. |
 | `comparison/` | Validation predictions from each baseline. |
 
-Keep this first run. Use a new output folder for each experiment so you can go back to an earlier model. If you prefer notebooks, `starter.ipynb` covers the same steps; you'll need your own Jupyter installation.
+Keep this first run. Give each model its own folder under `runs/` so you can go back to an earlier one (see [Keep your runs separate](#keep-your-runs-separate)). If you prefer notebooks, `starter.ipynb` covers the same steps; you'll need your own Jupyter installation.
+
+### Keep your runs separate
+
+Every model, method, or experiment gets its own folder under `runs/`, named for what it is:
+
+```text
+mainFiles/runs/pooled/           run_starter.py --method pooled
+mainFiles/runs/recent/           run_starter.py --method recent
+mainFiles/runs/experiments-01/   run_experiments.py
+mainFiles/runs/my-model-v2/      your own script
+```
+
+- **`runs/` is git-ignored.** Predictions, model files, JSON reports, and ZIPs stay on your machine and are not pushed to `main` or your feature branch. Only commit code, settings, and documentation.
+- **Always pass `--out runs/<name>`.** The scripts default to `outputs/` or `experiments/`, which would scatter results. Choose a new name for each run: `run_experiments.py` and `build_entry.py` refuse to reuse an existing path, but `run_starter.py` overwrites an existing folder without warning.
+- **To share a result with the team,** write the exact command, method, and settings in your README or PR description. Don't commit the CSVs.
+- **To compare runs,** check each folder's validation file: `python check_submission.py runs/<name>/validation_predictions.csv --split validation`.
 
 ## 2. The data
 
@@ -140,9 +156,9 @@ See `DATA.md` for details. Use validation answers to compare ideas, but remember
 ### Try another baseline
 
 ```sh
-python run_starter.py --method recent --out recent-run
-python check_submission.py recent-run/validation_predictions.csv --split validation
-python check_submission.py recent-run/submission.csv
+python run_starter.py --method recent --out runs/recent
+python check_submission.py runs/recent/validation_predictions.csv --split validation
+python check_submission.py runs/recent/submission.csv
 ```
 
 The included methods are `global`, `context`, `empirical`, `recent`, `pooled`, and `pooled_recent`. You're free to use other methods and libraries.
@@ -240,11 +256,11 @@ Save your baseline results, change one thing, and compare on the same validation
 ### Run the included experiments
 
 ```sh
-python run_experiments.py --out experiments-01
-python check_submission.py experiments-01/submission.csv
+python run_experiments.py --out runs/experiments-01
+python check_submission.py runs/experiments-01/submission.csv
 ```
 
-This tries 12 settings. It chooses a model using half the validation episodes in each condition, then checks that model on the other half. It writes `submission.csv`, `validation_predictions.csv`, and `experiments.json`. Edit `starter_candidates()` in `slot_forecasting/experiments.py` to add your own candidates.
+This tries 12 settings. It chooses a model using half the validation episodes in each condition, then checks that model on the other half. It writes `submission.csv`, `validation_predictions.csv`, and `experiments.json` into `runs/experiments-01/`. Edit `starter_candidates()` in `slot_forecasting/experiments.py` to add your own candidates.
 
 Once you start tuning against that second half, it stops being an independent check. Keep whole episodes together and look for future information accidentally getting into your features before trusting a large improvement.
 
@@ -343,7 +359,7 @@ Run the checker on that output from the kit folder. Make sure it matches the CSV
 Package the source folder from the kit folder:
 
 ```text
-python build_entry.py --source my-entry --out custom-entry.zip
+python build_entry.py --source my-entry --out runs/my-model-v2/entry.zip
 ```
 
 Keep the ZIP outside `my-entry/`. It must open directly to `README.md` and `reproduce.json`, without an extra enclosing folder. Limits are 5,000 entries, 100 MB compressed, and 512 MiB unpacked. Symlinks, encrypted files, unsafe paths, and duplicate paths are rejected.
@@ -400,7 +416,7 @@ After each cutoff, organizers select each team's latest response and validate it
 | `query_id mismatch` | Check the round and split. Validation files need `--split validation`; uploads need test IDs. |
 | Probabilities don't add up to one | Check column order, normalize each row, and avoid rounding too much. Find the cause of any NaNs. |
 | Extra columns | Remove dataframe indices. With pandas, use `index=False`. |
-| Output folder already exists | Pick a new `--out` folder. |
+| Output folder already exists | Pick a new `runs/<name>` folder for each run. `run_experiments.py` and `build_entry.py` refuse to reuse an existing path; `run_starter.py` overwrites it, so pick a new name each time. |
 | Points differ from the `score` field | Use `technical_points` for the round score. The older diagnostic has a different scale. |
 | Can I use coding assistants or automated tuning? | Yes. You're responsible for the results and for following the data rules. |
 | Do I need RL, a neural network, or a GPU? | No. Any model that produces the required probabilities can compete. |

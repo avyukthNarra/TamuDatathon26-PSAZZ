@@ -31,10 +31,10 @@ Compare round points and the scores for each machine condition. Keep a change th
 ## Optional: use the experiment runner
 
 ```sh
-python run_experiments.py --out experiments-01
+python run_experiments.py --out runs/experiments-01
 ```
 
-It tries 12 small model settings. Half the validation episodes in each condition choose a model; the other half checks it afterward. It saves `submission.csv`, validation predictions, and `experiments.json` with the results.
+It tries 12 small model settings. Half the validation episodes in each condition choose a model; the other half checks it afterward. It saves `submission.csv`, validation predictions, and `experiments.json` with the results in `runs/experiments-01/`. Keep each variant in its own `runs/` folder; those outputs stay local and are not committed (see the README's [Keep your runs separate](README.md#keep-your-runs-separate)).
 
 Edit `starter_candidates()` in `slot_forecasting/experiments.py` to change the list. Or pass `(name, factory)` pairs to `run_experiments`. Each model needs `fit(queries, history, labels)` and `predict(queries, history)`. `TransitionForecaster` is a starting point for changing history lags, memory, smoothing, and features.
 
