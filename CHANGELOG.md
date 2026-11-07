@@ -20,6 +20,7 @@ How to add an entry (every PR):
 
 ### Added
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
+- Per-machine soft memory selection for the combo ExtraTrees and logistic win models
 
 ### Changed
 - Model outputs go to `mainFiles/runs/<name>/`, which is git-ignored, so prediction files are no longer committed; run docs updated to match (#7)
