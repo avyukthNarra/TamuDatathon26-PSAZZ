@@ -53,7 +53,7 @@ toward its machine type's average mix, refined by per-machine size rules (same t
 rule search, applied to the sizes of past wins). The final forecast averages two variants: rules graded on
 the exact payout, and rules graded on win/lose only.
 
-The final forecast is 30% this rule model + 70% the team's pair mixer
+The final forecast is 20% this rule model + 80% the team's pair mixer
 (`slot_forecasting/pair_mixer.py`): a per-machine online mixture of lag-pair experts
 (match/differ cells, fast and slow memory, weights from recent squared error), with lag pairs
 rediscovered on `/data/train`.

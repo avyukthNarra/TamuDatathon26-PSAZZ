@@ -1,9 +1,9 @@
 # House Edge — Our Model (rule model v4 + team pair mixer)
 
-> **Submitted entry = combined model: 54.48 / 60 on validation.**
-> It's a weighted average: **30% this rule model + 70% the team's pair mixer**
+> **Submitted entry = combined model: 54.45 / 60 on validation.**
+> It's a weighted average: **20% this rule model + 80% the team's pair mixer**
 > (`slot_forecasting/pair_mixer.py`, from the `COMBINED_SOLUTIONS` branch). See [§13](#13-the-combined-model).
-> Build it with `python3 make_entry.py --out runs/combined-v1`.
+> Build it with `python3 make_entry.py --out runs/combined-v2`.
 
 > **TL;DR (rule model)**
 > - The slot machines follow hidden **rules**: whether a machine pays depends on whether it **won at two specific
@@ -398,14 +398,33 @@ builds it a bit differently. Both models make different mistakes, so we average 
 |---|---|---|---|---|---|---|
 | Rule model v4 | 52.89 | 53.08 / 52.68 | 0.068 | 0.208 | 0.130 | 0.132 |
 | Pair mixer | 54.21 | 54.08 / 54.39 | 0.083 | 0.151 | 0.093 | 0.100 |
-| **30% rule + 70% mixer** | **54.48** | **54.42 / 54.56** | **0.067** | **0.148** | **0.091** | **0.099** |
+| 30% rule + 70% mixer | 54.48 | 54.42 / 54.56 | 0.067 | 0.148 | 0.091 | 0.099 |
+| **20% rule + 80% mixer (submitted)** | **54.45** | | **0.072** | **0.147** | **0.090** | **0.098** |
 
 Blend weights tried: 0.2 → 54.45, 0.3 → 54.48, 0.4 → 54.44, 0.5 → 54.33 (weight = rule model's share).
 A geometric average gave the same 54.48, so we kept the simpler straight average.
 Adding a very long memory to the mixer gave only +0.08, so the mixer's own settings are unchanged.
 
+### Why 0.2 and not 0.3: an independent check
+
+Validation picked the weight, so we also checked on data neither of us tuned the blend on: fit both models on
+**validation**, predict the **train** queries, and score against their real outcomes (Brier; lower is better).
+
+| Model | Train-outcome Brier |
+|---|---|
+| reference (pooled) | 0.5703 |
+| rule model | 0.3736 |
+| pair mixer | **0.3595** |
+| 20% rule + 80% mixer | 0.3606 |
+| 30% rule + 70% mixer | 0.3615 (vs mixer +0.0021, 95% range −0.0001 to +0.0042) |
+
+Here the mixer alone is slightly best, but the mixer was itself tuned on train outcomes
+(`tune_pair_mixer.py`), so this check leans its way just as validation leans toward the blend. 0.2 keeps
+almost all of the validation gain (54.45 vs 54.48) at half the cost on this check. Either way the difference
+is under ~0.3 points. **These are all estimates: the test score is hidden until results are released.**
+
 ### How it runs
 
 `predict.py` fits both models on `/data/train` (the mixer rediscovers its lag pairs there, so round two
-adapts automatically), predicts with each, and writes `0.3 × rule + 0.7 × mixer`. The weight is
+adapts automatically), predicts with each, and writes `0.2 × rule + 0.8 × mixer`. The weight is
 `RULE_WEIGHT` in `predict.py`. Total runtime is about 105 s per split, deterministic.

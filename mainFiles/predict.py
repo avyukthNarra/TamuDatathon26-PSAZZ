@@ -1,6 +1,6 @@
 """Recreate our test forecast: python predict.py --data <public folder> --out <submission.csv>
 
-Combined model (validation 54.48 / 60): 30% our rule model + 70% the team's pair mixer
+Combined model (validation 54.45 / 60): 20% our rule model + 80% the team's pair mixer
 (slot_forecasting/pair_mixer.py, COMBINED_SOLUTIONS branch). Both refit on <data>/train
 (deterministic, no randomness), then predict <data>/test. Standard library only.
 Works unchanged for the main round and round two (adaptation).
@@ -13,10 +13,12 @@ from slot_forecasting.pair_mixer import adapt
 
 from rule_model import RuleForecaster
 
-# Weight of our rule model in the final blend; the pair mixer gets the rest. Chosen on validation:
-# 0.3 -> 54.48 (tune 54.42, audit 54.56) vs rule model 52.89 and pair mixer 54.21 alone.
-# The rule model is better on stable machines, the pair mixer on short_history / drift / shared_change.
-RULE_WEIGHT = 0.3
+# Weight of our rule model in the final blend; the pair mixer gets the rest.
+# Validation (true odds): 0.2 -> 54.45, 0.3 -> 54.48, mixer alone 54.21, rule model alone 52.89.
+# Independent check (fit on validation, Brier on train outcomes): mixer alone best; 0.2 costs
+# +0.0011, 0.3 costs +0.0021 (95% range -0.0001..+0.0042). Each check is biased toward what was
+# tuned on it, so 0.2 is the compromise. The rule model helps most on stable machines.
+RULE_WEIGHT = 0.2
 
 
 # v4 (validation 52.89 / 60): average of two rule models that make different mistakes.
