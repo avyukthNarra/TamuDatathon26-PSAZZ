@@ -19,10 +19,12 @@ How to add an entry (every PR):
 ## [Unreleased]
 
 ### Added
+- Lag-pair mixer forecaster with a verified, reproducible entry ZIP (`mainFiles/run_pair_mixer.py`); validation 53.75 / 60
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 - House Edge rule model (v4): per-machine lag-pair win rules plus payout-size rules, 52.89 / 60 on validation vs 30.83 for the best starter, with a one-command entry builder for main and round two
 
 ### Changed
+- Pair mixer's payout-size experts now read the exact earlier payouts (lags 1, 2, (1,2), (2,3)); validation 53.75 -> 54.21 / 60
 - Model outputs go to `mainFiles/runs/<name>/`, which is git-ignored, so prediction files are no longer committed; run docs updated to match (#7)
 - Playbook requires agents to delete branches with merged PRs (local and origin) after each merge (#6)
 - Playbook spells out PR flow: no pushes to `main`, one approval (own is fine), merge only when approved with no conflicts
