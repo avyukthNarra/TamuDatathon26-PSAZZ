@@ -226,3 +226,8 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
 ### Q2 volatility-linked random-walk filter and lag-pair-cell filters (Haiku worker report reviewed)
 - Standalone 31-36 dev, member weight 0.00 in all 6 OOF folds for every candidate (loss rises monotonically with w), filter pw correlates 0.53 with BEST pw. Verdict hurts/no value.
 - Overall: random walk (geometric Brownian motion) on log-odds, volatility-linked noise, gated and neural blends and a 1681-structure search all fail to beat the best model by more than noise.
+
+### Codex branch merged into sai/master-test (consolidation); Codex's B4 learners and team analyses re-scored by the lead
+- S1_B4 / S2_B4 / S5_B4 (residual learners and distillation on B4): 50.99 / 51.00 / 51.05 dev vs B4 50.89: +0.1, far below BEST (54.77). Residual learning on B4 adds nothing material.
+- TEAM_DIRECT/FACTOR/GATE/VOLATILITY (blends of team members on the older win model): 54.1-54.3, below BEST (-0.4..-0.6).
+- TEAM_SIZE_MODES: re-derives the two-mode payout size with mode centers learned from DEV training folds only (no hard-coded modes/lags) on TM_COMBINED's win prob: 54.87, +0.73 [+0.40,+1.07] over old TM_COMBINED, +0.09 [-0.11,+0.30] over BEST. Confirms Pranav's finding independently.

@@ -61,16 +61,22 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 |---|---|---|---|---|---|---|---|---|---|
 | Q3 | sai-worker | 54.95 | 53.93-55.84 | 0.068 | 0.144 | 0.067 | 0.088 | 4 | None |
 | K2 | claude | 54.91 | 53.97-55.78 | 0.067 | 0.135 | 0.080 | 0.089 | 45 | None |
+| TEAM_SIZE_MODES | ? | 54.87 | 53.85-55.86 | 0.059 | 0.155 | 0.072 | 0.089 | 14 | 0.0 |
 | K1 | sai-worker | 54.85 | 53.85-55.74 | 0.064 | 0.140 | 0.081 | 0.090 | 0 | None |
 | Q2 | claude | 54.77 | 53.70-55.71 | 0.066 | 0.149 | 0.076 | 0.091 | 133 | 0.0 |
 | TM_COMBINED3 | teammates | 54.77 | 53.74-55.71 | 0.066 | 0.149 | 0.076 | 0.091 | 0 | None |
 | TM_MIXER3 | teammates | 54.59 | 53.52-55.58 | 0.079 | 0.152 | 0.073 | 0.092 | 0 | None |
 | G3 | claude | 54.37 | 53.42-55.25 | 0.076 | 0.141 | 0.096 | 0.101 | 4 | None |
 | G1 | claude | 54.35 | 53.44-55.20 | 0.069 | 0.142 | 0.102 | 0.103 | 4 | None |
+| TEAM_FACTOR | codex-team | 54.34 | 53.33-55.21 | 0.079 | 0.139 | 0.096 | 0.103 | 1 | 0.0 |
 | G2 | claude | 54.31 | 53.23-55.32 | 0.078 | 0.142 | 0.098 | 0.101 | 7 | None |
 | V2 | sai-worker | 54.30 | 53.35-55.18 | 0.072 | 0.145 | 0.099 | 0.104 | 0 | None |
+| TEAM_GATE | codex-team | 54.29 | 53.37-55.15 | 0.073 | 0.144 | 0.099 | 0.104 | 1 | 0.0 |
 | V1 | sai-worker | 54.27 | 53.31-55.17 | 0.072 | 0.146 | 0.100 | 0.104 | 0 | None |
+| TEAM_DIRECT | codex-team | 54.27 | 53.30-55.16 | 0.072 | 0.147 | 0.098 | 0.105 | 0 | 0.0 |
+| TEAM_VOLATILITY | codex | 54.22 | 53.17-55.20 | 0.074 | 0.152 | 0.094 | 0.106 | 99 | 0.0 |
 | V3 | sai-worker | 54.14 | 53.07-55.12 | 0.077 | 0.156 | 0.094 | 0.106 | 0 | None |
+| TEAM_VOLATILITY_CONTROL | codex | 54.14 | 53.07-55.12 | 0.077 | 0.156 | 0.094 | 0.106 | 99 | 0.0 |
 | TM_COMBINED | teammates | 54.14 | 53.07-55.12 | 0.077 | 0.156 | 0.094 | 0.106 | 0 | None |
 | TM_MIXER | teammates | 53.87 | 52.76-54.87 | 0.091 | 0.159 | 0.096 | 0.109 | 0 | None |
 | TM_RULE | teammates | 52.89 | 51.78-53.94 | 0.057 | 0.210 | 0.133 | 0.136 | 0 | None |
@@ -85,6 +91,9 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | L10 | claude | 51.10 | 49.98-52.07 | 0.107 | 0.208 | 0.202 | 0.179 | 0 | 0.0 |
 | L5 | claude-w1 | 51.09 | 50.03-52.04 | 0.109 | 0.206 | 0.201 | 0.181 | 0 | 0.0 |
 | M3_B4 | claude-w2 | 51.09 | 50.07-52.00 | 0.091 | 0.216 | 0.208 | 0.183 | 0 | 0.0 |
+| S5_B4 | codex | 51.05 | 50.02-51.99 | 0.103 | 0.210 | 0.210 | 0.179 | 3 | 0.0 |
+| S2_B4 | codex | 51.00 | 49.93-52.00 | 0.107 | 0.214 | 0.209 | 0.176 | 44 | 0.0 |
+| S1_B4 | codex | 50.99 | 49.92-51.96 | 0.108 | 0.215 | 0.210 | 0.175 | 19 | 0.0 |
 | M1_B4 | claude-w2 | 50.89 | 49.85-51.87 | 0.105 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
 | B4 | claude-w1 | 50.89 | 49.85-51.87 | 0.106 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
 | L2 | claude-w1 | 50.89 | 49.85-51.87 | 0.106 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
@@ -214,6 +223,15 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | S6 | smoothed pseudo-targets from a future window (train only) | codex | hurts | results/S6.json; 34.74 (-11.08 vs B3): future-window pseudo-targets average through drift; built on old B3; lead re-scored via harness |
 | S7 | regularized multinomial logistic on full feature set | codex | neutral | results/S7.json; 44.73 (-1.09 vs B3), blend over B4 +0.09 [-0.02,+0.22]; built on old B3; lead re-scored via harness |
 | S8 | small MLP | codex | hurts | results/S8.json; 39.92 (-5.90 vs B3), blend over B4 +0.05; hit iteration cap; built on old B3; lead re-scored via harness |
+| S1_B4 | HistGB residual rebased onto B4 | codex | neutral | results/S1_B4.json; dev 50.99 vs B4 50.89 (+0.1); -3.8 vs BEST; lead re-scored |
+| S2_B4 | CatBoost/LightGBM residual rebased onto B4 | codex | neutral | results/S2_B4.json; dev 51.00 vs B4 50.89; -3.8 vs BEST; lead re-scored |
+| S5_B4 | soft-target distillation rebased onto B4 | codex | neutral | results/S5_B4.json; dev 51.05 vs B4 50.89; -3.7 vs BEST; lead re-scored |
+| TEAM_DIRECT | direct blends of team members | codex | neutral | results/TEAM_DIRECT.json; 54.27, -0.51 vs BEST; built on the older TM_COMBINED win model; lead re-scored |
+| TEAM_FACTOR | factorised pw/shares blends of team members | codex | neutral | results/TEAM_FACTOR.json; 54.34, -0.43 vs BEST; built on the older TM_COMBINED win model; lead re-scored |
+| TEAM_GATE | gated blends of team members | codex | neutral | results/TEAM_GATE.json; 54.29, -0.48 vs BEST; built on the older TM_COMBINED win model; lead re-scored |
+| TEAM_SIZE_MODES | two-mode size inference on TM_COMBINED win prob; mode centers learned only from outer-training DEV folds | codex | neutral | results/TEAM_SIZE_MODES.json; dev 54.87, +0.09 [-0.11,+0.30] vs BEST, +0.73 [+0.40,+1.07] vs old TM_COMBINED: independent reproduction of Pranav's two-mode size discovery without hard-coded modes or lags; selection optimism noted |
+| TEAM_VOLATILITY | volatility-memory blend of team members | codex | neutral | results/TEAM_VOLATILITY.json; 54.22, -0.55 vs BEST; built on the older TM_COMBINED win model; lead re-scored |
+| TEAM_VOLATILITY_CONTROL | control for the volatility-memory blend | codex | neutral | results/TEAM_VOLATILITY_CONTROL.json; 54.14, -0.63 vs BEST; built on the older TM_COMBINED win model; lead re-scored |
 | TM_COMBINED | zhill-branch combined 20% rule + 80% mixer | teammates | helps | results/TM_COMBINED.json; BEST SINGLE MODEL: dev 54.14 [53.1,55.1], audit 55.37 [54.5,56.1] (+1.3 over our stack 54.09); stdlib, deterministic, entry already built; tuned on all validation so optimistic |
 | TM_MIXER | Pranav pair mixer | teammates | helps | results/TM_MIXER.json; dev 53.87 [52.8,54.9], +1.79 [+0.98,+2.63] vs our C2; audit 55.20; stdlib only; their win model (p0 share .45 vs our .54) is much better on drift (.096 vs .184) and shared_change |
 | TM_RULE | zhill rule model v4 | teammates | helps | results/TM_RULE.json; dev 52.89, +0.81 [-0.19,+1.76] vs C2; best stable (.057); audit 52.85 |
@@ -226,4 +244,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | V2 | softmax-linear vol/history gate | claude | neutral | results/V2.json; dev 54.27-54.30, +0.13..+0.16 [-0.05,+0.34]; same conclusion, 20-36 params |
 | V3 | vol-scaled shrinkage of p_win toward longer memory | claude | neutral | results/V3.json; dev 54.13, 0.00 [-0.10,+0.06]; optimiser never shrinks: TM_COMBINED p_win is already calibrated w.r.t. volatility |
 
-Counts: alive 10, baseline 5, helps 20, hurts 9, neutral 39
+Counts: alive 10, baseline 5, helps 20, hurts 9, neutral 48
