@@ -9,7 +9,8 @@ from rule_model import RuleForecaster
 from slot_forecasting.pair_mixer import PairMixer, choose_pairs, cutoff_brier
 
 
-def adapt_with_memory(queries, history, labels=None, *, half_life=(12.0, 40.0), log=print):
+def adapt_with_memory(queries, history, labels=None, *, half_life=(12.0, 40.0),
+                      mixer_factory=None, mixer_kwargs=None, log=print):
     """Mirror ``pair_mixer.adapt`` while setting memory before mode selection.
 
     Pair discovery and the parity/full cutoff-Brier comparison receive only the
@@ -19,8 +20,10 @@ def adapt_with_memory(queries, history, labels=None, *, half_life=(12.0, 40.0), 
     """
     pairs = choose_pairs(queries, history)
     log(f"lag pairs found on train: {pairs}")
+    factory = PairMixer if mixer_factory is None else mixer_factory
+    kwargs = dict(mixer_kwargs or {})
     candidates = [
-        PairMixer(pairs=pairs, cell_mode=mode, half_life=half_life).fit(
+        factory(pairs=pairs, cell_mode=mode, half_life=half_life, **kwargs).fit(
             queries, history
         )
         for mode in ("parity", "full")
@@ -43,6 +46,8 @@ class ZhillBlendForecaster:
         half_life=(12.0, 40.0),
         rule_weight: float = RULE_WEIGHT,
         settings: dict[str, Any] | None = None,
+        mixer_factory=None,
+        mixer_kwargs=None,
         log=lambda *_: None,
     ) -> None:
         if not 0.0 <= rule_weight <= 1.0:
@@ -50,6 +55,8 @@ class ZhillBlendForecaster:
         self.half_life = tuple(half_life) if isinstance(half_life, (list, tuple)) else half_life
         self.rule_weight = float(rule_weight)
         self.settings = dict(SETTINGS if settings is None else settings)
+        self.mixer_factory = mixer_factory
+        self.mixer_kwargs = dict(mixer_kwargs or {})
         self.log = log
         self.rules = None
         self.mixer = None
@@ -64,6 +71,8 @@ class ZhillBlendForecaster:
             history,
             labels,
             half_life=self.half_life,
+            mixer_factory=self.mixer_factory,
+            mixer_kwargs=self.mixer_kwargs,
             log=self.log,
         )
         return self
