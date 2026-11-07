@@ -1,0 +1,512 @@
+[
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 8,
+   "hl": 64,
+   "g": 0.0
+  },
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120766,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752242,
+   "shared_change": 0.18332901494514262
+  },
+  "seconds": 1.4
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 24,
+   "hl": 64,
+   "g": 0.0
+  },
+  "points": 51.1083466897563,
+  "condition_ratios": {
+   "stable": 0.10376443464336012,
+   "short_history": 0.20448849064682645,
+   "drift": 0.209816935664678,
+   "shared_change": 0.17783629810904114
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 64,
+   "hl": 64,
+   "g": 0.0
+  },
+  "points": 51.1421899535788,
+  "condition_ratios": {
+   "stable": 0.10523744234671809,
+   "short_history": 0.201037644592456,
+   "drift": 0.2113016589249566,
+   "shared_change": 0.17522190467948798
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 8,
+   "hl": 64,
+   "g": -1
+  },
+  "points": 50.98366309721359,
+  "condition_ratios": {
+   "stable": 0.10554262666830266,
+   "short_history": 0.20734426239522769,
+   "drift": 0.2111391513305768,
+   "shared_change": 0.1833642375931311
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 24,
+   "hl": 64,
+   "g": -1
+  },
+  "points": 51.14173972956407,
+  "condition_ratios": {
+   "stable": 0.10381336931069203,
+   "short_history": 0.20137314717642033,
+   "drift": 0.20978653263976296,
+   "shared_change": 0.17786691425944154
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 64,
+   "hl": 64,
+   "g": -1
+  },
+  "points": 51.140572091638575,
+  "condition_ratios": {
+   "stable": 0.10529697088613355,
+   "short_history": 0.20118949669864816,
+   "drift": 0.21122863117212395,
+   "shared_change": 0.17523201121959298
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 8,
+   "hl": 64,
+   "g": -0.5
+  },
+  "points": 50.94060937535195,
+  "condition_ratios": {
+   "stable": 0.10553101269915889,
+   "short_history": 0.2113545201558105,
+   "drift": 0.21113669295880438,
+   "shared_change": 0.1833466200431444
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 24,
+   "hl": 64,
+   "g": -0.5
+  },
+  "points": 51.13033588129906,
+  "condition_ratios": {
+   "stable": 0.10378877673831295,
+   "short_history": 0.20244479707278068,
+   "drift": 0.20980158678685387,
+   "shared_change": 0.17785146978071342
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 64,
+   "hl": 64,
+   "g": -0.5
+  },
+  "points": 51.142925261218714,
+  "condition_ratios": {
+   "stable": 0.10526710717776522,
+   "short_history": 0.20097215914442312,
+   "drift": 0.21126505307452145,
+   "shared_change": 0.1752268604130255
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 8,
+   "hl": 64,
+   "g": 0.5
+  },
+  "points": 50.83808708677891,
+  "condition_ratios": {
+   "stable": 0.10550783566605128,
+   "short_history": 0.22091876163646085,
+   "drift": 0.21113197552495336,
+   "shared_change": 0.18331142352641097
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 24,
+   "hl": 64,
+   "g": 0.5
+  },
+  "points": 51.074544153180156,
+  "condition_ratios": {
+   "stable": 0.10374034375131534,
+   "short_history": 0.2076197150774599,
+   "drift": 0.20983258049213066,
+   "shared_change": 0.17782139945747819
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 64,
+   "hl": 64,
+   "g": 0.5
+  },
+  "points": 51.13553912613674,
+  "condition_ratios": {
+   "stable": 0.10520797864204014,
+   "short_history": 0.20164544330428757,
+   "drift": 0.21133844467595944,
+   "shared_change": 0.17521714209059036
+  },
+  "seconds": 0.1
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 8,
+   "hl": 64,
+   "g": 1
+  },
+  "points": 50.78812738146186,
+  "condition_ratios": {
+   "stable": 0.10549627080897249,
+   "short_history": 0.2255940239798697,
+   "drift": 0.21112972084497225,
+   "shared_change": 0.18329384703327445
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 24,
+   "hl": 64,
+   "g": 1
+  },
+  "points": 51.03026582072163,
+  "condition_ratios": {
+   "stable": 0.10371650473020173,
+   "short_history": 0.21171951419025373,
+   "drift": 0.20984852242150376,
+   "shared_change": 0.17780677397986402
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 64,
+   "hl": 64,
+   "g": 1
+  },
+  "points": 51.119826007962914,
+  "condition_ratios": {
+   "stable": 0.10517871828213304,
+   "short_history": 0.20308496491632555,
+   "drift": 0.21137540624689638,
+   "shared_change": 0.17521257070339624
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 8,
+   "hl": 64,
+   "g": 0.0
+  },
+  "points": 50.893846092934446,
+  "condition_ratios": {
+   "stable": 0.10556625670805053,
+   "short_history": 0.2158012306217668,
+   "drift": 0.21130786610271712,
+   "shared_change": 0.1830224848041206
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 24,
+   "hl": 64,
+   "g": 0.0
+  },
+  "points": 51.11679373106202,
+  "condition_ratios": {
+   "stable": 0.10376822635838598,
+   "short_history": 0.20398451328785672,
+   "drift": 0.21023718919940515,
+   "shared_change": 0.1771402325392542
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 64,
+   "hl": 64,
+   "g": 0.0
+  },
+  "points": 51.15596440918018,
+  "condition_ratios": {
+   "stable": 0.10504083153687864,
+   "short_history": 0.20033044907806138,
+   "drift": 0.21205416727407567,
+   "shared_change": 0.17410960128563907
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 8,
+   "hl": 64,
+   "g": -1
+  },
+  "points": 50.98915422720143,
+  "condition_ratios": {
+   "stable": 0.10558928055912488,
+   "short_history": 0.2069221614207474,
+   "drift": 0.21130927176664763,
+   "shared_change": 0.18306261541382207
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 24,
+   "hl": 64,
+   "g": -1
+  },
+  "points": 51.152089423553285,
+  "condition_ratios": {
+   "stable": 0.10381591055852743,
+   "short_history": 0.20069706935171008,
+   "drift": 0.2101999080040348,
+   "shared_change": 0.1771775647461137
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 64,
+   "hl": 64,
+   "g": -1
+  },
+  "points": 51.15530657801249,
+  "condition_ratios": {
+   "stable": 0.10509817437531237,
+   "short_history": 0.2004004619565571,
+   "drift": 0.21197299047338197,
+   "shared_change": 0.1741237531187636
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 8,
+   "hl": 64,
+   "g": -0.5
+  },
+  "points": 50.94499601818136,
+  "condition_ratios": {
+   "stable": 0.10557776259305542,
+   "short_history": 0.21103432905476635,
+   "drift": 0.2113085252830833,
+   "shared_change": 0.18304255429690838
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 24,
+   "hl": 64,
+   "g": -0.5
+  },
+  "points": 51.139824974281446,
+  "condition_ratios": {
+   "stable": 0.10379194916464188,
+   "short_history": 0.20184656588923736,
+   "drift": 0.21021838820909375,
+   "shared_change": 0.17715876741438213
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 64,
+   "hl": 64,
+   "g": -0.5
+  },
+  "points": 51.157267783249495,
+  "condition_ratios": {
+   "stable": 0.10506940577957527,
+   "short_history": 0.20021605376361268,
+   "drift": 0.21201348813185275,
+   "shared_change": 0.17411657156001045
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 8,
+   "hl": 64,
+   "g": 0.5
+  },
+  "points": 50.84065398345729,
+  "condition_ratios": {
+   "stable": 0.10555476200843965,
+   "short_history": 0.22076717731969858,
+   "drift": 0.2113072965944716,
+   "shared_change": 0.18300240815679217
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 24,
+   "hl": 64,
+   "g": 0.5
+  },
+  "points": 51.081851806400216,
+  "condition_ratios": {
+   "stable": 0.10374474289559445,
+   "short_history": 0.20721879293144224,
+   "drift": 0.21025631199688458,
+   "shared_change": 0.17712196072283906
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 64,
+   "hl": 64,
+   "g": 0.5
+  },
+  "points": 51.14853563387411,
+  "condition_ratios": {
+   "stable": 0.10501245392418679,
+   "short_history": 0.20100612645910976,
+   "drift": 0.21209502331732805,
+   "shared_change": 0.1741028405382083
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 8,
+   "hl": 64,
+   "g": 1
+  },
+  "points": 50.790077954314576,
+  "condition_ratios": {
+   "stable": 0.10554327762159314,
+   "short_history": 0.22549995880398516,
+   "drift": 0.21130681915209368,
+   "shared_change": 0.18298232559880165
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 24,
+   "hl": 64,
+   "g": 1
+  },
+  "points": 51.03645197895676,
+  "condition_ratios": {
+   "stable": 0.10372149947850129,
+   "short_history": 0.2114200413319103,
+   "drift": 0.21027575754686914,
+   "shared_change": 0.17710395251173142
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 64,
+   "hl": 64,
+   "g": 1
+  },
+  "points": 51.13183701516871,
+  "condition_ratios": {
+   "stable": 0.10498427518844813,
+   "short_history": 0.20253221238277552,
+   "drift": 0.21213605164801663,
+   "shared_change": 0.17409628754014056
+  },
+  "seconds": 0.0
+ }
+]

@@ -151,3 +151,11 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
 - S2 fixes stable (.162->.115 vs S1) and S1/S2 improve drift/shared vs B3, but B4 already beats them in every condition.
 - S3 (condition classifier gating), S6 (future-window targets average through drift), S8 (MLP) clearly hurt; S4 row multiplication did nothing.
 - Learners on B3 output cannot rescue a weak base; the question is whether residual learning on B4 keeps any gain. Rebase pending in Codex.
+
+### B4 size/severity rebase (A1_B4, A4_B4, A6_B4, A9), worker report reviewed, all four re-scored by the lead (match)
+- A9 (severity given win): 51.47 [50.50,52.38], +0.58 [+0.21,+0.92] over B4 (50.89). Per-machine ridge adjusting P(payout>=2 | win)
+  on centred log1p lagged payouts at lags 1, 2, 4 (learned from a train severity screen with null lags 9-16). Lag 7 carries NO
+  severity signal; win lags and severity lags differ. Conditions: stable .090, short .203, drift .203, shared .167. p1/p2 error
+  fell. Effect is per-machine: a pooled train beta alone equals B4. 292 cells, so some selection optimism. Null lags 9-12: -0.2..-0.34.
+- A1_B4/A4_B4/A6_B4 (alpha ~64 size-split prior): ~51.16, +0.27 [+0.10,+0.44]. One effect (p5/p20 shrinkage), not three.
+- A9 touches p1/p2 and alpha touches p5/p20, so they should add; combination queued as C1.

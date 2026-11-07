@@ -1,0 +1,130 @@
+[
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 8,
+   "hl": 64
+  },
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120766,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752242,
+   "shared_change": 0.18332901494514262
+  },
+  "seconds": 1.3
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 24,
+   "hl": 64
+  },
+  "points": 51.1083466897563,
+  "condition_ratios": {
+   "stable": 0.10376443464336012,
+   "short_history": 0.20448849064682645,
+   "drift": 0.209816935664678,
+   "shared_change": 0.17783629810904114
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 64,
+   "hl": 64
+  },
+  "points": 51.1421899535788,
+  "condition_ratios": {
+   "stable": 0.10523744234671809,
+   "short_history": 0.201037644592456,
+   "drift": 0.2113016589249566,
+   "shared_change": 0.17522190467948798
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "self",
+   "alpha": 128,
+   "hl": 64
+  },
+  "points": 51.085971271063215,
+  "condition_ratios": {
+   "stable": 0.10791045065080179,
+   "short_history": 0.2011156788149921,
+   "drift": 0.21372988590881653,
+   "shared_change": 0.1752069288269402
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 8,
+   "hl": 64
+  },
+  "points": 50.893846092934446,
+  "condition_ratios": {
+   "stable": 0.10556625670805053,
+   "short_history": 0.2158012306217668,
+   "drift": 0.21130786610271712,
+   "shared_change": 0.1830224848041206
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 24,
+   "hl": 64
+  },
+  "points": 51.11679373106202,
+  "condition_ratios": {
+   "stable": 0.10376822635838598,
+   "short_history": 0.20398451328785672,
+   "drift": 0.21023718919940515,
+   "shared_change": 0.1771402325392542
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 64,
+   "hl": 64
+  },
+  "points": 51.15596440918018,
+  "condition_ratios": {
+   "stable": 0.10504083153687864,
+   "short_history": 0.20033044907806138,
+   "drift": 0.21205416727407567,
+   "shared_change": 0.17410960128563907
+  },
+  "seconds": 0.0
+ },
+ {
+  "params": {
+   "mode": "ridge",
+   "prior": "type",
+   "alpha": 128,
+   "hl": 64
+  },
+  "points": 51.10267813777694,
+  "condition_ratios": {
+   "stable": 0.10750295539819728,
+   "short_history": 0.20033392369196196,
+   "drift": 0.21471401304201157,
+   "shared_change": 0.1738761591652322
+  },
+  "seconds": 0.0
+ }
+]

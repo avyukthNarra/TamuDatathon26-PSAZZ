@@ -7,9 +7,14 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 
 | ID | owner | points | CI95 | stable | short | drift | shared | sec | det |
 |---|---|---|---|---|---|---|---|---|---|
-| A9 | claude-w1 | 51.46 | 50.50-52.37 | 0.091 | 0.205 | 0.199 | 0.168 | 0 | 0.0 |
+| A9 | claude-w1 | 51.47 | 50.50-52.38 | 0.090 | 0.203 | 0.203 | 0.167 | 0 | 0.0 |
+| M9b_B4 | claude-w2 | 51.22 | 50.22-52.15 | 0.105 | 0.216 | 0.197 | 0.168 | 0 | 0.0 |
+| A6_B4 | claude-w1 | 51.16 | 50.13-52.14 | 0.105 | 0.200 | 0.212 | 0.174 | 0 | 0.0 |
+| A1_B4 | claude-w1 | 51.16 | 50.13-52.13 | 0.105 | 0.200 | 0.212 | 0.174 | 0 | 0.0 |
+| A4_B4 | claude-w1 | 51.15 | 50.13-52.13 | 0.103 | 0.203 | 0.210 | 0.176 | 0 | 0.0 |
 | M2_B4 | claude-w2 | 51.11 | 50.10-52.01 | 0.089 | 0.216 | 0.208 | 0.183 | 0 | 0.0 |
 | L5 | claude-w1 | 51.09 | 50.03-52.04 | 0.109 | 0.206 | 0.201 | 0.181 | 0 | 0.0 |
+| M3_B4 | claude-w2 | 51.09 | 50.07-52.00 | 0.091 | 0.216 | 0.208 | 0.183 | 0 | 0.0 |
 | M1_B4 | claude-w2 | 50.89 | 49.85-51.87 | 0.105 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
 | B4 | claude-w1 | 50.89 | 49.85-51.87 | 0.106 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
 | L2 | claude-w1 | 50.89 | 49.85-51.87 | 0.106 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
@@ -71,15 +76,16 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | A6 | prior strength scaled by effective sample size | claude | neutral | results/A6.json; +0.16 [+0.07,+0.27] ties fixed alpha 64; best at grid edge (a0=32, g=-1); a0>32 untested |
 | A7 | factorized win-rate x severity blended with direct 5-class | claude | neutral | results/A7.json; factorized B3 split is already the best; blending direct 5-class hurts (43.1 at w=0.25) |
 | A8 | leave-one-out episode / episode-type shrinkage | claude | neutral | results/A8.json; peer shares only hurt as weight grows; best cell is the no-peer alpha 64 control |
-| A9 | severity-given-win with lag features on the B4 base (new, from L-report finding that size is ~half the error) | claude | alive | results/A9.json |
-| A1_B4 | type-level Dirichlet smoothing, alpha 2/8/24/64 rebased onto B4 | claude | alive | - |
-| A4_B4 | class-specific half-life and alpha rebased onto B4 | claude | alive | - |
-| A6_B4 | prior strength scaled by effective sample size rebased onto B4 | claude | alive | - |
+| A9 | severity-given-win with lag features on the B4 base (new, from L-report finding that size is ~half the error) | claude | helps | results/A9.json; severity-given-win on B4: 51.47 [50.50,52.38], +0.58 [+0.21,+0.92] vs B4 (lead re-scored); per-machine ridge on P(pay>=2|win) with centred log1p lags 1,2,4 learned from train severity screen (lag 7 has no severity signal; null lags 9-12 score -0.2..-0.34); 292 cells so some selection optimism; moves p1/p2 error |
+| A1_B4 | type-level Dirichlet smoothing, alpha 2/8/24/64 rebased onto B4 | claude | helps | results/A1_B4.json; size-split prior on B4: ~51.16, +0.27 [+0.10,+0.44] vs B4 (lead re-scored); ONE effect (alpha ~64 shrinkage, moves p5/p20 only), the three IDs are not independent |
+| A4_B4 | class-specific half-life and alpha rebased onto B4 | claude | helps | results/A4_B4.json; size-split prior on B4: ~51.16, +0.27 [+0.10,+0.44] vs B4 (lead re-scored); ONE effect (alpha ~64 shrinkage, moves p5/p20 only), the three IDs are not independent |
+| A6_B4 | prior strength scaled by effective sample size rebased onto B4 | claude | helps | results/A6_B4.json; size-split prior on B4: ~51.16, +0.27 [+0.10,+0.44] vs B4 (lead re-scored); ONE effect (alpha ~64 shrinkage, moves p5/p20 only), the three IDs are not independent |
 | B0 | starter pooled (reference) | claude | baseline | results/B0.json |
 | B1 | pooled_recent | claude | baseline | - |
 | B2 | GB, HL 4/16/64/128 + LAGRESP (mainFiles/experiments/gb_proto.py) | claude | baseline | - |
 | B3 | pair-model prototype | claude | baseline | results/B3.json |
 | B4 | B4 = L2 structure (lam 0.05, lag 7 + 3 pairs); new base for all further tests | claude | baseline | results/B4.json |
+| C1 | B4 + A9 severity + alpha-64 size prior (+ best memory later) | claude | alive | - |
 | E1 | recent residual pooling across peer machines | codex | neutral | results/E1.json; 45.75, vs B3 -0.07 [-0.15,+0.01]; blend over B4 0.00 [-0.04,+0.04]; lead re-scored via harness; built on the old B3 base |
 | E2 | cosine-similarity subgroup pooling; pool by type and signal | codex | neutral | results/E2.json; 45.77, vs B3 -0.05 [-0.17,+0.07]; blend over B4 -0.02; lead re-scored via harness; built on the old B3 base |
 | E3 | episode-level drift stats as features | codex | neutral | results/E3.json; 45.81, vs B3 -0.01 [-0.20,+0.15]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base |
@@ -107,8 +113,8 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | M10 | half-life implied by Kalman gain (sanity check) | claude | hurts | results/M10.json; diagnostic only: -7.2; corr(log hl, B3's) = 0.00, does not corroborate hl 16 |
 | M1_B4 | holdout-selected half-life variants (holdout length, grid, floor) rebased onto B4 | claude | alive | results/M1_B4.json |
 | M2_B4 | fixed-share over half-lives rebased onto B4 | claude | alive | results/M2_B4.json |
-| M3_B4 | dynamic model averaging rebased onto B4 | claude | alive | - |
-| M9b_B4 | M9b rebased onto B4 | claude | alive | - |
+| M3_B4 | dynamic model averaging rebased onto B4 | claude | alive | results/M3_B4.json |
+| M9b_B4 | M9b rebased onto B4 | claude | alive | results/M9b_B4.json |
 | P1 | simplex projection vs divide-by-sum vs softmax | claude | alive | - |
 | P2 | temperature / Dirichlet calibration, episodes held out | claude | alive | - |
 | P3 | affine 5x5 calibration per (type, signal) | claude | alive | - |
@@ -125,4 +131,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | S7 | regularized multinomial logistic on full feature set | codex | neutral | results/S7.json; 44.73 (-1.09 vs B3), blend over B4 +0.09 [-0.02,+0.22]; built on old B3; lead re-scored via harness |
 | S8 | small MLP | codex | hurts | results/S8.json; 39.92 (-5.90 vs B3), blend over B4 +0.05; hit iteration cap; built on old B3; lead re-scored via harness |
 
-Counts: alive 19, baseline 5, helps 7, hurts 7, neutral 23
+Counts: alive 16, baseline 5, helps 11, hurts 7, neutral 23

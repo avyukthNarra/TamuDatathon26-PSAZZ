@@ -308,7 +308,8 @@
  "A9": [
   "severity-given-win with lag features on the B4 base (new, from L-report finding that size is ~half the error)",
   "claude",
-  "alive"
+  "helps",
+  "severity-given-win on B4: 51.47 [50.50,52.38], +0.58 [+0.21,+0.92] vs B4 (lead re-scored); per-machine ridge on P(pay>=2|win) with centred log1p lags 1,2,4 learned from train severity screen (lag 7 has no severity signal; null lags 9-12 score -0.2..-0.34); 292 cells so some selection optimism; moves p1/p2 error"
  ],
  "M1_B4": [
   "holdout-selected half-life variants (holdout length, grid, floor) rebased onto B4",
@@ -333,15 +334,23 @@
  "A1_B4": [
   "type-level Dirichlet smoothing, alpha 2/8/24/64 rebased onto B4",
   "claude",
-  "alive"
+  "helps",
+  "size-split prior on B4: ~51.16, +0.27 [+0.10,+0.44] vs B4 (lead re-scored); ONE effect (alpha ~64 shrinkage, moves p5/p20 only), the three IDs are not independent"
  ],
  "A4_B4": [
   "class-specific half-life and alpha rebased onto B4",
   "claude",
-  "alive"
+  "helps",
+  "size-split prior on B4: ~51.16, +0.27 [+0.10,+0.44] vs B4 (lead re-scored); ONE effect (alpha ~64 shrinkage, moves p5/p20 only), the three IDs are not independent"
  ],
  "A6_B4": [
   "prior strength scaled by effective sample size rebased onto B4",
+  "claude",
+  "helps",
+  "size-split prior on B4: ~51.16, +0.27 [+0.10,+0.44] vs B4 (lead re-scored); ONE effect (alpha ~64 shrinkage, moves p5/p20 only), the three IDs are not independent"
+ ],
+ "C1": [
+  "B4 + A9 severity + alpha-64 size prior (+ best memory later)",
   "claude",
   "alive"
  ]
