@@ -1,0 +1,1373 @@
+{
+ "id": "S2",
+ "owner": "codex",
+ "description": "CatBoost and LightGBM residual on B3",
+ "params": {
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "hl_grid": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "hyper": "cat_5",
+  "training_iterations": null
+ },
+ "scope": "dev",
+ "points": 46.76529088993736,
+ "ci95": [
+  45.662164570020074,
+  47.85591339324776
+ ],
+ "condition_ratios": {
+  "stable": 0.11470106780913565,
+  "short_history": 0.3288654758679986,
+  "drift": 0.35727715655264347,
+  "shared_change": 0.3311675720799087
+ },
+ "R": 0.2830028180774216,
+ "class_error_shares": {
+  "p_0": 0.563688917606759,
+  "p_1": 0.23670491226388657,
+  "p_2": 0.14534380808984584,
+  "p_5": 0.04921238429087831,
+  "p_20": 0.005049977748630286
+ },
+ "runtime_seconds": 17.521695540999644,
+ "seed": 20261107,
+ "stdlib_only": false,
+ "determinism_max_diff": 0.0,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "extra": {
+  "fitting_metadata": {},
+  "training_iterations": {
+   "hist": 20,
+   "mlp": 35
+  },
+  "smoke": {
+   "id": "S2",
+   "smoke_points": 32.29914295275196,
+   "seconds": 0.5528833330026828,
+   "grid_estimate_seconds": 35.3845333121717
+  },
+  "grid": [
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 0,
+    "hyper": "cat_3",
+    "points": 31.46018511646942,
+    "condition_ratios": {
+     "stable": 0.8988206538598243,
+     "short_history": 0.9587638850068717,
+     "drift": 0.9257287761325557,
+     "shared_change": 0.8453766978373187
+    },
+    "runtime_seconds": 0.19017499999608845
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 0,
+    "hyper": "cat_5",
+    "points": 31.468547860337065,
+    "condition_ratios": {
+     "stable": 0.899976687951568,
+     "short_history": 0.9630805578471272,
+     "drift": 0.9210344313689511,
+     "shared_change": 0.8425710168073697
+    },
+    "runtime_seconds": 0.3441827080096118
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 1,
+    "hyper": "cat_3",
+    "points": 31.579500634770646,
+    "condition_ratios": {
+     "stable": 0.8910500164942243,
+     "short_history": 0.9484266067922893,
+     "drift": 0.9184051121295358,
+     "shared_change": 0.8419851141486241
+    },
+    "runtime_seconds": 0.13815833399712574
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 1,
+    "hyper": "cat_5",
+    "points": 31.553114223363522,
+    "condition_ratios": {
+     "stable": 0.8924773355404246,
+     "short_history": 0.9476503646277523,
+     "drift": 0.9241803563313321,
+     "shared_change": 0.8419142105340202
+    },
+    "runtime_seconds": 0.35029966699949
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 2,
+    "hyper": "cat_3",
+    "points": 31.474154016703174,
+    "condition_ratios": {
+     "stable": 0.8998672875429997,
+     "short_history": 0.9586614854828794,
+     "drift": 0.9220624645515332,
+     "shared_change": 0.8447130000720959
+    },
+    "runtime_seconds": 0.10815179199562408
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 2,
+    "hyper": "cat_5",
+    "points": 31.481776393224656,
+    "condition_ratios": {
+     "stable": 0.8974192034596313,
+     "short_history": 0.959547435822269,
+     "drift": 0.9211650849250521,
+     "shared_change": 0.8453262726439352
+    },
+    "runtime_seconds": 0.3458457910019206
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 3,
+    "hyper": "cat_3",
+    "points": 31.56600822230576,
+    "condition_ratios": {
+     "stable": 0.891778880847476,
+     "short_history": 0.9508618546293134,
+     "drift": 0.918882627657886,
+     "shared_change": 0.8415919344912913
+    },
+    "runtime_seconds": 0.10994374999427237
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 3,
+    "hyper": "cat_5",
+    "points": 31.573388695939993,
+    "condition_ratios": {
+     "stable": 0.8944091217667377,
+     "short_history": 0.9470500788753909,
+     "drift": 0.9162296177387832,
+     "shared_change": 0.843649204321146
+    },
+    "runtime_seconds": 0.36993220799195115
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 4,
+    "hyper": "cat_3",
+    "points": 31.411842512111527,
+    "condition_ratios": {
+     "stable": 0.8894504729793586,
+     "short_history": 0.9552630433880959,
+     "drift": 0.9475165372015616,
+     "shared_change": 0.848200459460034
+    },
+    "runtime_seconds": 0.1199684160092147
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 4,
+    "hyper": "cat_5",
+    "points": 31.404820682430774,
+    "condition_ratios": {
+     "stable": 0.8866686772722374,
+     "short_history": 0.9551502108916521,
+     "drift": 0.9484715650990956,
+     "shared_change": 0.8518483899072438
+    },
+    "runtime_seconds": 0.3763130829902366
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 5,
+    "hyper": "cat_3",
+    "points": 31.49367790966201,
+    "condition_ratios": {
+     "stable": 0.886225808180662,
+     "short_history": 0.9423250063021454,
+     "drift": 0.9473188563608924,
+     "shared_change": 0.8447074077822897
+    },
+    "runtime_seconds": 0.12185479199979454
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 5,
+    "hyper": "cat_5",
+    "points": 31.486105492377572,
+    "condition_ratios": {
+     "stable": 0.8855509770262031,
+     "short_history": 0.9425800930107728,
+     "drift": 0.9501867186882348,
+     "shared_change": 0.8440920408455268
+    },
+    "runtime_seconds": 0.43527458400058094
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 6,
+    "hyper": "cat_3",
+    "points": 31.432191832274693,
+    "condition_ratios": {
+     "stable": 0.8888637486544,
+     "short_history": 0.95438497145435,
+     "drift": 0.9468177591297261,
+     "shared_change": 0.8454175901087684
+    },
+    "runtime_seconds": 0.12505404099647421
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 6,
+    "hyper": "cat_5",
+    "points": 31.38552276275354,
+    "condition_ratios": {
+     "stable": 0.8892607461463486,
+     "short_history": 0.9525280524573606,
+     "drift": 0.9477676556620754,
+     "shared_change": 0.8572812872682728
+    },
+    "runtime_seconds": 0.37351695900724735
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 7,
+    "hyper": "cat_3",
+    "points": 31.46532386419758,
+    "condition_ratios": {
+     "stable": 0.8892510709359701,
+     "short_history": 0.944098288463542,
+     "drift": 0.9510042172099052,
+     "shared_change": 0.8430905595394871
+    },
+    "runtime_seconds": 0.11604962500859983
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 7,
+    "hyper": "cat_5",
+    "points": 31.46907361342731,
+    "condition_ratios": {
+     "stable": 0.8894266294576353,
+     "short_history": 0.9405386811755072,
+     "drift": 0.9496506904436313,
+     "shared_change": 0.8469192744197436
+    },
+    "runtime_seconds": 0.3439895420015091
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 8,
+    "hyper": "cat_3",
+    "points": 46.638258273031425,
+    "condition_ratios": {
+     "stable": 0.1135188174588835,
+     "short_history": 0.32996787457543303,
+     "drift": 0.36448262554845406,
+     "shared_change": 0.33802045319689883
+    },
+    "runtime_seconds": 0.10938004199124407
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 8,
+    "hyper": "cat_5",
+    "points": 46.72310030238111,
+    "condition_ratios": {
+     "stable": 0.11502918592169606,
+     "short_history": 0.3291900667881619,
+     "drift": 0.359575141688835,
+     "shared_change": 0.3328510432279931
+    },
+    "runtime_seconds": 0.34427395899547264
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 9,
+    "hyper": "cat_3",
+    "points": 45.273568843525375,
+    "condition_ratios": {
+     "stable": 0.11364775886845901,
+     "short_history": 0.4644140468584881,
+     "drift": 0.37805607221327403,
+     "shared_change": 0.34498839953237276
+    },
+    "runtime_seconds": 0.11067383299814537
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 9,
+    "hyper": "cat_5",
+    "points": 45.229229763844344,
+    "condition_ratios": {
+     "stable": 0.11514634827363114,
+     "short_history": 0.4640313215194135,
+     "drift": 0.37873005026509343,
+     "shared_change": 0.34839533336800865
+    },
+    "runtime_seconds": 0.3466916670004139
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 10,
+    "hyper": "cat_3",
+    "points": 46.67019792132666,
+    "condition_ratios": {
+     "stable": 0.11529233202587856,
+     "short_history": 0.3295415252704532,
+     "drift": 0.3626279543245153,
+     "shared_change": 0.33500620200478853
+    },
+    "runtime_seconds": 0.10921666699869093
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 10,
+    "hyper": "cat_5",
+    "points": 46.76529088993736,
+    "condition_ratios": {
+     "stable": 0.11470106780913565,
+     "short_history": 0.3288654758679986,
+     "drift": 0.35727715655264347,
+     "shared_change": 0.3311675720799087
+    },
+    "runtime_seconds": 0.3741687500005355
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 11,
+    "hyper": "cat_3",
+    "points": 45.27267089146719,
+    "condition_ratios": {
+     "stable": 0.1136972177791181,
+     "short_history": 0.4646332320322673,
+     "drift": 0.3775697856036954,
+     "shared_change": 0.34531118582744663
+    },
+    "runtime_seconds": 0.10866974999953527
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 11,
+    "hyper": "cat_5",
+    "points": 45.24888903643794,
+    "condition_ratios": {
+     "stable": 0.11701813947328071,
+     "short_history": 0.4640039472211627,
+     "drift": 0.37613722407809896,
+     "shared_change": 0.34683831459972414
+    },
+    "runtime_seconds": 0.3475129580037901
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 12,
+    "hyper": "cat_3",
+    "points": 44.39565107612449,
+    "condition_ratios": {
+     "stable": 0.12434081514280698,
+     "short_history": 0.33381687651292963,
+     "drift": 0.4919746730871622,
+     "shared_change": 0.4558025451534776
+    },
+    "runtime_seconds": 0.10926245800510515
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 12,
+    "hyper": "cat_5",
+    "points": 44.369047562335425,
+    "condition_ratios": {
+     "stable": 0.1261705128578903,
+     "short_history": 0.3388575902826256,
+     "drift": 0.4949995582295433,
+     "shared_change": 0.44914862673521766
+    },
+    "runtime_seconds": 0.34638366699800827
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 13,
+    "hyper": "cat_3",
+    "points": 43.18068151759636,
+    "condition_ratios": {
+     "stable": 0.12564506383767093,
+     "short_history": 0.4649394009399835,
+     "drift": 0.5022501727285652,
+     "shared_change": 0.46520640226288823
+    },
+    "runtime_seconds": 0.10699258399836253
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 13,
+    "hyper": "cat_5",
+    "points": 43.28317522476214,
+    "condition_ratios": {
+     "stable": 0.12657768313400522,
+     "short_history": 0.4640961909194874,
+     "drift": 0.49541245712085796,
+     "shared_change": 0.45879337678887017
+    },
+    "runtime_seconds": 0.3459966250084108
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 14,
+    "hyper": "cat_3",
+    "points": 44.38625433052006,
+    "condition_ratios": {
+     "stable": 0.12452817541486974,
+     "short_history": 0.3346346689714103,
+     "drift": 0.49140420952423125,
+     "shared_change": 0.4565123137885921
+    },
+    "runtime_seconds": 0.10894462499709334
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 14,
+    "hyper": "cat_5",
+    "points": 44.408626795078156,
+    "condition_ratios": {
+     "stable": 0.12584432842672522,
+     "short_history": 0.33459969151237046,
+     "drift": 0.49254095188803126,
+     "shared_change": 0.45137038253837675
+    },
+    "runtime_seconds": 0.34904116700636223
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 15,
+    "hyper": "cat_3",
+    "points": 43.18654370882769,
+    "condition_ratios": {
+     "stable": 0.12594966298943883,
+     "short_history": 0.46477070998509995,
+     "drift": 0.5018062992069802,
+     "shared_change": 0.4647599126891746
+    },
+    "runtime_seconds": 0.1412824169965461
+   },
+   {
+    "config": {
+     "signal": 0,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 15,
+    "hyper": "cat_5",
+    "points": 43.22011930216036,
+    "condition_ratios": {
+     "stable": 0.12692265635806127,
+     "short_history": 0.4652882352488722,
+     "drift": 0.5010732321324984,
+     "shared_change": 0.4596852774348864
+    },
+    "runtime_seconds": 0.3497595420049038
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 16,
+    "hyper": "cat_3",
+    "points": 31.44830966816753,
+    "condition_ratios": {
+     "stable": 0.9021047789142046,
+     "short_history": 0.9632958279377531,
+     "drift": 0.9194637313707731,
+     "shared_change": 0.8467064054007891
+    },
+    "runtime_seconds": 0.11093833298946265
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 16,
+    "hyper": "cat_5",
+    "points": 31.49323293146264,
+    "condition_ratios": {
+     "stable": 0.9038276918913563,
+     "short_history": 0.9502904420116761,
+     "drift": 0.9171929594841608,
+     "shared_change": 0.849373658867414
+    },
+    "runtime_seconds": 0.3487709589971928
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 17,
+    "hyper": "cat_3",
+    "points": 31.49572692847461,
+    "condition_ratios": {
+     "stable": 0.8995135052614589,
+     "short_history": 0.9590064745555856,
+     "drift": 0.9157263081617903,
+     "shared_change": 0.8458350184482013
+    },
+    "runtime_seconds": 0.10871620901161805
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 17,
+    "hyper": "cat_5",
+    "points": 31.531838804764675,
+    "condition_ratios": {
+     "stable": 0.9007101477685181,
+     "short_history": 0.9454197990084361,
+     "drift": 0.9181366627089864,
+     "shared_change": 0.8470877896661438
+    },
+    "runtime_seconds": 0.3514354169892613
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 18,
+    "hyper": "cat_3",
+    "points": 31.45192597216259,
+    "condition_ratios": {
+     "stable": 0.9033058852941167,
+     "short_history": 0.9618104358260043,
+     "drift": 0.9182809842561098,
+     "shared_change": 0.8472959695735676
+    },
+    "runtime_seconds": 0.10863991599762812
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 18,
+    "hyper": "cat_5",
+    "points": 31.429681257351625,
+    "condition_ratios": {
+     "stable": 0.9041654419399977,
+     "short_history": 0.9629545277563318,
+     "drift": 0.9184266869249809,
+     "shared_change": 0.8505473283872808
+    },
+    "runtime_seconds": 0.3481405420025112
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 19,
+    "hyper": "cat_3",
+    "points": 31.50742015468831,
+    "condition_ratios": {
+     "stable": 0.9003457336080627,
+     "short_history": 0.9550515539342724,
+     "drift": 0.9167384033068761,
+     "shared_change": 0.845117604460273
+    },
+    "runtime_seconds": 0.10855437499412801
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 19,
+    "hyper": "cat_5",
+    "points": 31.521252090714817,
+    "condition_ratios": {
+     "stable": 0.8963702941343473,
+     "short_history": 0.9512306700115711,
+     "drift": 0.9176259369273129,
+     "shared_change": 0.8486838442647219
+    },
+    "runtime_seconds": 0.38136362499790266
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 20,
+    "hyper": "cat_3",
+    "points": 31.378801476486988,
+    "condition_ratios": {
+     "stable": 0.8930934213478373,
+     "short_history": 0.9626077419893679,
+     "drift": 0.9444812118773106,
+     "shared_change": 0.8482933060456083
+    },
+    "runtime_seconds": 0.11447637500532437
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 20,
+    "hyper": "cat_5",
+    "points": 31.484791582862876,
+    "condition_ratios": {
+     "stable": 0.8928887947133357,
+     "short_history": 0.9468936819633402,
+     "drift": 0.9366759823331176,
+     "shared_change": 0.8462694656251479
+    },
+    "runtime_seconds": 0.3483983750047628
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 21,
+    "hyper": "cat_3",
+    "points": 31.409071499952073,
+    "condition_ratios": {
+     "stable": 0.89233847557824,
+     "short_history": 0.9507112758617191,
+     "drift": 0.9496691940005343,
+     "shared_change": 0.8483856316357893
+    },
+    "runtime_seconds": 0.1088944169896422
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 21,
+    "hyper": "cat_5",
+    "points": 31.450328010791264,
+    "condition_ratios": {
+     "stable": 0.8962494317811721,
+     "short_history": 0.93849457246953,
+     "drift": 0.9443627087368749,
+     "shared_change": 0.8519742702584797
+    },
+    "runtime_seconds": 0.34632170900295023
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 22,
+    "hyper": "cat_3",
+    "points": 31.370867673125186,
+    "condition_ratios": {
+     "stable": 0.8942665822835599,
+     "short_history": 0.9619293502503511,
+     "drift": 0.9454181453937164,
+     "shared_change": 0.8487959298772675
+    },
+    "runtime_seconds": 0.11335441599658225
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 22,
+    "hyper": "cat_5",
+    "points": 31.48643197043213,
+    "condition_ratios": {
+     "stable": 0.8919210767509705,
+     "short_history": 0.948175632096306,
+     "drift": 0.9371956977157018,
+     "shared_change": 0.8450383873922117
+    },
+    "runtime_seconds": 0.3746764169918606
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 23,
+    "hyper": "cat_3",
+    "points": 31.402264128311835,
+    "condition_ratios": {
+     "stable": 0.8933939705500861,
+     "short_history": 0.9478910140467557,
+     "drift": 0.9513791682738947,
+     "shared_change": 0.8500968601359472
+    },
+    "runtime_seconds": 0.11971074999019038
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 0,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 23,
+    "hyper": "cat_5",
+    "points": 31.417000809114143,
+    "condition_ratios": {
+     "stable": 0.8981236715347882,
+     "short_history": 0.942850965990307,
+     "drift": 0.9456332413089298,
+     "shared_change": 0.8525681665883461
+    },
+    "runtime_seconds": 0.37613920800504275
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 24,
+    "hyper": "cat_3",
+    "points": 46.713079532343414,
+    "condition_ratios": {
+     "stable": 0.11676532401641436,
+     "short_history": 0.33022249729023107,
+     "drift": 0.35892000103688226,
+     "shared_change": 0.3318395152908436
+    },
+    "runtime_seconds": 0.12497804099984933
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 24,
+    "hyper": "cat_5",
+    "points": 46.5731512285679,
+    "condition_ratios": {
+     "stable": 0.11980831776901428,
+     "short_history": 0.3348433356158673,
+     "drift": 0.3629984321085455,
+     "shared_change": 0.33553353358675125
+    },
+    "runtime_seconds": 0.47180412500165403
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 25,
+    "hyper": "cat_3",
+    "points": 45.39415449501883,
+    "condition_ratios": {
+     "stable": 0.1160229370840163,
+     "short_history": 0.458831196503207,
+     "drift": 0.3706294063363766,
+     "shared_change": 0.34154080648945073
+    },
+    "runtime_seconds": 0.12639945800765418
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 25,
+    "hyper": "cat_5",
+    "points": 45.546493712367614,
+    "condition_ratios": {
+     "stable": 0.11536389648886931,
+     "short_history": 0.46633576300475055,
+     "drift": 0.3578925179855328,
+     "shared_change": 0.3297486748734586
+    },
+    "runtime_seconds": 0.4036037499899976
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 26,
+    "hyper": "cat_3",
+    "points": 46.67813821782784,
+    "condition_ratios": {
+     "stable": 0.11747010542228228,
+     "short_history": 0.3311444365609154,
+     "drift": 0.36013000763276515,
+     "shared_change": 0.33284869217139934
+    },
+    "runtime_seconds": 0.11496116599300876
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 26,
+    "hyper": "cat_5",
+    "points": 46.59470668804234,
+    "condition_ratios": {
+     "stable": 0.12073941566217469,
+     "short_history": 0.3329307765647922,
+     "drift": 0.36145666542315846,
+     "shared_change": 0.3356728159443745
+    },
+    "runtime_seconds": 0.48284916699049063
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 27,
+    "hyper": "cat_3",
+    "points": 45.422428658213576,
+    "condition_ratios": {
+     "stable": 0.11583882396529176,
+     "short_history": 0.45785558347045,
+     "drift": 0.37033127857453974,
+     "shared_change": 0.33970763890522115
+    },
+    "runtime_seconds": 0.11509145799209364
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 0,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 27,
+    "hyper": "cat_5",
+    "points": 45.488787533979675,
+    "condition_ratios": {
+     "stable": 0.11631726663140134,
+     "short_history": 0.4684092577417701,
+     "drift": 0.3605496529172245,
+     "shared_change": 0.33074925690528034
+    },
+    "runtime_seconds": 0.37672670900064986
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 28,
+    "hyper": "cat_3",
+    "points": 44.43840738589365,
+    "condition_ratios": {
+     "stable": 0.1258757122588953,
+     "short_history": 0.33431873507446175,
+     "drift": 0.4879018393919662,
+     "shared_change": 0.4526373155365938
+    },
+    "runtime_seconds": 0.1132477080100216
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 0
+    },
+    "config_index": 28,
+    "hyper": "cat_5",
+    "points": 44.54282339872596,
+    "condition_ratios": {
+     "stable": 0.1295244910447132,
+     "short_history": 0.33424715769644087,
+     "drift": 0.47831588450222234,
+     "shared_change": 0.4459858237514251
+    },
+    "runtime_seconds": 0.37135862500872463
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 29,
+    "hyper": "cat_3",
+    "points": 43.21793457102461,
+    "condition_ratios": {
+     "stable": 0.12584708073797196,
+     "short_history": 0.4635676568830584,
+     "drift": 0.4996164156569855,
+     "shared_change": 0.46421895879253205
+    },
+    "runtime_seconds": 0.1146999579941621
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 0,
+     "density": 1
+    },
+    "config_index": 29,
+    "hyper": "cat_5",
+    "points": 43.33255284785063,
+    "condition_ratios": {
+     "stable": 0.12934717282144972,
+     "short_history": 0.46279811466302145,
+     "drift": 0.4909619291293275,
+     "shared_change": 0.45545407800202115
+    },
+    "runtime_seconds": 0.3727804169902811
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 30,
+    "hyper": "cat_3",
+    "points": 44.458895661337436,
+    "condition_ratios": {
+     "stable": 0.12504340347030304,
+     "short_history": 0.3341140895670477,
+     "drift": 0.4877925882242209,
+     "shared_change": 0.4512946666103368
+    },
+    "runtime_seconds": 0.11760675000550691
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 0
+    },
+    "config_index": 30,
+    "hyper": "cat_5",
+    "points": 44.52563670776124,
+    "condition_ratios": {
+     "stable": 0.12812331472197,
+     "short_history": 0.3356381972075365,
+     "drift": 0.4795509113533284,
+     "shared_change": 0.4468407052442573
+    },
+    "runtime_seconds": 0.3709813750028843
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 31,
+    "hyper": "cat_3",
+    "points": 43.21690586570384,
+    "condition_ratios": {
+     "stable": 0.12576616278759223,
+     "short_history": 0.4646319229764502,
+     "drift": 0.49852705777885775,
+     "shared_change": 0.46445715425042017
+    },
+    "runtime_seconds": 0.11496637501113582
+   },
+   {
+    "config": {
+     "signal": 1,
+     "pairs": 1,
+     "hl_grid": 1,
+     "prior": 1,
+     "density": 1
+    },
+    "config_index": 31,
+    "hyper": "cat_5",
+    "points": 43.3108953290842,
+    "condition_ratios": {
+     "stable": 0.12982715911654175,
+     "short_history": 0.46228600598405595,
+     "drift": 0.4902606058792488,
+     "shared_change": 0.4589570691340689
+    },
+    "runtime_seconds": 0.3725384999997914
+   }
+  ],
+  "completed_cells": 64,
+  "declared_cells": 128,
+  "optional_runtime_attempts": {
+   "catboost": {
+    "available": true,
+    "version": "1.2.10"
+   },
+   "lightgbm": {
+    "available": false,
+    "error": "OSError: dlopen(/private/tmp/house-edge-w3w4-optional/lightgbm/lib/lib_lightgbm.dylib, 0x0006): Library not loaded: @rpath/libomp.dylib\n  Referenced from: <59CCDAC2-EBAE-32F7-ADF4-469B834532C9> /private/tmp/house-edge-w3w4-optional/lightgbm/lib/lib_lightgbm.dylib\n  Reason: tried: '/opt/homebrew/opt/libomp/lib/libomp.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/opt/libomp/lib/libomp.dylib' (no such file), '/opt/local/lib/libomp/libomp.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/local/lib/libomp/libomp.dylib' (no such file), '/opt/homebrew/opt/libomp/lib/libomp.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/homebrew/opt/libomp/lib/libomp.dylib' (no such file), '/opt/local/lib/libomp/libomp.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/opt/local/lib/libomp/libomp.dylib' (no such file)"
+   }
+  },
+  "feature_ablations": [
+   {
+    "omit": "lags",
+    "points": 47.000801227517286,
+    "condition_ratios": {
+     "stable": 0.11562079734069773,
+     "short_history": 0.32105285464388666,
+     "drift": 0.3472164193694642,
+     "shared_change": 0.32240585833083873
+    }
+   },
+   {
+    "omit": "frequency",
+    "points": 46.751992188171435,
+    "condition_ratios": {
+     "stable": 0.115417677308253,
+     "short_history": 0.3293091386237837,
+     "drift": 0.3589679873857848,
+     "shared_change": 0.3297762803106014
+    }
+   },
+   {
+    "omit": "drift",
+    "points": 46.827742625207,
+    "condition_ratios": {
+     "stable": 0.1162582591614488,
+     "short_history": 0.3268642724651342,
+     "drift": 0.35447593774218644,
+     "shared_change": 0.3275685052786464
+    }
+   },
+   {
+    "omit": "context",
+    "points": 46.85448841728237,
+    "condition_ratios": {
+     "stable": 0.1170603081254612,
+     "short_history": 0.33002927849812924,
+     "drift": 0.3506840396298114,
+     "shared_change": 0.3244677663444421
+    }
+   }
+  ],
+  "standalone_vs_B3": {
+   "diff": 0.9428062723457131,
+   "ci95": [
+    0.7288014133566494,
+    1.162624860768281
+   ]
+  },
+  "episode_oof_blend": {
+   "w_per_fold": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "w_mean": 1.0,
+   "points": 46.76529088993736,
+   "ci95": [
+    45.662164570020074,
+    47.85591339324776
+   ],
+   "condition_ratios": {
+    "stable": 0.11470106780913565,
+    "short_history": 0.3288654758679987,
+    "drift": 0.3572771565526436,
+    "shared_change": 0.3311675720799087
+   },
+   "vs_base": {
+    "diff": 0.9428062723457131,
+    "ci95": [
+     0.7288014133566494,
+     1.162624860768281
+    ]
+   }
+  },
+  "selection_caveat": "Global hyperparameter selection on dev before episode-OOF blend is optimistic; S5 fold hyperparameters also selected globally. Audit truth never fit or tuned.",
+  "leakage_checks": {
+   "train_only": true,
+   "condition_inference": false,
+   "episode_grouped": true,
+   "audit_fit": false,
+   "same_cutoff_features": false
+  },
+  "dependencies": "numpy/scipy/sklearn",
+  "time_cap_seconds": 600
+ }
+}
