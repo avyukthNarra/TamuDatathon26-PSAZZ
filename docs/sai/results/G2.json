@@ -1,0 +1,61 @@
+{
+ "id": "G2",
+ "owner": "claude",
+ "description": "per-class / log-linear pool (log_pc, lam=0.0)",
+ "params": {
+  "kind": "log_pc",
+  "lam": 0.0,
+  "members": [
+   "TM_MIXER",
+   "TM_RULE",
+   "TM_E7",
+   "TM_E6",
+   "C2",
+   "L7",
+   "L5"
+  ],
+  "n_params": 35
+ },
+ "scope": "dev",
+ "points": 54.30699033640896,
+ "ci95": [
+  53.22975013532715,
+  55.31867767025142
+ ],
+ "condition_ratios": {
+  "stable": 0.07802448331607362,
+  "short_history": 0.14222802942263055,
+  "drift": 0.0976031080358189,
+  "shared_change": 0.1014649586444607
+ },
+ "R": 0.10483014485474594,
+ "class_error_shares": {
+  "p_0": 0.4693782814694657,
+  "p_1": 0.2623899912290325,
+  "p_2": 0.19604705647886325,
+  "p_5": 0.06460742773768409,
+  "p_20": 0.007577243084954448
+ },
+ "runtime_seconds": 7.2110859579988755,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "extra": {
+  "vs_TM_COMBINED": {
+   "diff": 0.16744032122426233,
+   "ci95": [
+    -0.16318121625545245,
+    0.4649914400450454
+   ]
+  },
+  "vs_TEAM_stack": {
+   "diff": 0.014605919902614062,
+   "ci95": [
+    -0.2853288956808475,
+    0.2929695625088991
+   ]
+  }
+ }
+}

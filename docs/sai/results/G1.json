@@ -1,0 +1,61 @@
+{
+ "id": "G1",
+ "owner": "claude",
+ "description": "observable gated linear pool (smooth, lam=0.001)",
+ "params": {
+  "gate": "smooth",
+  "lam": 0.001,
+  "members": [
+   "TM_MIXER",
+   "TM_RULE",
+   "TM_E7",
+   "TM_E6",
+   "C2",
+   "L7",
+   "L5"
+  ],
+  "n_params": 48
+ },
+ "scope": "dev",
+ "points": 54.350004643353316,
+ "ci95": [
+  53.439567954675184,
+  55.2022247514355
+ ],
+ "condition_ratios": {
+  "stable": 0.0691228212886523,
+  "short_history": 0.1421888296763881,
+  "drift": 0.10178889087933572,
+  "shared_change": 0.1027224479582681
+ },
+ "R": 0.10395574745066105,
+ "class_error_shares": {
+  "p_0": 0.46526289688795114,
+  "p_1": 0.2622732628180963,
+  "p_2": 0.196345660518666,
+  "p_5": 0.06936257324623314,
+  "p_20": 0.006755606529053401
+ },
+ "runtime_seconds": 3.5392502089962363,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "extra": {
+  "vs_TM_COMBINED": {
+   "diff": 0.2104546281686197,
+   "ci95": [
+    -0.028823599421579433,
+    0.4341819103585821
+   ]
+  },
+  "vs_TEAM_stack": {
+   "diff": 0.057620226846971434,
+   "ci95": [
+    -0.13897016248278876,
+    0.27236233457301645
+   ]
+  }
+ }
+}

@@ -46,6 +46,11 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 
 | ID | owner | points | CI95 | stable | short | drift | shared | sec | det |
 |---|---|---|---|---|---|---|---|---|---|
+| G1 | claude | 54.35 | 53.44-55.20 | 0.069 | 0.142 | 0.102 | 0.103 | 4 | None |
+| G2 | claude | 54.31 | 53.23-55.32 | 0.078 | 0.142 | 0.098 | 0.101 | 7 | None |
+| V2 | sai-worker | 54.30 | 53.35-55.18 | 0.072 | 0.145 | 0.099 | 0.104 | 0 | None |
+| V1 | sai-worker | 54.27 | 53.31-55.17 | 0.072 | 0.146 | 0.100 | 0.104 | 0 | None |
+| V3 | sai-worker | 54.14 | 53.07-55.12 | 0.077 | 0.156 | 0.094 | 0.106 | 0 | None |
 | TM_COMBINED | teammates | 54.14 | 53.07-55.12 | 0.077 | 0.156 | 0.094 | 0.106 | 0 | None |
 | TM_MIXER | teammates | 53.87 | 52.76-54.87 | 0.091 | 0.159 | 0.096 | 0.109 | 0 | None |
 | TM_RULE | teammates | 52.89 | 51.78-53.94 | 0.057 | 0.210 | 0.133 | 0.136 | 0 | None |
@@ -186,5 +191,8 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | TM_E6 | Avyukth E6 signed-L1 logistic | teammates | neutral | results/TM_E6.json; dev 47.69, below B4; adds +0.22 [+0.02,+0.41] to C2 as a blend member (w .17); his E7 neural net not run (no torch locally); his blend claims 50.02 on a different 48-episode audit split |
 | TM_E7 | Avyukth E7 neural context | teammates | neutral | results/TM_E7.json; dev 49.42 [48.2,50.7]; -4.72 vs TM_COMBINED; adds +0.03 [-0.04,+0.11] to it (w .09); short_history .225 much better than his E6 (.327) as he claimed; needs torch |
 | TM_E67 | Avyukth final entry: E6+E7 50/50 | teammates | neutral | results/TM_E67.json; dev 50.02 [49.0,51.1] (his own audit claim 50.02 on a different split); -4.12 vs TM_COMBINED; blend weight 0 into it; needs torch==2.9.1 |
+| V1 | volatility screen + binned vol gate over 5 members | claude | neutral | results/V1.json; dev 54.27, +0.13 [-0.05,+0.29] vs TM_COMBINED; gate slopes ~0, so it is the static stack gain, not volatility; error rises with vol equally for every member (rho ~ +0.3 for ewv_w16, vy16, garch_h) |
+| V2 | softmax-linear vol/history gate | claude | neutral | results/V2.json; dev 54.27-54.30, +0.13..+0.16 [-0.05,+0.34]; same conclusion, 20-36 params |
+| V3 | vol-scaled shrinkage of p_win toward longer memory | claude | neutral | results/V3.json; dev 54.13, 0.00 [-0.10,+0.06]; optimiser never shrinks: TM_COMBINED p_win is already calibrated w.r.t. volatility |
 
-Counts: alive 10, baseline 5, helps 18, hurts 7, neutral 30
+Counts: alive 10, baseline 5, helps 18, hurts 7, neutral 33

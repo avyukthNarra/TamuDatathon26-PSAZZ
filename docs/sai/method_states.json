@@ -407,5 +407,23 @@
   "teammates",
   "neutral",
   "dev 50.02 [49.0,51.1] (his own audit claim 50.02 on a different split); -4.12 vs TM_COMBINED; blend weight 0 into it; needs torch==2.9.1"
+ ],
+ "V1": [
+  "volatility screen + binned vol gate over 5 members",
+  "claude",
+  "neutral",
+  "dev 54.27, +0.13 [-0.05,+0.29] vs TM_COMBINED; gate slopes ~0, so it is the static stack gain, not volatility; error rises with vol equally for every member (rho ~ +0.3 for ewv_w16, vy16, garch_h)"
+ ],
+ "V2": [
+  "softmax-linear vol/history gate",
+  "claude",
+  "neutral",
+  "dev 54.27-54.30, +0.13..+0.16 [-0.05,+0.34]; same conclusion, 20-36 params"
+ ],
+ "V3": [
+  "vol-scaled shrinkage of p_win toward longer memory",
+  "claude",
+  "neutral",
+  "dev 54.13, 0.00 [-0.10,+0.06]; optimiser never shrinks: TM_COMBINED p_win is already calibrated w.r.t. volatility"
  ]
 }

@@ -189,3 +189,9 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
 - This beats our best (stack 52.32 dev OOF / 54.09 audit; C2 52.09 / 53.77): TM_COMBINED - C2 on audit +1.59 [+0.91,+2.24]. Their win model is far better on drift and shared_change.
 - Team stack (ours + theirs) 54.29 dev OOF, only +0.15 [-0.05,+0.34] over TM_COMBINED; size-share averaging with C1 gives 54.37 dev (+0.23 [+0.10,+0.35]).
 - Lesson: our "half-lives 4-12 hurt" was specific to the near-OLS ridge; their mixer's short memories (12, 40) fix drift. Remaining TM_COMBINED error is ~54% payout size.
+
+### V1-V3 volatility modeling (worker report reviewed; lead re-scored, match)
+- Volatility features (EWMA/rolling/GARCH-style conditional variance of the win flag, vol-of-vol, short-long gap, peer volatility) predict ERROR but not WHICH model is best:
+  error rises with volatility equally for every member (Spearman ~ +0.3 for ewv_w16, vy16, garch_h), TM_COMBINED is best in almost every vol tercile.
+- V1/V2 gated blends: +0.13..+0.16 over TM_COMBINED (CI includes 0), gate slopes fit ~0 => it is the static stack gain. V3 vol-scaled shrinkage: 0.00, never shrinks.
+- Verdict: volatility is shared noise, not a selection or calibration signal for these models. 21 settings tried.

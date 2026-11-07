@@ -1,0 +1,54 @@
+{
+ "id": "V3",
+ "owner": "sai-worker",
+ "description": "vol-scaled shrinkage of TM_COMBINED p_win toward long-memory baseline, shares unchanged",
+ "params": {
+  "base": "long",
+  "lam": 0.3,
+  "feats": [
+   "ewv_w16",
+   "vol_of_vol",
+   "garch_h",
+   "abs_gap_z",
+   "obs_frac",
+   "peer_mean_ewv_w16"
+  ],
+  "n_params": 7,
+  "b0": -12.78390974138578,
+  "beta": [
+   -6.774367012890734e-07,
+   -2.508744737692675e-06,
+   4.99311602653812e-07,
+   -3.2194528286869664e-07,
+   -9.949224826680231e-07,
+   -7.09331906744866e-07
+  ],
+  "settings_tried": 12
+ },
+ "scope": "dev",
+ "points": 54.13959251963601,
+ "ci95": [
+  53.071320395575704,
+  55.11534522846267
+ ],
+ "condition_ratios": {
+  "stable": 0.07668294035050231,
+  "short_history": 0.15612001059631989,
+  "drift": 0.09432539111743607,
+  "shared_change": 0.10585662938623572
+ },
+ "R": 0.10824624286262349,
+ "class_error_shares": {
+  "p_0": 0.45949054100880266,
+  "p_1": 0.2557395310875303,
+  "p_2": 0.19975837979275934,
+  "p_5": 0.07717343048725331,
+  "p_20": 0.007838117623654415
+ },
+ "runtime_seconds": 0.0,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72
+}

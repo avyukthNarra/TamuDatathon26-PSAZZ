@@ -1,0 +1,36 @@
+{
+ "id": "V1",
+ "owner": "sai-worker",
+ "description": "vol-tercile binned gate (ewv_w16 x obs_frac) over 5 members, episode-OOF",
+ "params": {
+  "lam": 0.003,
+  "n_params": 20,
+  "settings_tried": 3
+ },
+ "scope": "dev",
+ "points": 54.268625810536456,
+ "ci95": [
+  53.31141085933766,
+  55.165980292564775
+ ],
+ "condition_ratios": {
+  "stable": 0.07218344241587472,
+  "short_history": 0.14605268759618523,
+  "drift": 0.10002234476992393,
+  "shared_change": 0.10418628801507064
+ },
+ "R": 0.10561119069926363,
+ "class_error_shares": {
+  "p_0": 0.46985674094458424,
+  "p_1": 0.25748892483490254,
+  "p_2": 0.19568645277382643,
+  "p_5": 0.07036875459015285,
+  "p_20": 0.0065991268565338814
+ },
+ "runtime_seconds": 0.0,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72
+}
