@@ -282,7 +282,8 @@
  "P5": [
   "stack all helps members (episode-OOF)",
   "claude",
-  "alive"
+  "helps",
+  "stack over pw members (M9b_B4 .52, L7 .23, M2_B4 .12, L5 .08, S1 .04) and size-share members (C1 .77, A9 .20): dev OOF 52.32 [51.33,53.25], +1.43 vs B4, +0.23 [-0.02,+0.50] vs C2; audit not yet scored"
  ],
  "P6": [
   "shrink ensemble toward the type prior",
@@ -364,5 +365,10 @@
   "claude",
   "helps",
   "52.09 [51.16,52.97], +1.19 vs B4, +0.36 [+0.16,+0.57] vs C1; drift .184 shared .142 stable .090 short .191; selection optimism of members carries over"
+ ],
+ "L10": [
+  "win model with payout-level features at the severity-screened lags 1,2,4 on B4 (idea from A9's finding)",
+  "claude",
+  "alive"
  ]
 }

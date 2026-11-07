@@ -103,6 +103,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | L7 | per-machine sparse feature selection from the screen | claude | alive | results/L7.json; 49.34; vs L2 standalone -1.55 but blend over L2 +0.25 [-0.02,+0.55] w .79; better short_history (.201 vs .216), worse drift/shared_change: possible complement |
 | L8 | mixture transition distribution (MTD) lags | claude | hurts | results/L8.json; -2.70 [-3.49,-1.87] vs B3; blend over L2 +0.05; short_history 0.99 (not investigated) |
 | L9 | signal x lag and type x lag interactions | claude | neutral | results/L9.json; relative to L2: no signal/type x lag prior cell beats its control; effect magnitude is smaller at signal +1 (diagnostic), sign-free interaction untested |
+| L10 | win model with payout-level features at the severity-screened lags 1,2,4 on B4 (idea from A9's finding) | claude | alive | - |
 | M1 | holdout-selected half-life variants (holdout length, grid, floor) | claude | neutral | results/M1.json; +0.01 [-0.01,+0.02]; 90 cells; hl 4-12 hurt at every holdout; floors hurt |
 | M2 | fixed-share over half-lives | claude | helps | results/M2.json; marginal: +0.26 [+0.02,+0.69], stable only (0.118->0.090); one cell (window 180 ~ whole history), dev-selected so optimistic; confirm on audit; on B4 (M2_B4) +0.22 [-0.01,+0.53], CI includes 0 |
 | M3 | dynamic model averaging | claude | helps | results/M3.json; same effect as M2 (+0.26 [+0.02,+0.69]); two methods agree, one effect, not two; on B4 (M3_B4) +0.20 [-0.03,+0.51], CI includes 0 |
@@ -122,7 +123,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | P2 | temperature / Dirichlet calibration, episodes held out | claude | alive | - |
 | P3 | affine 5x5 calibration per (type, signal) | claude | alive | - |
 | P4 | convex blend, R-weighted objective | claude | alive | - |
-| P5 | stack all helps members (episode-OOF) | claude | alive | - |
+| P5 | stack all helps members (episode-OOF) | claude | helps | -; stack over pw members (M9b_B4 .52, L7 .23, M2_B4 .12, L5 .08, S1 .04) and size-share members (C1 .77, A9 .20): dev OOF 52.32 [51.33,53.25], +1.43 vs B4, +0.23 [-0.02,+0.50] vs C2; audit not yet scored |
 | P6 | shrink ensemble toward the type prior | claude | alive | - |
 | P7 | clip bounds | claude | alive | - |
 | S1 | GB / HistGB second stage on B3 output + features | codex | alive | results/S1.json; 46.59 (+0.77 vs B3) but blend over B4 +0.06 [-0.07,+0.19]; rebase pending (S1_B4); built on old B3; lead re-scored via harness |
@@ -134,4 +135,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | S7 | regularized multinomial logistic on full feature set | codex | neutral | results/S7.json; 44.73 (-1.09 vs B3), blend over B4 +0.09 [-0.02,+0.22]; built on old B3; lead re-scored via harness |
 | S8 | small MLP | codex | hurts | results/S8.json; 39.92 (-5.90 vs B3), blend over B4 +0.05; hit iteration cap; built on old B3; lead re-scored via harness |
 
-Counts: alive 11, baseline 5, helps 14, hurts 7, neutral 26
+Counts: alive 11, baseline 5, helps 15, hurts 7, neutral 26
