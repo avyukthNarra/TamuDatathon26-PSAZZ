@@ -24,7 +24,7 @@ from pathlib import Path
 from slot_forecasting.contest import score_contest_files
 from slot_forecasting.experiments import episode_folds, subset_score
 from slot_forecasting.io import load_inputs, read_labels, read_submission, read_targets, write_submission
-from slot_forecasting.pair_mixer import PairMixer, size_modes_from_targets
+from slot_forecasting.pair_mixer import PairMixer, size_modes_from_targets, win_prior_from_targets
 from slot_forecasting.rounds import VERSION, round_metadata
 from slot_forecasting.schema import PAYOUTS
 
@@ -33,6 +33,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("candidates", help="JSON list of PairMixer keyword settings")
 parser.add_argument("--data", default=str(HERE / "public"))
 parser.add_argument("--val", action="store_true")
+parser.add_argument("--base", default="{}", help="JSON settings to compare against (default: PairMixer defaults); "
+                    "candidates are applied on top of it")
 parser.add_argument("--scratch", default=str(HERE / "runs" / "tuning"))
 args = parser.parse_args()
 
@@ -52,10 +54,12 @@ baseline_error = {c: sum(v) / len(v) for c, v in ref_err.items()}
 
 
 def build(settings):
-    """PairMixer from JSON settings; "size_modes": "val" = the two size mixes per type read from validation targets."""
+    """PairMixer from JSON settings; "size_modes"/"win_prior": "val" = read from validation targets."""
     settings = dict(settings)
     if settings.get("size_modes") == "val":
         settings["size_modes"] = size_modes_from_targets(read_targets(val / "targets.csv"), load_inputs(val)[0])
+    if settings.get("win_prior") == "val":
+        settings["win_prior"] = win_prior_from_targets(read_targets(val / "targets.csv"))
     return PairMixer(**settings).fit(train_q, train_h)
 
 
@@ -75,11 +79,13 @@ def delta_r(diff, groups):
 
 val_targets = read_targets(val / "targets.csv")
 val_halves = episode_folds(val_targets, val_cond)
-base = cutoff_brier({})
+base_settings = json.loads(args.base)
+base = cutoff_brier(base_settings)
 event = {"max_points": round_metadata(public)["max_points"], "version": VERSION}
 scratch = Path(args.scratch)
 scratch.mkdir(parents=True, exist_ok=True)
 for settings in json.loads(args.candidates):
+    settings = {**base_settings, **settings}
     cand = cutoff_brier(settings)
     diff_by_episode = defaultdict(lambda: defaultdict(list))
     for q in cand:
