@@ -10,13 +10,23 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | L5 | claude-w1 | 51.09 | 50.03-52.04 | 0.109 | 0.206 | 0.201 | 0.181 | 0 | 0.0 |
 | L2 | claude-w1 | 50.89 | 49.85-51.87 | 0.106 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
 | L3 | claude-w1 | 50.88 | 49.84-51.86 | 0.106 | 0.216 | 0.211 | 0.184 | 0 | 0.0 |
+| L1 | claude-w1 | 50.87 | 49.77-51.90 | 0.107 | 0.225 | 0.203 | 0.183 | 0 | 0.0 |
 | L6 | claude-w1 | 50.77 | 49.75-51.74 | 0.108 | 0.216 | 0.214 | 0.189 | 0 | 0.0 |
 | L9 | claude-w1 | 50.77 | 49.75-51.74 | 0.108 | 0.216 | 0.214 | 0.189 | 0 | 0.0 |
+| L7 | claude-w1 | 49.34 | 47.54-50.80 | 0.106 | 0.201 | 0.299 | 0.258 | 1 | 0.0 |
 | L4 | claude-w1 | 46.71 | 44.58-48.71 | 0.151 | 0.437 | 0.280 | 0.269 | 4 | 0.0 |
 | M3 | claude-w2 | 46.09 | 45.04-47.04 | 0.091 | 0.344 | 0.398 | 0.375 | 0 | 0.0 |
 | M2 | claude-w2 | 46.08 | 45.04-47.06 | 0.090 | 0.344 | 0.399 | 0.375 | 0 | 0.0 |
+| A3 | claude-w1 | 45.98 | 44.90-47.05 | 0.115 | 0.333 | 0.399 | 0.372 | 0 | 0.0 |
+| A6 | claude-w1 | 45.98 | 44.88-47.05 | 0.117 | 0.332 | 0.398 | 0.372 | 0 | 0.0 |
+| A8 | claude-w1 | 45.96 | 44.87-47.04 | 0.119 | 0.332 | 0.400 | 0.371 | 0 | 0.0 |
+| A1 | claude-w1 | 45.96 | 44.87-47.04 | 0.119 | 0.332 | 0.400 | 0.371 | 0 | 0.0 |
+| A5 | claude-w1 | 45.96 | 44.87-47.03 | 0.116 | 0.335 | 0.398 | 0.373 | 0 | 0.0 |
+| A2 | claude-w1 | 45.95 | 44.87-47.03 | 0.117 | 0.335 | 0.398 | 0.373 | 0 | 0.0 |
 | M9 | claude-w2 | 45.88 | 44.68-47.00 | 0.159 | 0.344 | 0.377 | 0.350 | 0 | 0.0 |
+| A4 | claude-w1 | 45.85 | 44.77-46.91 | 0.117 | 0.343 | 0.399 | 0.376 | 0 | 0.0 |
 | M1 | claude-w2 | 45.83 | 44.75-46.89 | 0.118 | 0.344 | 0.399 | 0.375 | 0 | 0.0 |
+| A7 | claude-w1 | 45.82 | 44.75-46.90 | 0.118 | 0.344 | 0.399 | 0.377 | 0 | 0.0 |
 | B3 | claude | 45.82 | 44.75-46.90 | 0.118 | 0.344 | 0.399 | 0.377 | 1 | 0.0 |
 | M7 | claude-w2 | 45.76 | 44.62-46.83 | 0.137 | 0.344 | 0.397 | 0.366 | 0 | 0.0 |
 | M5 | claude-w2 | 45.75 | 44.63-46.85 | 0.129 | 0.344 | 0.398 | 0.375 | 0 | 0.0 |
@@ -30,14 +40,14 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 
 | ID | method | owner | state | evidence |
 |---|---|---|---|---|
-| A1 | type-level Dirichlet smoothing, alpha 2/8/24/64 | claude | alive | - |
-| A2 | 9-cell (type x signal) priors | claude | alive | - |
-| A3 | half-life grid 4..128, inf | claude | alive | - |
-| A4 | class-specific half-life and alpha | claude | alive | - |
-| A5 | inverse-density weights for short_history older ticks | claude | alive | - |
-| A6 | prior strength scaled by effective sample size | claude | alive | - |
-| A7 | factorized win-rate x severity blended with direct 5-class | claude | alive | - |
-| A8 | leave-one-out episode / episode-type shrinkage | claude | alive | - |
+| A1 | type-level Dirichlet smoothing, alpha 2/8/24/64 | claude | helps | results/A1.json; small: +0.14 [+0.03,+0.27], blend +0.14 [+0.05,+0.25]; alpha 24-64 on the size split. ONE effect found by A1,A2,A3,A5,A6,A8; under the ~0.2 noise line but CI clear |
+| A2 | 9-cell (type x signal) priors | claude | neutral | results/A2.json; +0.13 [+0.07,+0.20] is just alpha 24; 9-cell priors agree with type priors within 0.003; shrinking the ridge win rate toward the prior hurts (-2.9 at 50 pseudo-ticks) |
+| A3 | half-life grid 4..128, inf | claude | neutral | results/A3.json; +0.16 is alpha 24 again; half-life curve flat at alpha 8 (45.64 at hl 4 to 45.84 at hl 128) |
+| A4 | class-specific half-life and alpha | claude | neutral | results/A4.json; +0.03 [0.00,0.06]; short half-life on p1/p2 drops to ~41 |
+| A5 | inverse-density weights for short_history older ticks | claude | neutral | results/A5.json; no gain beyond alpha; weighting size counts -0.02/-0.12; weighting ridge rows cut short_history to 0.442 (confounded with a looser ridge penalty, not separated) |
+| A6 | prior strength scaled by effective sample size | claude | neutral | results/A6.json; +0.16 [+0.07,+0.27] ties fixed alpha 64; best at grid edge (a0=32, g=-1); a0>32 untested |
+| A7 | factorized win-rate x severity blended with direct 5-class | claude | neutral | results/A7.json; factorized B3 split is already the best; blending direct 5-class hurts (43.1 at w=0.25) |
+| A8 | leave-one-out episode / episode-type shrinkage | claude | neutral | results/A8.json; peer shares only hurt as weight grows; best cell is the no-peer alpha 64 control |
 | B0 | starter pooled (reference) | claude | baseline | results/B0.json |
 | B1 | pooled_recent | claude | baseline | - |
 | B2 | GB, HL 4/16/64/128 + LAGRESP (mainFiles/experiments/gb_proto.py) | claude | baseline | - |
@@ -47,13 +57,13 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | E3 | episode-level drift stats as features | codex | alive | - |
 | E4 | peer lagged associations vs null controls | codex | alive | - |
 | E5 | latent factor model for episode state | codex | alive | - |
-| L1 | one-hot lags 1-8 + missing flag, regularized multinomial | claude | alive | - |
+| L1 | one-hot lags 1-8 + missing flag, regularized multinomial | claude | alive | results/L1.json |
 | L2 | per-machine ridge on lags + pairs (B3 variants: lambda, lag set, pair set) | claude | alive | results/L2.json |
 | L3 | all pairs among lags 1-8 with null controls (9-16); triples | claude | alive | results/L3.json |
 | L4 | per-machine single-lag conditional lift | claude | alive | results/L4.json |
 | L5 | 3-state conditioning / log(1+y) levels vs win flag | claude | alive | results/L5.json |
 | L6 | partial pooling of coefficients to the type mean | claude | alive | results/L6.json |
-| L7 | per-machine sparse feature selection from the screen | claude | alive | - |
+| L7 | per-machine sparse feature selection from the screen | claude | alive | results/L7.json |
 | L8 | mixture transition distribution (MTD) lags | claude | alive | - |
 | L9 | signal x lag and type x lag interactions | claude | alive | results/L9.json |
 | M1 | holdout-selected half-life variants (holdout length, grid, floor) | claude | neutral | results/M1.json; +0.01 [-0.01,+0.02]; 90 cells; hl 4-12 hurt at every holdout; floors hurt |
@@ -82,4 +92,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | S7 | regularized multinomial logistic on full feature set | codex | alive | - |
 | S8 | small MLP | codex | alive | - |
 
-Counts: alive 38, baseline 4, helps 2, hurts 3, neutral 4
+Counts: alive 30, baseline 4, helps 3, hurts 3, neutral 11

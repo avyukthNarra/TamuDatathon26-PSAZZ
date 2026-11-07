@@ -96,3 +96,15 @@ Not checked: multiple seeds. Differences under ~0.2 should be treated as noise.
   cells. Alive; follow-up is a peer-agreement gate.
 - M10 Kalman half-life disagrees with B3's choice (corr 0.00) yet B3's choice is what scores well; no corroboration.
 - Takeaway: B3's memory is near a plateau. Verdicts: helps M2,M3; alive M9; neutral M1,M4,M5,M7; hurts M6,M8,M10.
+
+### W1-A frequency and shrinkage (A1-A8), worker report reviewed
+Each A method tested (1) as B3's payout-size split / win prior with the pair-ridge win model kept, (2) standalone.
+- The only lever found is a stronger prior on the size shares, alpha 24-64: +0.14 to +0.16 [CI ~+0.03..+0.27]
+  (A1, A2, A3, A5, A6, A8 all rediscover the same effect). Verdict: A1 helps (tiny), rest neutral.
+- p1 and p2 error shares do not move (0.229, 0.137): the size split is NOT where the p1/p2 error lives. Only p5 shrinks.
+  So the remaining p1+p2 error is probably conditional structure (lags/state affecting severity), not shrinkage.
+- Signal moves win rate ~7 points but barely moves size shares; with/without-signal cross is a null.
+- Shrinking the ridge win probability toward a type/cell rate hurts badly (-2.9 at 50 pseudo-ticks): per-machine win
+  rates are far from type priors.
+- Standalone frequency models score 29.9-30.8 (~15 below B3); blend weight 0.00, zero stack value.
+- Implication: look at severity-given-win with lag features (L5 log levels / 3-state) rather than more shrinkage.
