@@ -1,0 +1,617 @@
+{
+  "id": "TM_AUTOTUNE",
+  "leakage": "YES for blend selection: dev targets used in this scoped wrapper; native auto_tune uses all 96 validation targets, including its own tune/audit halves. Not a Phase B member.",
+  "dev": {
+    "scope": "dev",
+    "points": 54.139550015184696,
+    "R": 0.10824711293632105,
+    "n_episodes": 72,
+    "condition_ratios": {
+      "stable": 0.07668532635805103,
+      "short_history": 0.15612014586587936,
+      "drift": 0.09432649894724532,
+      "shared_change": 0.1058564805741085
+    },
+    "mean_error": 0.020241042969206428,
+    "ci95": [
+      53.071273132159796,
+      55.11533076882959
+    ],
+    "class_error_shares": {
+      "p_0": 0.4594919622646291,
+      "p_1": 0.2557359392718667,
+      "p_2": 0.19976053715027908,
+      "p_5": 0.07717309737138615,
+      "p_20": 0.007838463941838954
+    }
+  },
+  "native_not_run": "Native script reads/scores all validation; would violate dev-only phase. Selection and confirmation restricted to disjoint 36-episode dev halves.",
+  "best": {
+    "weights": {
+      "rule": 0.4,
+      "mixer": 0.6
+    },
+    "tune": 53.29939344801033,
+    "confirm": 55.11830474643945
+  },
+  "current": {
+    "weights": {
+      "rule": 0.2,
+      "mixer": 0.8
+    },
+    "tune": 53.214561949910504,
+    "confirm": 55.14488393837347
+  },
+  "accepted": false,
+  "chosen": {
+    "weights": {
+      "rule": 0.2,
+      "mixer": 0.8
+    },
+    "tune": 53.214561949910504,
+    "confirm": 55.14488393837347
+  },
+  "grid": [
+    {
+      "weights": {
+        "mixer_all": 1.0
+      },
+      "tune": 51.713856059841675,
+      "confirm": 54.59849328663975
+    },
+    {
+      "weights": {
+        "mixer": 0.1,
+        "mixer_all": 0.9
+      },
+      "tune": 51.900251668822094,
+      "confirm": 54.6376431207709
+    },
+    {
+      "weights": {
+        "mixer": 0.2,
+        "mixer_all": 0.8
+      },
+      "tune": 52.072793567867016,
+      "confirm": 54.67497906666319
+    },
+    {
+      "weights": {
+        "mixer": 0.3,
+        "mixer_all": 0.7
+      },
+      "tune": 52.2311916348743,
+      "confirm": 54.7104935699955
+    },
+    {
+      "weights": {
+        "mixer": 0.4,
+        "mixer_all": 0.6
+      },
+      "tune": 52.37517694932093,
+      "confirm": 54.744179430547526
+    },
+    {
+      "weights": {
+        "mixer": 0.5,
+        "mixer_all": 0.5
+      },
+      "tune": 52.504502907781735,
+      "confirm": 54.77602980581834
+    },
+    {
+      "weights": {
+        "mixer": 0.6,
+        "mixer_all": 0.4
+      },
+      "tune": 52.61894626024592,
+      "confirm": 54.80603821447475
+    },
+    {
+      "weights": {
+        "mixer": 0.7,
+        "mixer_all": 0.3
+      },
+      "tune": 52.71830805926297,
+      "confirm": 54.83419853962636
+    },
+    {
+      "weights": {
+        "mixer": 0.8,
+        "mixer_all": 0.2
+      },
+      "tune": 52.80241451450369,
+      "confirm": 54.860505031924
+    },
+    {
+      "weights": {
+        "mixer": 0.9,
+        "mixer_all": 0.1
+      },
+      "tune": 52.87111774596848,
+      "confirm": 54.884952312478845
+    },
+    {
+      "weights": {
+        "mixer": 1.0
+      },
+      "tune": 52.92429642980603,
+      "confirm": 54.90753537559929
+    },
+    {
+      "weights": {
+        "rule": 0.1,
+        "mixer_all": 0.9
+      },
+      "tune": 52.047624570515765,
+      "confirm": 54.78086171153417
+    },
+    {
+      "weights": {
+        "rule": 0.1,
+        "mixer": 0.1,
+        "mixer_all": 0.8
+      },
+      "tune": 52.223003893195084,
+      "confirm": 54.8191402907354
+    },
+    {
+      "weights": {
+        "rule": 0.1,
+        "mixer": 0.2,
+        "mixer_all": 0.7
+      },
+      "tune": 52.38418449293009,
+      "confirm": 54.85558995335522
+    },
+    {
+      "weights": {
+        "rule": 0.1,
+        "mixer": 0.3,
+        "mixer_all": 0.6
+      },
+      "tune": 52.53089216653048,
+      "confirm": 54.89020329420246
+    },
+    {
+      "weights": {
+        "rule": 0.1,
+        "mixer": 0.4,
+        "mixer_all": 0.5
+      },
+      "tune": 52.66287510081846,
+      "confirm": 54.92297326742321
+    },
+    {
+      "weights": {
+        "rule": 0.1,
+        "mixer": 0.5,
+        "mixer_all": 0.4
+      },
+      "tune": 52.77990493255771,
+      "confirm": 54.953893190057975
+    },
+    {
+      "weights": {
+        "rule": 0.1,
+        "mixer": 0.6,
+        "mixer_all": 0.3
+      },
+      "tune": 52.88177772111423,
+      "confirm": 54.98295674542468
+    },
+    {
+      "weights": {
+        "rule": 0.1,
+        "mixer": 0.7,
+        "mixer_all": 0.2
+      },
+      "tune": 52.96831482624127,
+      "confirm": 55.01015798632451
+    },
+    {
+      "weights": {
+        "rule": 0.1,
+        "mixer": 0.8,
+        "mixer_all": 0.1
+      },
+      "tune": 53.03936368402565,
+      "confirm": 55.03549133806731
+    },
+    {
+      "weights": {
+        "rule": 0.1,
+        "mixer": 0.9
+      },
+      "tune": 53.09479847476465,
+      "confirm": 55.05895160131392
+    },
+    {
+      "weights": {
+        "rule": 0.2,
+        "mixer_all": 0.8
+      },
+      "tune": 52.323964125970654,
+      "confirm": 54.89833450121031
+    },
+    {
+      "weights": {
+        "rule": 0.2,
+        "mixer": 0.1,
+        "mixer_all": 0.7
+      },
+      "tune": 52.487642856449206,
+      "confirm": 54.93563934151098
+    },
+    {
+      "weights": {
+        "rule": 0.2,
+        "mixer": 0.2,
+        "mixer_all": 0.6
+      },
+      "tune": 52.636815430748726,
+      "confirm": 54.97110452997953
+    },
+    {
+      "weights": {
+        "rule": 0.2,
+        "mixer": 0.3,
+        "mixer_all": 0.5
+      },
+      "tune": 52.77122548830666,
+      "confirm": 55.00472284060774
+    },
+    {
+      "weights": {
+        "rule": 0.2,
+        "mixer": 0.4,
+        "mixer_all": 0.4
+      },
+      "tune": 52.89064014941748,
+      "confirm": 55.0364874107136
+    },
+    {
+      "weights": {
+        "rule": 0.2,
+        "mixer": 0.5,
+        "mixer_all": 0.3
+      },
+      "tune": 52.99485100801008,
+      "confirm": 55.066391744417565
+    },
+    {
+      "weights": {
+        "rule": 0.2,
+        "mixer": 0.6,
+        "mixer_all": 0.2
+      },
+      "tune": 53.083675029617766,
+      "confirm": 55.09442971594153
+    },
+    {
+      "weights": {
+        "rule": 0.2,
+        "mixer": 0.7,
+        "mixer_all": 0.1
+      },
+      "tune": 53.15695534741314,
+      "confirm": 55.1205955727276
+    },
+    {
+      "weights": {
+        "rule": 0.2,
+        "mixer": 0.8
+      },
+      "tune": 53.214561949910504,
+      "confirm": 55.14488393837347
+    },
+    {
+      "weights": {
+        "rule": 0.3,
+        "mixer_all": 0.7
+      },
+      "tune": 52.54097469225652,
+      "confirm": 54.95006944145797
+    },
+    {
+      "weights": {
+        "rule": 0.3,
+        "mixer": 0.1,
+        "mixer_all": 0.6
+      },
+      "tune": 52.69233899326829,
+      "confirm": 54.98630440627284
+    },
+    {
+      "weights": {
+        "rule": 0.3,
+        "mixer": 0.2,
+        "mixer_all": 0.5
+      },
+      "tune": 52.82893092441051,
+      "confirm": 55.02069339275575
+    },
+    {
+      "weights": {
+        "rule": 0.3,
+        "mixer": 0.3,
+        "mixer_all": 0.4
+      },
+      "tune": 52.950513728282935,
+      "confirm": 55.053229382421485
+    },
+    {
+      "weights": {
+        "rule": 0.3,
+        "mixer": 0.4,
+        "mixer_all": 0.3
+      },
+      "tune": 53.056875102578104,
+      "confirm": 55.08390572279508
+    },
+    {
+      "weights": {
+        "rule": 0.3,
+        "mixer": 0.5,
+        "mixer_all": 0.2
+      },
+      "tune": 53.14782811495113,
+      "confirm": 55.11271613078862
+    },
+    {
+      "weights": {
+        "rule": 0.3,
+        "mixer": 0.6,
+        "mixer_all": 0.1
+      },
+      "tune": 53.22321201624927,
+      "confirm": 55.13965469589869
+    },
+    {
+      "weights": {
+        "rule": 0.3,
+        "mixer": 0.7
+      },
+      "tune": 53.282892945565784,
+      "confirm": 55.1647158832213
+    },
+    {
+      "weights": {
+        "rule": 0.4,
+        "mixer_all": 0.6
+      },
+      "tune": 52.69714281217375,
+      "confirm": 54.9356939048442
+    },
+    {
+      "weights": {
+        "rule": 0.4,
+        "mixer": 0.1,
+        "mixer_all": 0.5
+      },
+      "tune": 52.83565796378677,
+      "confirm": 54.9707703081277
+    },
+    {
+      "weights": {
+        "rule": 0.4,
+        "mixer": 0.2,
+        "mixer_all": 0.4
+      },
+      "tune": 52.95917893663181,
+      "confirm": 55.0039988839265
+    },
+    {
+      "weights": {
+        "rule": 0.4,
+        "mixer": 0.3,
+        "mixer_all": 0.3
+      },
+      "tune": 53.067490136658954,
+      "confirm": 55.035372847467045
+    },
+    {
+      "weights": {
+        "rule": 0.4,
+        "mixer": 0.4,
+        "mixer_all": 0.2
+      },
+      "tune": 53.16040126530708,
+      "confirm": 55.06488578132602
+    },
+    {
+      "weights": {
+        "rule": 0.4,
+        "mixer": 0.5,
+        "mixer_all": 0.1
+      },
+      "tune": 53.23774814682804,
+      "confirm": 55.09253163869088
+    },
+    {
+      "weights": {
+        "rule": 0.4,
+        "mixer": 0.6
+      },
+      "tune": 53.29939344801033,
+      "confirm": 55.11830474643945
+    },
+    {
+      "weights": {
+        "rule": 0.5,
+        "mixer_all": 0.5
+      },
+      "tune": 52.791367663796436,
+      "confirm": 54.855311538445264
+    },
+    {
+      "weights": {
+        "rule": 0.5,
+        "mixer": 0.1,
+        "mixer_all": 0.4
+      },
+      "tune": 52.9165854961749,
+      "confirm": 54.88914911883813
+    },
+    {
+      "weights": {
+        "rule": 0.5,
+        "mixer": 0.2,
+        "mixer_all": 0.3
+      },
+      "tune": 53.02663439463112,
+      "confirm": 54.92114151982813
+    },
+    {
+      "weights": {
+        "rule": 0.5,
+        "mixer": 0.3,
+        "mixer_all": 0.2
+      },
+      "tune": 53.12132125533858,
+      "confirm": 54.95128221400109
+    },
+    {
+      "weights": {
+        "rule": 0.5,
+        "mixer": 0.4,
+        "mixer_all": 0.1
+      },
+      "tune": 53.200478961674136,
+      "confirm": 54.979565041269986
+    },
+    {
+      "weights": {
+        "rule": 0.5,
+        "mixer": 0.5
+      },
+      "tune": 53.263967115759684,
+      "confirm": 55.00598421200365
+    },
+    {
+      "weights": {
+        "rule": 0.6,
+        "mixer_all": 0.4
+      },
+      "tune": 52.82298031052704,
+      "confirm": 54.70950040091293
+    },
+    {
+      "weights": {
+        "rule": 0.6,
+        "mixer": 0.1,
+        "mixer_all": 0.3
+      },
+      "tune": 52.93454520839631,
+      "confirm": 54.742028143195235
+    },
+    {
+      "weights": {
+        "rule": 0.6,
+        "mixer": 0.2,
+        "mixer_all": 0.2
+      },
+      "tune": 53.03081551498677,
+      "confirm": 54.772717822095956
+    },
+    {
+      "weights": {
+        "rule": 0.6,
+        "mixer": 0.3,
+        "mixer_all": 0.1
+      },
+      "tune": 53.1116216827785,
+      "confirm": 54.80156318833915
+    },
+    {
+      "weights": {
+        "rule": 0.6,
+        "mixer": 0.4
+      },
+      "tune": 53.176820682559814,
+      "confirm": 54.828558358590726
+    },
+    {
+      "weights": {
+        "rule": 0.7,
+        "mixer_all": 0.3
+      },
+      "tune": 52.7917555198767,
+      "confirm": 54.49930261112738
+    },
+    {
+      "weights": {
+        "rule": 0.7,
+        "mixer": 0.1,
+        "mixer_all": 0.2
+      },
+      "tune": 52.8894088292938,
+      "confirm": 54.53045939643629
+    },
+    {
+      "weights": {
+        "rule": 0.7,
+        "mixer": 0.2,
+        "mixer_all": 0.1
+      },
+      "tune": 52.97169237463674,
+      "confirm": 54.559789624564935
+    },
+    {
+      "weights": {
+        "rule": 0.7,
+        "mixer": 0.3
+      },
+      "tune": 53.03846094908525,
+      "confirm": 54.58728734202821
+    },
+    {
+      "weights": {
+        "rule": 0.8,
+        "mixer_all": 0.2
+      },
+      "tune": 52.69791576339906,
+      "confirm": 54.22620585266983
+    },
+    {
+      "weights": {
+        "rule": 0.8,
+        "mixer": 0.1,
+        "mixer_all": 0.1
+      },
+      "tune": 52.781498482431346,
+      "confirm": 54.255940924810425
+    },
+    {
+      "weights": {
+        "rule": 0.8,
+        "mixer": 0.2
+      },
+      "tune": 52.84968744476716,
+      "confirm": 54.2838652118082
+    },
+    {
+      "weights": {
+        "rule": 0.9,
+        "mixer_all": 0.1
+      },
+      "tune": 52.542127265725775,
+      "confirm": 53.89211734204632
+    },
+    {
+      "weights": {
+        "rule": 0.9,
+        "mixer": 0.1
+      },
+      "tune": 52.61158095709137,
+      "confirm": 53.92039058349935
+    },
+    {
+      "weights": {
+        "rule": 1.0
+      },
+      "tune": 52.32548823314149,
+      "confirm": 53.499331100468204
+    }
+  ]
+}

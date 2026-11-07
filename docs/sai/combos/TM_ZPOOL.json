@@ -1,0 +1,28 @@
+{
+  "id": "TM_ZPOOL",
+  "leakage": "No validation targets read at runtime; inherited blend/settings were selected on validation. EpisodeMemoryMixer gamma=0.5.",
+  "dev": {
+    "scope": "dev",
+    "points": 54.43777002688182,
+    "R": 0.1021759335544329,
+    "n_episodes": 72,
+    "condition_ratios": {
+      "stable": 0.05984144592805833,
+      "short_history": 0.14866375088961004,
+      "drift": 0.09432649901781266,
+      "shared_change": 0.10587203838225055
+    },
+    "mean_error": 0.019092206541634755,
+    "ci95": [
+      53.50123652639671,
+      55.32764407956802
+    ],
+    "class_error_shares": {
+      "p_0": 0.44634189930171636,
+      "p_1": 0.2546910546505507,
+      "p_2": 0.21000490759353146,
+      "p_5": 0.08074779176147158,
+      "p_20": 0.008214346692729819
+    }
+  }
+}

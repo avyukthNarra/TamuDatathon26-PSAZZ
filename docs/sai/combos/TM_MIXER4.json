@@ -1,0 +1,117 @@
+{
+  "id": "TM_MIXER4",
+  "leakage": "YES: size modes per type AND Beta-mixture win prior fit from all 96 validation targets; settings previously validation-tuned.",
+  "dev": {
+    "scope": "dev",
+    "points": 55.09531386280525,
+    "R": 0.08902183857973985,
+    "n_episodes": 72,
+    "condition_ratios": {
+      "stable": 0.07519770705512627,
+      "short_history": 0.1294378404950758,
+      "drift": 0.0680129098447536,
+      "shared_change": 0.08343889692400369
+    },
+    "mean_error": 0.016668208236146318,
+    "ci95": [
+      54.16009972754891,
+      55.92738146488074
+    ],
+    "class_error_shares": {
+      "p_0": 0.4999954683724189,
+      "p_1": 0.257731409121997,
+      "p_2": 0.17365091213205566,
+      "p_5": 0.06286057829067175,
+      "p_20": 0.00576163208285672
+    }
+  },
+  "size_modes": {
+    "balanced": [
+      [
+        0.5,
+        0.348,
+        0.13,
+        0.022
+      ],
+      [
+        0.214,
+        0.547,
+        0.205,
+        0.034
+      ]
+    ],
+    "steady": [
+      [
+        0.754,
+        0.197,
+        0.048,
+        0.001
+      ],
+      [
+        0.455,
+        0.436,
+        0.107,
+        0.002
+      ]
+    ],
+    "jackpot": [
+      [
+        0.335,
+        0.245,
+        0.315,
+        0.105
+      ],
+      [
+        0.121,
+        0.324,
+        0.416,
+        0.139
+      ]
+    ]
+  },
+  "win_prior": [
+    [
+      0.45,
+      0.0435,
+      6.0
+    ],
+    [
+      0.45,
+      0.898,
+      6.0
+    ],
+    [
+      0.1,
+      0.5,
+      2.0
+    ]
+  ],
+  "source": "39e5757 (81d4fff changes docs only)",
+  "combined4": {
+    "leakage": "YES: size modes per type AND Beta-mixture win prior fit from all 96 validation targets; settings previously validation-tuned.",
+    "dev": {
+      "scope": "dev",
+      "points": 55.344761540784475,
+      "R": 0.08411344325307102,
+      "n_episodes": 72,
+      "condition_ratios": {
+        "stable": 0.06299575909159877,
+        "short_history": 0.12135756670506158,
+        "drift": 0.07037598111459344,
+        "shared_change": 0.08172446610103029
+      },
+      "mean_error": 0.01573712104805593,
+      "ci95": [
+        54.53824946143387,
+        56.106184703276725
+      ],
+      "class_error_shares": {
+        "p_0": 0.4948122221491876,
+        "p_1": 0.2585929579218002,
+        "p_2": 0.17955240958816748,
+        "p_5": 0.06134997044930981,
+        "p_20": 0.005692439891534941
+      }
+    }
+  }
+}
