@@ -101,8 +101,8 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | L8 | mixture transition distribution (MTD) lags | claude | hurts | results/L8.json; -2.70 [-3.49,-1.87] vs B3; blend over L2 +0.05; short_history 0.99 (not investigated) |
 | L9 | signal x lag and type x lag interactions | claude | neutral | results/L9.json; relative to L2: no signal/type x lag prior cell beats its control; effect magnitude is smaller at signal +1 (diagnostic), sign-free interaction untested |
 | M1 | holdout-selected half-life variants (holdout length, grid, floor) | claude | neutral | results/M1.json; +0.01 [-0.01,+0.02]; 90 cells; hl 4-12 hurt at every holdout; floors hurt |
-| M2 | fixed-share over half-lives | claude | helps | results/M2.json; marginal: +0.26 [+0.02,+0.69], stable only (0.118->0.090); one cell (window 180 ~ whole history), dev-selected so optimistic; confirm on audit |
-| M3 | dynamic model averaging | claude | helps | results/M3.json; same effect as M2 (+0.26 [+0.02,+0.69]); two methods agree, one effect, not two |
+| M2 | fixed-share over half-lives | claude | helps | results/M2.json; marginal: +0.26 [+0.02,+0.69], stable only (0.118->0.090); one cell (window 180 ~ whole history), dev-selected so optimistic; confirm on audit; on B4 (M2_B4) +0.22 [-0.01,+0.53], CI includes 0 |
+| M3 | dynamic model averaging | claude | helps | results/M3.json; same effect as M2 (+0.26 [+0.02,+0.69]); two methods agree, one effect, not two; on B4 (M3_B4) +0.20 [-0.03,+0.51], CI includes 0 |
 | M4 | BOCPD (Dirichlet-multinomial) | claude | neutral | results/M4.json; -0.11 [-0.29,+0.06]; converges to B3 as hazard->0 |
 | M5 | ADWIN | claude | neutral | results/M5.json; -0.07 [-0.19,+0.03] |
 | M6 | JSD/TV-gated blend of short and long windows | claude | hurts | results/M6.json; -0.30 [-0.66,-0.06]; 324 cells; blend weight 0 |
@@ -111,10 +111,10 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | M9 | changepoints shared across an episode's machines | claude | helps | results/M9.json; helps only in one condition (rule 5): shared_change -0.074 [-0.110,-0.042] at h=1/5000 but drift +0.236 [+0.052,+0.453] when ungated; superseded by M9b |
 | M9b | M9b: episode-shared BOCPD gated by k-of-others peer shift (W=80, k=2-3), B3 fallback | claude | helps | results/M9b.json; +0.25 [+0.12,+0.40] (lead re-scored 46.07); 298-cell search so ~0.25 selection optimism; drift -0.009 [-0.014,-0.003], shared_change -0.020 [-0.036,-0.006], stable 0.000; k=3 +0.21, k=1,4 weaker; validate on audit |
 | M10 | half-life implied by Kalman gain (sanity check) | claude | hurts | results/M10.json; diagnostic only: -7.2; corr(log hl, B3's) = 0.00, does not corroborate hl 16 |
-| M1_B4 | holdout-selected half-life variants (holdout length, grid, floor) rebased onto B4 | claude | alive | results/M1_B4.json |
-| M2_B4 | fixed-share over half-lives rebased onto B4 | claude | alive | results/M2_B4.json |
-| M3_B4 | dynamic model averaging rebased onto B4 | claude | alive | results/M3_B4.json |
-| M9b_B4 | M9b rebased onto B4 | claude | alive | results/M9b_B4.json |
+| M1_B4 | holdout-selected half-life variants (holdout length, grid, floor) rebased onto B4 | claude | neutral | results/M1_B4.json; identical to B4 (50.89); holdout 40 + B3 grid is the optimum; half-lives 4-12 and floors still hurt on near-OLS ridge; holdout 60-80 drops to ~47; 150 cells |
+| M2_B4 | fixed-share over half-lives rebased onto B4 | claude | neutral | results/M2_B4.json; 51.11, +0.22 [-0.01,+0.53]; gain rests on ONE cell (window 190 = grid maximum), other windows ~50.93; stable only; 336 cells |
+| M3_B4 | dynamic model averaging rebased onto B4 | claude | neutral | results/M3_B4.json; 51.09, +0.20 [-0.03,+0.51]; flat plateau across windows 80-190 (51.02-51.09), stable only; 128 cells |
+| M9b_B4 | M9b rebased onto B4 | claude | helps | results/M9b_B4.json; 51.22 [50.22,52.15], +0.33 [+0.14,+0.53] vs B4 (lead re-scored); robust to neighbours (k=1-4: 51.08/51.22/51.17/51.02; lam 0.5 51.18); drift -0.014 [-0.029,-0.002], shared -0.015 [-0.030,-0.004], stable -0.001; 164 cells; survives rebase unlike M2/M3 |
 | P1 | simplex projection vs divide-by-sum vs softmax | claude | alive | - |
 | P2 | temperature / Dirichlet calibration, episodes held out | claude | alive | - |
 | P3 | affine 5x5 calibration per (type, signal) | claude | alive | - |
@@ -131,4 +131,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | S7 | regularized multinomial logistic on full feature set | codex | neutral | results/S7.json; 44.73 (-1.09 vs B3), blend over B4 +0.09 [-0.02,+0.22]; built on old B3; lead re-scored via harness |
 | S8 | small MLP | codex | hurts | results/S8.json; 39.92 (-5.90 vs B3), blend over B4 +0.05; hit iteration cap; built on old B3; lead re-scored via harness |
 
-Counts: alive 16, baseline 5, helps 11, hurts 7, neutral 23
+Counts: alive 12, baseline 5, helps 12, hurts 7, neutral 26

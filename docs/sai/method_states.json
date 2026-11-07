@@ -131,13 +131,13 @@
   "fixed-share over half-lives",
   "claude",
   "helps",
-  "marginal: +0.26 [+0.02,+0.69], stable only (0.118->0.090); one cell (window 180 ~ whole history), dev-selected so optimistic; confirm on audit"
+  "marginal: +0.26 [+0.02,+0.69], stable only (0.118->0.090); one cell (window 180 ~ whole history), dev-selected so optimistic; confirm on audit; on B4 (M2_B4) +0.22 [-0.01,+0.53], CI includes 0"
  ],
  "M3": [
   "dynamic model averaging",
   "claude",
   "helps",
-  "same effect as M2 (+0.26 [+0.02,+0.69]); two methods agree, one effect, not two"
+  "same effect as M2 (+0.26 [+0.02,+0.69]); two methods agree, one effect, not two; on B4 (M3_B4) +0.20 [-0.03,+0.51], CI includes 0"
  ],
  "M4": [
   "BOCPD (Dirichlet-multinomial)",
@@ -314,22 +314,26 @@
  "M1_B4": [
   "holdout-selected half-life variants (holdout length, grid, floor) rebased onto B4",
   "claude",
-  "alive"
+  "neutral",
+  "identical to B4 (50.89); holdout 40 + B3 grid is the optimum; half-lives 4-12 and floors still hurt on near-OLS ridge; holdout 60-80 drops to ~47; 150 cells"
  ],
  "M2_B4": [
   "fixed-share over half-lives rebased onto B4",
   "claude",
-  "alive"
+  "neutral",
+  "51.11, +0.22 [-0.01,+0.53]; gain rests on ONE cell (window 190 = grid maximum), other windows ~50.93; stable only; 336 cells"
  ],
  "M3_B4": [
   "dynamic model averaging rebased onto B4",
   "claude",
-  "alive"
+  "neutral",
+  "51.09, +0.20 [-0.03,+0.51]; flat plateau across windows 80-190 (51.02-51.09), stable only; 128 cells"
  ],
  "M9b_B4": [
   "M9b rebased onto B4",
   "claude",
-  "alive"
+  "helps",
+  "51.22 [50.22,52.15], +0.33 [+0.14,+0.53] vs B4 (lead re-scored); robust to neighbours (k=1-4: 51.08/51.22/51.17/51.02; lam 0.5 51.18); drift -0.014 [-0.029,-0.002], shared -0.015 [-0.030,-0.004], stable -0.001; 164 cells; survives rebase unlike M2/M3"
  ],
  "A1_B4": [
   "type-level Dirichlet smoothing, alpha 2/8/24/64 rebased onto B4",

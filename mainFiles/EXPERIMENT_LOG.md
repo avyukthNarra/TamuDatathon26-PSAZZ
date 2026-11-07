@@ -159,3 +159,9 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
   fell. Effect is per-machine: a pooled train beta alone equals B4. 292 cells, so some selection optimism. Null lags 9-12: -0.2..-0.34.
 - A1_B4/A4_B4/A6_B4 (alpha ~64 size-split prior): ~51.16, +0.27 [+0.10,+0.44]. One effect (p5/p20 shrinkage), not three.
 - A9 touches p1/p2 and alpha touches p5/p20, so they should add; combination queued as C1.
+
+### B4 memory rebase (M1_B4, M2_B4, M3_B4, M9b_B4), worker report reviewed, lead re-scored (match)
+- M9b_B4: 51.22, +0.33 [+0.14,+0.53] over B4; drift .211->.197, shared .183->.168, stable unchanged. Survives the rebase and is robust to neighbours (k=1-4, lam 0.5). Helps.
+- M2_B4 +0.22 [-0.01,+0.53] (one cell, window 190 = grid max) and M3_B4 +0.20 [-0.03,+0.51]: the B3 "helps" does not hold up on B4 (CI includes 0). Neutral.
+- M1_B4 = B4 exactly: holdout-40 B3-grid memory is at a plateau; half-lives 4-12, floors, longer holdouts still hurt with the near-OLS ridge.
+- Lambda 0.05/0.5/2 does not reopen gains for any memory method.
