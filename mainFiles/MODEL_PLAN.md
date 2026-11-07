@@ -475,3 +475,15 @@ Both priors are read from `validation/targets.csv`; `RULES.md` allows learning f
 
 Why Sai's notes say ~56: Sai scores on a 24-episode audit split (our 20/80 + mixer v3 = 55.90 there,
 54.77 on their other 72 episodes). We score on all 96. Same model, different yardstick.
+
+### Attempts toward 57 (Nov 7, ~6 PM), all on the 96 validation episodes
+
+| Attempt | Result | Kept? |
+|---|---|---|
+| Pull Sai's `sai/combo-top10` (660-structure search over every team member) | Its best combos are 20–26% Rule + 74–76% Mixer4, i.e. our current entry; all top 10 tie within noise. Sai's 56.2 is the 24-episode audit split | — (already have it) |
+| Live/dead Beta-mixture win prior inside the rule model's win/lose variant (`RuleForecaster(win_prior=...)`) | Rule model alone 52.89 → 53.53 (short .208 → .183); **blend 55.58 → 55.59/55.60** | code kept, off by default |
+| Mixer v4: win-prior strength 10/16, eta 5/12, extra 1e6 half-life | 55.13–55.39 alone; blend 55.54–55.61 | ❌ noise |
+
+The blend is saturated at ~55.6 on all 96 episodes: improvements to either member land where the other
+is already strong. 57 would need R ≈ 0.053 (now 0.080), a third less error, which needs a new kind of
+information rather than more tuning or mixing.

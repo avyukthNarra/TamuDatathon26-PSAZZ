@@ -38,11 +38,15 @@ class RuleForecaster:
     def __init__(self, rules=None, strength=1.0, forget=(0.95, 1.0), trust_forget=1.0, beta=1.0,
                  floor=1e-4, base_strength=20.0, base_half_life=24.0, rule_prior=None,
                  prior_weight=3.0, prior_min_history=150, size_strength=None, size_half_life=None, binary=False,
-                 size_rule_strength=None, size_rule_beta=1.0, size_rule_min_wins=0):
+                 size_rule_strength=None, size_rule_beta=1.0, size_rule_min_wins=0,
+                 win_prior=None):
         self.binary = binary                  # True = rules score win/lose only (needs size_strength)
         self.size_rule_strength = size_rule_strength  # None = no per-machine size rules
         self.size_rule_beta = size_rule_beta
         self.size_rule_min_wins = size_rule_min_wins
+        # win_prior: [(weight, mean, strength)] Beta mixture for win cells (binary variant only)
+        self.win_prior = ([(float(w), float(m) * float(k), (1 - float(m)) * float(k)) for w, m, k in win_prior]
+                          if win_prior else None)
         self.size_strength = size_strength    # None = sizes come from the rule tallies (v2 behaviour)
         self.size_half_life = size_half_life
         self.size_prior = {}
@@ -62,7 +66,7 @@ class RuleForecaster:
         self.base = FrequencyForecaster("pooled_recent", prior_strength=base_strength, half_life=base_half_life)
 
     def settings(self):
-        return {k: v for k, v in vars(self).items() if k not in ("base", "rules", "rule_prior", "rule_wins", "size_prior")} | {
+        return {k: v for k, v in vars(self).items() if k not in ("base", "rules", "rule_prior", "rule_wins", "size_prior", "win_prior")} | {
             "n_rules": len(self.rules), "base_strength": self.base.prior_strength,
             "base_half_life": self.base.half_life,
             "rule_wins": {"-".join(map(str, r)) or "none": n for r, n in sorted(self.rule_wins.items())}}
@@ -105,7 +109,20 @@ class RuleForecaster:
         return {r: self.prior_weight * math.log((wins.get(r, 0) + 1) / (total + len(self.rules)))
                 for r in self.rules}
 
-    def _forecast(self, seq, cutoff, base):
+    def _cell_rate(self, w, n):
+        """Posterior mean win rate of a cell (w wins in n spins) under the live/dead Beta-mixture prior
+        (the pair mixer v4 idea: true win chances sit near a "dead" or a "live" level)."""
+        logs, means = [], []
+        for weight, a, b in self.win_prior:
+            logs.append(math.log(weight) + math.lgamma(a + w) + math.lgamma(b + n - w) - math.lgamma(a + b + n)
+                        - math.lgamma(a) - math.lgamma(b) + math.lgamma(a + b))
+            means.append((a + w) / (a + b + n))
+        top = max(logs)
+        post = [math.exp(v - top) for v in logs]
+        return math.fsum(p * m for p, m in zip(post, means)) / math.fsum(post)
+
+    def _forecast(self, seq, cutoff, base, live_dead=False):
+        """live_dead=True: seq holds 0/1 (lose/win) and cells use the Beta-mixture win prior."""
         ticks = sorted(seq)
         prior = [self.strength * b for b in base]
         forecasts, scores = [], []
@@ -124,7 +141,11 @@ class RuleForecaster:
                 else:
                     counts = [0.0] * N
                 n = math.fsum(counts)
-                p = (counts[INDEX[seq[t]]] + prior[INDEX[seq[t]]]) / (n + self.strength)
+                if live_dead:
+                    pw = self._cell_rate(counts[1], counts[0] + counts[1])
+                    p = pw if seq[t] else 1.0 - pw
+                else:
+                    p = (counts[INDEX[seq[t]]] + prior[INDEX[seq[t]]]) / (n + self.strength)
                 if last is not None:
                     score *= self.trust_forget ** (t - last)
                 score += math.log(p)
@@ -143,7 +164,11 @@ class RuleForecaster:
             else:
                 counts = [0.0] * N
             n = math.fsum(counts)
-            forecasts.append([(c + pr) / (n + self.strength) for c, pr in zip(counts, prior)])
+            if live_dead:
+                pw = self._cell_rate(counts[1], counts[0] + counts[1])
+                forecasts.append([1.0 - pw, pw, 0.0, 0.0, 0.0])
+            else:
+                forecasts.append([(c + pr) / (n + self.strength) for c, pr in zip(counts, prior)])
             scores.append(self.beta * score + self.rule_prior.get(rule, 0.0))
         if not forecasts:
             return list(base)
@@ -242,7 +267,8 @@ class RuleForecaster:
             if self.binary and self.size_strength is not None:
                 # rules only judge WIN vs LOSE (payout size is handled separately below)
                 wl = {t: int(v > 0) for t, v in seq.items()}  # 0 -> index 0, 1 -> index 1
-                p = self._forecast(wl, q.cutoff, [base[0], 1.0 - base[0], 0.0, 0.0, 0.0])
+                p = self._forecast(wl, q.cutoff, [base[0], 1.0 - base[0], 0.0, 0.0, 0.0],
+                                   live_dead=self.win_prior is not None)
                 p = [p[0]] + [p[1] * b / (1.0 - base[0]) for b in base[1:]]  # placeholder split
             else:
                 p = self._forecast(seq, q.cutoff, base)
