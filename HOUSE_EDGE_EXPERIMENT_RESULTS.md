@@ -1,7 +1,7 @@
 # House Edge: Experiment Results
 
 **Date:** November 7, 2026 · **Agents:** Claude (Opus 5.5, with Haiku subagents) and Codex (GPT-6.1-Sol, with cheaper subagents)
-**Status:** Main-round experiments. E6 sweeps and E7 (neural) from Codex were still running when this was written; see `worktrees/_coord/RESULTS.md` for the live log.
+**Status:** Main-round experiments, updated after Codex's E6/E7 results. Live log: `worktrees/_coord/RESULTS.md`. Codex's detailed report: `worktrees/_coord/CODEX_REPORT.md`.
 
 ## TL;DR
 
@@ -9,15 +9,19 @@
 |---|---|---|
 | Kit baseline (`pooled_recent`) | 31.06 | 30.57 |
 | Safe entry #1 (E5) | 36.45 | 38.08 |
-| **Final candidate (E11)** | **40.26** | **40.90** |
+| E11 (Claude's best ensemble) | 40.26 | 40.90 |
+| **E6: signed-L1 interaction logistic (Codex)** | **48.54** | **48.19** |
+| E7: neural in-context model (Codex) | 50.18 | not yet audited |
 
-The final candidate is **E11 (`FlexEpisodeForecaster`)**. It scores about +10 points over the baseline, and the gain held on held-out audit episodes. The final model:
+**New leader: E6.** It's a per-machine logistic regression on **signed (±1)** win indicators at lags 1–8 plus all lag pairs, with **L1** regularisation (C=0.5) and a 16-spin recency half-life. I re-scored it independently and it holds on audit (48.19). The ablation shows the gain needs both pieces: 0/1 coding + L1 = 32.4, signed + L2 = 38.7. The simulator's rules look **sparse and XOR-like** ("lag a same as lag b"). L1 on signed products picks out the few that matter, and it runs in under a second. E7 (neural) scores 1.6 points higher on tuning, but the gap's confidence interval includes 0. It also needs torch plus a saved model, so it only replaces E6 if it clearly wins on audit.
+
+Earlier summary of E11, kept for reference. It scored about +10 over the baseline, and the gain held on audit. The E11 model:
 1. **Memory per episode.** It picks one memory length per episode by testing which one best predicted the episode's own recent spins.
 2. **Win chance per machine.** It fits three small models for P(win) on each machine's own history (logistic regression with lag pairs, ExtraTrees and HistGradientBoosting) and averages them.
 3. **Shrinkage for short histories.** Machines with short histories are pulled toward the kit baseline.
 4. **Payout shape.** It splits the win into 1x/2x/5x/20x using a payout-shape prior for each machine type and signal.
 
-**Model choice (random forest vs XGBoost vs neural net):** fit **small tree-boosting and linear models per machine**, not one global model. Per-machine random forest was worse than ExtraTrees, and HistGradientBoosting, a boosting method like XGBoost, was the strongest single expert.
+**Model choice (random forest vs XGBoost vs neural net):** fit **a small sparse model per machine** on its own history. The big win came from the right *features and regulariser* (signed lag products + L1), not from a heavier model family. Per-machine random forest < ExtraTrees < HistGradientBoosting inside E11. A small neural in-context model (E7) is competitive with E6 but not clearly better.
 
 ## How we evaluated
 
@@ -53,8 +57,8 @@ Points are tuning /60 unless noted. The loss ratios are in `_coord/RESULTS.md`.
 | E4 (Claude) | Claude | **Episode-level memory:** one half-life (none/64/32/16) per episode, chosen by prequential Brier pooled over all 8 machines | **39.04** | ✅ Stable 0.32 → 0.20 |
 | E11 | Claude | Three experts (logistic + ExtraTrees + HistGradientBoosting), tuned | **40.26** (audit **40.90**) | ✅ **Final candidate** |
 | E11 misc | Claude | Imputed missing lags, 300 trees, train-fitted calibration (a=1.02), short alpha retune, more half-lives | 38.5–40.3 | No meaningful gain. Plateau ≈ 40.2 ± 0.1 |
-| E6 | Codex | 84-config sweep: signed/binary lag coding, pairs/triples, L1/L2, C, memory | running | — |
-| E7 | Codex | Tiny train-only neural in-context model, to blend into the final | running | — |
+| E6 | Codex | 96-config sweep: signed/binary lag coding, pairs/triples, L1/L2, C, memory | **48.54** (audit **48.19**, verified by Claude) | ✅ **Current leader**. Signed + L1 essential. PR #11 |
+| E7 | Codex | Small train-only neural in-context model (torch, saved artifact; 12.5k train examples) | **50.18** tuning; vs E6 +1.65, CI −0.06 to +3.27 | ⏳ Audit pending. PR #12 |
 
 ### Final candidate settings (E11)
 
@@ -80,11 +84,15 @@ Points are tuning /60 unless noted. The loss ratios are in `_coord/RESULTS.md`.
 |---|---|---|---|
 | #1 safe | `avyukth/entry-main` @ `d3c5cbd` | E5 (36.45 / audit 38.08) | Built and checked, runs in 8.6 s |
 | #2 | `avyukth/entry-main` @ `3ef911b` | E4 episode memory (39.04) | Built, checker passed, deterministic, about 5 min |
-| #3 final | to build | E11 (40.26 / audit 40.90) | Package before the 7:30 PM CT freeze |
+| #3 | `avyukth/entry-main` (building) | E6 signed-L1 (48.54 / audit 48.19) | Being packaged and verified by a Haiku agent |
+| final | TBD | E6, E7, or an E6-based combo, decided on audit | Decide before the 7:30 PM CT freeze |
 
 Each entry ZIP has `predict.py`, `reproduce.json`, a pinned `requirements.txt` (numpy, scikit-learn, scipy, joblib, threadpoolctl) and a README. Everything refits at run time from `/data`, so for round 2 (adaptation) it adapts to the new data without code changes. We'd only re-check settings on round 2's validation.
 
 ## Open items and caveats
+
+- **Audit isn't fully pristine.** The early `diag.py`/`diag2.py` diagnostics looked at all validation targets, which informed the E1 design (pairs, C, half-life). That's mild, but treat audit numbers as strong evidence, not a blind holdout.
+- Next, in progress by Codex: audit E7 and an E6+E7 blend, put E6 inside the episode-memory + short-shrinkage framework, and a finer E6 sweep.
 
 - E6 and E7 results from Codex are pending. Anything must beat 40.26 on tuning, and a second audit look would be logged.
 - With many configs tried on 48 tuning episodes, the last ±0.2 points are noise. The audit result (40.90) is the trustworthy number.
