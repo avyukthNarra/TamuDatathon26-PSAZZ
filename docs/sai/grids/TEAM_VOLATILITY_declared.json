@@ -1,0 +1,147 @@
+{
+ "grid": [
+  {
+   "half_life": [
+    12.0,
+    40.0
+   ]
+  },
+  {
+   "half_life": [
+    12.0,
+    40.0
+   ],
+   "score_half_life": 40.0
+  },
+  {
+   "half_life": [
+    12.0,
+    40.0
+   ],
+   "alpha": 0.01
+  },
+  {
+   "half_life": [
+    12.0,
+    40.0
+   ],
+   "decay_missing": false
+  },
+  {
+   "half_life": [
+    12.0,
+    40.0
+   ],
+   "score_half_life": 100.0
+  },
+  {
+   "half_life": [
+    12.0,
+    40.0
+   ],
+   "alpha": 0.05
+  },
+  {
+   "half_life": [
+    8.0,
+    24.0,
+    80.0
+   ]
+  },
+  {
+   "half_life": [
+    8.0,
+    24.0,
+    80.0
+   ],
+   "score_half_life": 40.0
+  },
+  {
+   "half_life": [
+    8.0,
+    24.0,
+    80.0
+   ],
+   "alpha": 0.01
+  },
+  {
+   "half_life": [
+    8.0,
+    24.0,
+    80.0
+   ],
+   "decay_missing": false
+  },
+  {
+   "half_life": [
+    16.0,
+    64.0,
+    1000000000.0
+   ]
+  },
+  {
+   "half_life": [
+    16.0,
+    64.0,
+    1000000000.0
+   ],
+   "score_half_life": 40.0
+  },
+  {
+   "half_life": [
+    16.0,
+    64.0,
+    1000000000.0
+   ],
+   "alpha": 0.01
+  },
+  {
+   "half_life": [
+    16.0,
+    64.0,
+    1000000000.0
+   ],
+   "decay_missing": false
+  },
+  {
+   "half_life": [
+    12.0,
+    40.0
+   ],
+   "adaptive": true,
+   "sensitivity": 1.0,
+   "alpha": 0.01
+  },
+  {
+   "half_life": [
+    12.0,
+    40.0
+   ],
+   "adaptive": true,
+   "sensitivity": 1.0,
+   "alpha": 0.05
+  },
+  {
+   "half_life": [
+    12.0,
+    40.0
+   ],
+   "adaptive": true,
+   "sensitivity": 2.0,
+   "alpha": 0.01
+  },
+  {
+   "half_life": [
+    12.0,
+    40.0
+   ],
+   "adaptive": true,
+   "sensitivity": 2.0,
+   "alpha": 0.05
+  }
+ ],
+ "source": "6a8098c06837d23b9f6b904ed5b8a9e0b5904569",
+ "selection": "total dev technical points; no audit evaluation",
+ "hybrid": "0.8 new mixer win + 0.2 cached rule win; cached TM_COMBINED severity",
+ "n_variants": 18
+}

@@ -1,0 +1,154 @@
+{
+  "scope": "Source-only review of git-show branch contents, no model fitting, experiments, scoring, checkout or branch mutation. No overall verdict.",
+  "branches": {
+    "avy": {
+      "commit": "64edf9dec0586f5f3decbfaa922d3fa8ff7d2d7c",
+      "algorithm": "Baseline/transition only; handouts contain no implementation",
+      "interface": "FrequencyForecaster,TransitionForecaster"
+    },
+    "avyukth/entry-final": {
+      "commit": "588a70b1b7ea88830add90e1cc5607581f7e2547",
+      "algorithm": "Full-distribution 50/50 signed-L1 E6 and artifact E7; broad exception falls back E6",
+      "interface": "entry/predict.py"
+    },
+    "avyukth/entry-main": {
+      "commit": "dbb6e382cce96528e7b61d53dd45f73da17e5948",
+      "algorithm": "E6 signed degree2 L1 C=.5 half_life16; stale docstring says episode memory",
+      "interface": "entry/predict.py"
+    },
+    "avyukth/exp-combo-e2-memory": {
+      "commit": "7c506e295d2cf6c781e48a7000cb74cc8a2f6ec4",
+      "algorithm": "Independent ET and LR soft memory; None/16/32/64; inverse temp128; last24 valid rows stride4; selection trees8/full final trees",
+      "interface": "combo_e2_memory.ComboAdaptiveMemoryForecaster"
+    },
+    "avyukth/exp-combo-trees-blend": {
+      "commit": "39168b8e21a84abe27250e15cd0af5d99d5e16b3",
+      "algorithm": "MRO ET/logistic probability mix plus short-history shrinkage; logistic fraction=mix",
+      "interface": "combo_trees_blend.ComboForecaster"
+    },
+    "avyukth/exp-e1-pair-logistic": {
+      "commit": "60f1daa3f23be2c6b31e9a1408887e94c8f5f69f",
+      "algorithm": "Exact tick lags1..8, binary mains/all pairs, C3 half_life32, pooled_recent positive shape",
+      "interface": "pair_logistic.PairLogisticForecaster"
+    },
+    "avyukth/exp-e2-adaptive-memory": {
+      "commit": "6511dfb5fce56d3c40019325953c7b399cf0cbb3",
+      "algorithm": "Joint per-machine half-life/C selection; None/16/32/64 C1/3; hard/soft; last32 valid rows stride4; prequential Brier or logloss",
+      "interface": "adaptive_memory.AdaptiveMemorySelector,AdaptiveMemoryForecaster"
+    },
+    "avyukth/exp-e3-pair-selection": {
+      "commit": "56b60d68062f08eabc9d13e926e353b138e2bbf6",
+      "algorithm": "TRAIN chronological tail holdout ranks each pair versus mains; top5 default; optional full pairs for long histories",
+      "interface": "pair_selection.TrainSelectedPairForecaster"
+    },
+    "avyukth/exp-e4-episode-memory": {
+      "commit": "0b3ff0d2f8ea9e9e3ce9c21bb01c312e1aa911fe",
+      "algorithm": "Episode pooled prequential per-row Brier picks None/64/32/16; last24 observed ticks stride3; hard/soft selection",
+      "interface": "episode_memory.EpisodeMemoryForecaster"
+    },
+    "avyukth/exp-e4-shared-change": {
+      "commit": "0e33eaa8f9efdf9bd5de7918881240fd88c58655",
+      "algorithm": "Episode tick split with machine-specific Bernoulli rates; likelihood gain minus BIC and scan penalty; min_side16 step4 threshold5; before_weight=.1",
+      "interface": "shared_change.estimate_shared_change,SharedChangeForecaster"
+    },
+    "avyukth/exp-e5-shape-head": {
+      "commit": "43f7de9143f634a727bafa8427af6b84100ae398",
+      "algorithm": "Separate positive-payout context prior and recency counts; optional >=2 lagged WIN-head indicators; no severity regression",
+      "interface": "shape_head.ShapeHeadForecaster"
+    },
+    "avyukth/exp-e6-interactions": {
+      "commit": "c3ba38752b8246d5188370c36e70be2ca1af1db7",
+      "algorithm": "Signed/binary contiguous configurable lags and degree1/2/3 products; L1 liblinear or L2; pooled_recent shape",
+      "interface": "interaction_sweep.InteractionSweepForecaster"
+    },
+    "avyukth/exp-e7-neural-context": {
+      "commit": "af645aa2bbb7455c47e132c44d63b4b475304093",
+      "algorithm": "TRAIN-only 64 hidden unit hypernetwork maps all-history/recent causal prefix means/correlations/count masses to signed main/pair coefficients; episode holdout; artifact save/load",
+      "interface": "neural_context.NeuralContextForecaster"
+    },
+    "avyukth/exp-e8-neighbor-inputs": {
+      "commit": "5c2bc3cc82a799a0e3930c68787e448ccc075f22",
+      "algorithm": "Other-machine earlier mean-win lags or individual lag1; missing=.5; same episode only",
+      "interface": "neighbor_inputs.NeighborForecaster"
+    },
+    "avyukth/exp-e9-win-blend": {
+      "commit": "f8c0978c581fdc3ac9e1aa7f0c6ff2fc3e6f8622",
+      "algorithm": "Temperature and alpha win shrinkage; short_alpha if <100 observed spins; default C10 shape_strength50",
+      "interface": "win_blend.WinBlendForecaster"
+    },
+    "avyukth/exp-e10-machine-trees": {
+      "commit": "281eaa47d5a4e50b8dbe0e409514a9555f4760e6",
+      "algorithm": "Per-machine ExtraTrees/RF on raw win lags, optional logistic mixture",
+      "interface": "machine_trees.MachineTreeForecaster"
+    },
+    "avyukth/exp-e11-flex-experts": {
+      "commit": "f35bb67e2183dbc6bf1fbc7ed1270c0e3bdf0746",
+      "algorithm": "Episode memory plus LR/ET/HGB weighted experts; optional missing-lag .5 and logit calibration; latest sweeps HGB weight, ET/HGB leaf sizes, memory and C",
+      "interface": "flex_experts.FlexEpisodeForecaster"
+    }
+  },
+  "reuse_hooks": {
+    "adaptive": "AdaptiveMemorySelector.predict_win(X,y,ticks,xq,cutoff,prior_win=train_prior) returns probability and mean_loss, selected_weights, prequential_ticks/predictions, final_sample_weights, eligible_rows, fallback. Requires causal feature rows and sorted actual ticks.",
+    "combo": "ComboAdaptiveMemoryForecaster.selection_diagnostics gives independent tree/logistic mean_brier_loss, selected_weights, prequential_ticks/predictions and final_probabilities after predict. Requires repeated tree fitting.",
+    "episode": "EpisodeMemoryForecaster._episode_losses(seqs,cutoff) returns pooled candidate Brier; no fit needed for this helper. Scorer C/min_rows configurable; lags are not forwarded.",
+    "change": "estimate_shared_change(streams,cutoff,min_side=16,step=4,evidence_threshold=5.0) requires no fit/targets/conditions; returns boundary/evidence/raw_gain/directions/observations/candidates.",
+    "uncertainty": "Derive ESS=(sum(w)^2)/sum(w*w) from adaptive final weights, candidate selection entropy, win disagreement and prequential support. None is supplied as calibrated uncertainty.",
+    "volatility": "Derive short-memory minus long-memory causal Brier regret on matched evaluation ticks; aggregate squared residual mean/variance and episode agreement. These existing selector regrets describe their binary LR/tree heads, not the parent parity mixer.",
+    "sign_flip": "SharedChange detects marginal Bernoulli rate shifts; directions are rate directions. Balanced parity-coefficient sign flips require conditional parity-feature/target correlations or residual likelihood split, not this marginal scan.",
+    "severity": "E5 has unconditional positive counts/prior and optional >=2 lags in WIN head. No explicit severity-lag1/2/4 mode exists; use parent severity model to derive separate change features."
+  },
+  "invocation": {
+    "predict_only": "Isolate git-show package outside shared sources. tq,th=load_inputs(train_path); labels=read_labels(train_path/labels.csv,tq); vq,vh=load_inputs(validation_path); m=Class(**frozen_settings).fit(tq,th,labels); pred=m.predict(vq,vh). Avoid experiment runners: they additionally score audit/test.",
+    "neural": "Use cached TM_E7/TM_E67; alternatively NeuralContextForecaster.load_artifact(path).predict(vq,vh). Final artifact exists at origin/avyukth/entry-final:mainFiles/entry/models/state.pt. Do not call neural fit now.",
+    "strict_cutoffs": "Use tick-keyed exact lag lookups. index_history rejects any observed tick>=machine cutoff. For gate backtests trim ALL same-episode machine streams to tick<t before predicting outcome t. Fit pooled priors on TRAIN only, never validation labels/history.",
+    "episode_grouping": "Invoke episode memory separately per episode/cutoff; implementation groups only episode and uses first query cutoff. Shared-change correctly groups episode/cutoff."
+  },
+  "caveats": [
+    {
+      "source": "episode_memory.py:38",
+      "fact": "Selection always instantiates default eight-lag all-pair binary LR; outer lags/pairs, E11 imputation and expert mix are not forwarded. LR proxy may not match final estimator."
+    },
+    {
+      "source": "episode_memory.py:55-63",
+      "fact": "Episode grouping uses first cutoff; different-machine cutoffs need external grouping. Pooling weights each scored row equally rather than each machine."
+    },
+    {
+      "source": "episode_memory.py:69",
+      "fact": "Infinite candidate losses replaced by worst finite loss in soft mode, giving unsupported candidates positive weight. All-inf hard fallback chooses first None memory."
+    },
+    {
+      "source": "adaptive_memory.py:_fit_probability",
+      "fact": "Too-short/one-class fallback ignores recency: unweighted y plus two prior pseudo-observations. Default prior_win=.4 unless supplied or learned TRAIN global prior."
+    },
+    {
+      "source": "combo_e2_memory.py:295",
+      "fact": "Diagnostic key includes entire supplied seq, even hypothetical postcutoff items; fitting itself filters tick<cutoff. Ordinary predict uses schema guard."
+    },
+    {
+      "source": "shape_head.py:fit",
+      "fact": "Shape context priors count TRAIN histories plus supplied terminal TRAIN labels; fitting on validation inputs/labels would contaminate validation."
+    },
+    {
+      "source": "neural_context.py:_make_training_examples",
+      "fact": "_sequence_rows(seq) has no explicit cutoff in training; relies on index_history rejecting future observations. Prefix summaries exclude each own outcome."
+    },
+    {
+      "source": "shared_change.py:estimate_shared_change",
+      "fact": "Every nonempty stream must have min_side on each side; one short stream can veto all boundaries. Detector measures rate changes, not interaction signs."
+    },
+    {
+      "source": "flex_experts.py:FlexTrees",
+      "fact": "Constructor does not validate positive total expert weight; all zero weights produces division by zero. Keep valid frozen settings."
+    },
+    {
+      "source": "entry/predict.py",
+      "fact": "entry-main stale episode-memory docstring contradicts actual E6 code. Final catches every E7 exception and silently changes forecast to E6 after stderr warning."
+    }
+  ],
+  "cache_scope": {
+    "available_from_parent": "TM_E67/TM_E7/TM_E6; cached CSV provenance not revalidated here.",
+    "upgrades_not_in_these_three": "E2 adaptive, independent combo memory, E4 pooling/shared-change, E11 HGB/imputation/calibration/memory sweeps require distinct predictions or gate extraction.",
+    "requested_memory16_13": "No remote ref exp-combo-e2-memory16:13 is present. exp-combo-e2-memory head 7c506e2 accepts arbitrary positive half_lives, including16 and13; no dedicated 16/13 default is present."
+  },
+  "verification": "Actual implementation files read at pinned commits; no tests/experiments run. A broad rg inadvertently emitted a preexisting TEAM_COMPARISON row; no metrics used, analyzed or copied into this review."
+}

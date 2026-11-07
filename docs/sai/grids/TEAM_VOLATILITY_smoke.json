@@ -1,0 +1,218 @@
+{
+ "smoke_rows": 192,
+ "seconds": 14.352006458007963,
+ "estimated_full_grid_seconds": 57.40802583203185,
+ "grid": [
+  {
+   "id": 0,
+   "params": {
+    "half_life": [
+     12.0,
+     40.0
+    ]
+   },
+   "points": 53.7565430700134
+  },
+  {
+   "id": 1,
+   "params": {
+    "half_life": [
+     12.0,
+     40.0
+    ],
+    "score_half_life": 40.0
+   },
+   "points": 53.75851096680422
+  },
+  {
+   "id": 2,
+   "params": {
+    "half_life": [
+     12.0,
+     40.0
+    ],
+    "alpha": 0.01
+   },
+   "points": 48.06792726958032
+  },
+  {
+   "id": 3,
+   "params": {
+    "half_life": [
+     12.0,
+     40.0
+    ],
+    "decay_missing": false
+   },
+   "points": 53.738317817966134
+  },
+  {
+   "id": 4,
+   "params": {
+    "half_life": [
+     12.0,
+     40.0
+    ],
+    "score_half_life": 100.0
+   },
+   "points": 53.75873144537311
+  },
+  {
+   "id": 5,
+   "params": {
+    "half_life": [
+     12.0,
+     40.0
+    ],
+    "alpha": 0.05
+   },
+   "points": 48.45831007340322
+  },
+  {
+   "id": 6,
+   "params": {
+    "half_life": [
+     8.0,
+     24.0,
+     80.0
+    ]
+   },
+   "points": 53.30554396747772
+  },
+  {
+   "id": 7,
+   "params": {
+    "half_life": [
+     8.0,
+     24.0,
+     80.0
+    ],
+    "score_half_life": 40.0
+   },
+   "points": 53.31372006498815
+  },
+  {
+   "id": 8,
+   "params": {
+    "half_life": [
+     8.0,
+     24.0,
+     80.0
+    ],
+    "alpha": 0.01
+   },
+   "points": 47.851250908276384
+  },
+  {
+   "id": 9,
+   "params": {
+    "half_life": [
+     8.0,
+     24.0,
+     80.0
+    ],
+    "decay_missing": false
+   },
+   "points": 53.28275687305928
+  },
+  {
+   "id": 10,
+   "params": {
+    "half_life": [
+     16.0,
+     64.0,
+     1000000000.0
+    ]
+   },
+   "points": 53.88017472660746
+  },
+  {
+   "id": 11,
+   "params": {
+    "half_life": [
+     16.0,
+     64.0,
+     1000000000.0
+    ],
+    "score_half_life": 40.0
+   },
+   "points": 53.88027886624178
+  },
+  {
+   "id": 12,
+   "params": {
+    "half_life": [
+     16.0,
+     64.0,
+     1000000000.0
+    ],
+    "alpha": 0.01
+   },
+   "points": 47.99805289567237
+  },
+  {
+   "id": 13,
+   "params": {
+    "half_life": [
+     16.0,
+     64.0,
+     1000000000.0
+    ],
+    "decay_missing": false
+   },
+   "points": 53.86665905726434
+  },
+  {
+   "id": 14,
+   "params": {
+    "half_life": [
+     12.0,
+     40.0
+    ],
+    "adaptive": true,
+    "sensitivity": 1.0,
+    "alpha": 0.01
+   },
+   "points": 52.28542929218853
+  },
+  {
+   "id": 15,
+   "params": {
+    "half_life": [
+     12.0,
+     40.0
+    ],
+    "adaptive": true,
+    "sensitivity": 1.0,
+    "alpha": 0.05
+   },
+   "points": 52.168923375720176
+  },
+  {
+   "id": 16,
+   "params": {
+    "half_life": [
+     12.0,
+     40.0
+    ],
+    "adaptive": true,
+    "sensitivity": 2.0,
+    "alpha": 0.01
+   },
+   "points": 53.493982730328675
+  },
+  {
+   "id": 17,
+   "params": {
+    "half_life": [
+     12.0,
+     40.0
+    ],
+    "adaptive": true,
+    "sensitivity": 2.0,
+    "alpha": 0.05
+   },
+   "points": 53.469373152069885
+  }
+ ]
+}

@@ -1,0 +1,102 @@
+[
+ {
+  "params": {
+   "family": "cat",
+   "iterations": 25,
+   "depth": 3,
+   "l2": 10
+  },
+  "strength": 0,
+  "points": 50.14035692715878
+ },
+ {
+  "params": {
+   "family": "cat",
+   "iterations": 25,
+   "depth": 3,
+   "l2": 10
+  },
+  "strength": 0.1,
+  "points": 50.1570631422319
+ },
+ {
+  "params": {
+   "family": "cat",
+   "iterations": 25,
+   "depth": 3,
+   "l2": 10
+  },
+  "strength": 0.25,
+  "points": 50.13863743975291
+ },
+ {
+  "params": {
+   "family": "cat",
+   "iterations": 25,
+   "depth": 3,
+   "l2": 10
+  },
+  "strength": 0.5,
+  "points": 49.9745588744317
+ },
+ {
+  "params": {
+   "family": "cat",
+   "iterations": 25,
+   "depth": 3,
+   "l2": 10
+  },
+  "strength": 1,
+  "points": 49.13896760234246
+ },
+ {
+  "params": {
+   "family": "light",
+   "iterations": 25,
+   "leaves": 7,
+   "l2": 10
+  },
+  "strength": 0,
+  "points": 50.14035692715878
+ },
+ {
+  "params": {
+   "family": "light",
+   "iterations": 25,
+   "leaves": 7,
+   "l2": 10
+  },
+  "strength": 0.1,
+  "points": 50.18201654156281
+ },
+ {
+  "params": {
+   "family": "light",
+   "iterations": 25,
+   "leaves": 7,
+   "l2": 10
+  },
+  "strength": 0.25,
+  "points": 50.03212199652127
+ },
+ {
+  "params": {
+   "family": "light",
+   "iterations": 25,
+   "leaves": 7,
+   "l2": 10
+  },
+  "strength": 0.5,
+  "points": 49.21847568726533
+ },
+ {
+  "params": {
+   "family": "light",
+   "iterations": 25,
+   "leaves": 7,
+   "l2": 10
+  },
+  "strength": 1,
+  "points": 45.88021631700774
+ }
+]

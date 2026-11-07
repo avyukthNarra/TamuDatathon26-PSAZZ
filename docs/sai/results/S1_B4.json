@@ -1,0 +1,243 @@
+{
+ "id": "S1_B4",
+ "owner": "codex",
+ "description": "B4 residual hist",
+ "params": {
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "hist",
+   "iterations": 20,
+   "leaves": 15,
+   "l2": 100
+  },
+  "strength": 0.25
+ },
+ "scope": "dev",
+ "points": 50.98568387495447,
+ "ci95": [
+  49.91725694490457,
+  51.957324045184485
+ ],
+ "condition_ratios": {
+  "stable": 0.10769128693999046,
+  "short_history": 0.21456642302394005,
+  "drift": 0.21037338981285095,
+  "shared_change": 0.17457260447507894
+ },
+ "R": 0.1768009260629651,
+ "class_error_shares": {
+  "p_0": 0.4902807878227389,
+  "p_1": 0.24938648290474671,
+  "p_2": 0.18949919347933872,
+  "p_5": 0.06424551954484832,
+  "p_20": 0.006588016248327195
+ },
+ "runtime_seconds": 18.981287542002974,
+ "seed": 20261107,
+ "stdlib_only": false,
+ "determinism_max_diff": 0.0,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "extra": {
+  "smoke": [
+   {
+    "params": {
+     "family": "hist",
+     "iterations": 20,
+     "leaves": 7,
+     "l2": 10
+    },
+    "strength": 0,
+    "points": 50.14035692715878
+   },
+   {
+    "params": {
+     "family": "hist",
+     "iterations": 20,
+     "leaves": 7,
+     "l2": 10
+    },
+    "strength": 0.1,
+    "points": 50.209025290219785
+   },
+   {
+    "params": {
+     "family": "hist",
+     "iterations": 20,
+     "leaves": 7,
+     "l2": 10
+    },
+    "strength": 0.25,
+    "points": 50.1575612809792
+   },
+   {
+    "params": {
+     "family": "hist",
+     "iterations": 20,
+     "leaves": 7,
+     "l2": 10
+    },
+    "strength": 0.5,
+    "points": 49.64686641333249
+   },
+   {
+    "params": {
+     "family": "hist",
+     "iterations": 20,
+     "leaves": 7,
+     "l2": 10
+    },
+    "strength": 1,
+    "points": 47.30886395966401
+   }
+  ],
+  "declared_cells": 320,
+  "completed_cells": 320,
+  "standalone_vs_B4": {
+   "diff": 0.09522550167184818,
+   "ci95": [
+    -0.022370679971585435,
+    0.2122079061345884
+   ]
+  },
+  "episode_oof_blend": {
+   "w_per_fold": [
+    1.0,
+    0.9500000000000001,
+    1.0,
+    1.0,
+    1.0,
+    0.8500000000000001
+   ],
+   "w_mean": 0.9666666666666668,
+   "points": 50.98190014309539,
+   "ci95": [
+    49.91054041658063,
+    51.955825065301504
+   ],
+   "condition_ratios": {
+    "stable": 0.10748626431165383,
+    "short_history": 0.21461109874301285,
+    "drift": 0.21024158110567184,
+    "shared_change": 0.17521411538375162
+   },
+   "vs_base": {
+    "diff": 0.09144176981276786,
+    "ci95": [
+     -0.022287701870756214,
+     0.20323523267867052
+    ]
+   }
+  },
+  "B4_condition_ratios": {
+   "stable": 0.10551941600120766,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "conditional_hybrid_vs_B4": {
+   "stable": {
+    "diff": -0.023425859678553707,
+    "ci95": [
+     -0.08660127413462249,
+     0.04338193980647542
+    ]
+   },
+   "short_history": {
+    "diff": 0.01578783325903288,
+    "ci95": [
+     -0.036197606901761326,
+     0.06978744388766511
+    ]
+   },
+   "drift": {
+    "diff": 0.008212306112149292,
+    "ci95": [
+     -0.0417540607208224,
+     0.06090142568792611
+    ]
+   },
+   "shared_change": {
+    "diff": 0.09466615038605397,
+    "ci95": [
+     0.04147498793717066,
+     0.14847295970390914
+    ]
+   }
+  },
+  "feature_metadata": {
+   "base": "B4",
+   "base_params": {
+    "lam": 0.05,
+    "lags": [
+     7
+    ],
+    "pairs": [
+     [
+      1,
+      3
+     ],
+     [
+      2,
+      5
+     ],
+     [
+      4,
+      7
+     ]
+    ]
+   },
+   "train_hash": "b814b70a21f669f09b55630c1bb22dc98e00de984bbfbd53399010c184b48446",
+   "validation_hash": "2abc692d486d52adef4561dd347f8a230392d0ff61db04f6f10a187716e86053",
+   "source_hash": "cb9039a88adcf28cc960cf69bc5dc1aeaec17bec0e295f1b2c68500223e7d09f",
+   "core_hash": "3898b7b538a75ae2e808cffc82c3b5797eda7d0ccc82b24929547fa25319df57",
+   "screen_sha256": "e8ab19238af24e91f9397f6d396a2aeae26d107b7b0e38b174dd74ebdcc6fcca",
+   "feature_pairs": [
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     5
+    ],
+    [
+     4,
+     7
+    ]
+   ],
+   "signal_toggle": "explicit signal columns only; A2 prior remains signal-conditioned",
+   "hl_grid": "B4 memory fixed; historical summary half-lives16/128 unchanged",
+   "train_features": "priors leave out the whole train episode; no validation target use",
+   "validation_base_max_diff": 3.3306690738754696e-16,
+   "cache": "w4_b4_features_d30d6658f92fba35.npz",
+   "feature_count": 134,
+   "rows": {
+    "tr": 768,
+    "va": 768
+   }
+  },
+  "selection_caveat": "Global DEV hyperparameter/strength selection is optimistic; audit truth never fit or tuned.",
+  "time_cap_seconds": 600,
+  "grid_budget_seconds": 480,
+  "verification": {
+   "prediction_rows": 768,
+   "unique_ids": true,
+   "probability_bounds_and_sum": true,
+   "saved_scores_and_intervals_reproduced": true,
+   "completed_grid_cells": 320,
+   "unique_feature_configs": 16,
+   "leakage_checks": {
+    "strict_cutoff_invariance": true,
+    "missing_ticks_unknown": true,
+    "base_matches_B4": 3.3306690738754696e-16
+   },
+   "audit_scored": false
+  }
+ }
+}

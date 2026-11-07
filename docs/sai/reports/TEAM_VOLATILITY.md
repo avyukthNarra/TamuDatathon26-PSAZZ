@@ -1,0 +1,13 @@
+# TEAM_VOLATILITY (dev only)
+- Predeclared 18 variants; smoke 192 rows, 14.4s; extrapolated grid 57.4s.
+- Best nonbaseline cell 1: {'half_life': (12.0, 40.0), 'score_half_life': 40.0}.
+- Cached mixer raw control max difference 2.22e-16; combined hybrid 2.22e-16.
+- Fresh trained refit determinism: selected 0, control 0.
+- Source pinned 6a8098c; no size modes or validation targets fitted.
+- Own-machine residual EWMA16/64 subtracts Bernoulli noise and normalizes variance before score forgetting/share adaptation.
+- Gate changes act on the next observed update; no peer or condition inputs.
+- Selection used total dev only; audit never evaluated.
+- Results include paired CIs, condition ratios, episode-OOF blend contribution; grid contains all controls.
+- Four synthetic checks passed (0.011s): exact source control, same/future tick causality, gate warmup, unknown values.
+- Grid selection used the same dev episodes; paired confidence intervals do not correct for selecting among 18 cells.
+- One exact zero-change control and three memory-family controls were included.

@@ -1,0 +1,42 @@
+[
+ {
+  "params": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.14035692715878
+ },
+ {
+  "params": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.106636176969324
+ },
+ {
+  "params": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 49.926110082083625
+ },
+ {
+  "params": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 49.27761123934531
+ },
+ {
+  "params": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 47.086232470410984
+ }
+]
