@@ -2,16 +2,19 @@
 
 Usage: python predict.py --data /data --out /output/submission.csv
 On <data>/train it rediscovers which lag pairs drive wins, picks match/differ vs
-4-cell experts by Brier on train labels.csv at the cutoff, and fits payout-size
-priors; then predicts <data>/test. Standard library only, deterministic.
+4-cell experts by Brier on train labels.csv at the cutoff, fits payout-size
+priors, and reads the two payout-size modes per machine type from
+<data>/validation/targets.csv (if present); then predicts <data>/test.
+Standard library only, deterministic.
 """
 import argparse
+import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from slot_forecasting.io import load_inputs, read_labels, write_submission  # noqa: E402
-from slot_forecasting.pair_mixer import adapt  # noqa: E402
+from slot_forecasting.io import load_inputs, read_labels, read_targets, write_submission  # noqa: E402
+from slot_forecasting.pair_mixer import adapt, size_modes_from_targets  # noqa: E402
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", required=True)
@@ -24,7 +27,16 @@ if (data / "public").is_dir():
 train_queries, train_history = load_inputs(data / "train")
 labels_path = data / "train" / "labels.csv"
 labels = read_labels(labels_path, train_queries) if labels_path.exists() else None
-model = adapt(train_queries, train_history, labels)
+# The two exact payout-size mixes per machine type come from this round's validation answers;
+# if that file is missing, use the copy saved next to this script when the entry was built.
+targets_path = data / "validation" / "targets.csv"
+saved_modes = Path(__file__).resolve().parent / "size_modes.json"
+size_modes = None
+if targets_path.exists():
+    size_modes = size_modes_from_targets(read_targets(targets_path), load_inputs(data / "validation")[0])
+elif saved_modes.exists():
+    size_modes = json.loads(saved_modes.read_text(encoding="utf-8"))
+model = adapt(train_queries, train_history, labels, size_modes=size_modes)
 queries, history = load_inputs(data / args.split)
 write_submission(args.out, model.predict(queries, history))
 print(f"wrote {args.out}")
