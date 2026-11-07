@@ -17,7 +17,8 @@ for r in rows:
                f"{c['drift']:.3f} | {c['shared_change']:.3f} | {r['runtime_seconds']:.0f} | {r['determinism_max_diff']} |")
 out += ["", "## Method status (every catalog ID)", "", "| ID | method | owner | state | evidence |", "|---|---|---|---|---|"]
 def key(i):
-    return (i[0], int(i[1:]))
+    digits = ''.join(ch for ch in i[1:] if ch.isdigit())
+    return (i[0], int(digits), i[1 + len(digits):])
 for mid in sorted(states, key=key):
     v = states[mid]
     ev = f"results/{mid}.json" if mid in results else "-"

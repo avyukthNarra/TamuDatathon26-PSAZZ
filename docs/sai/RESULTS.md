@@ -17,6 +17,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | L4 | claude-w1 | 46.71 | 44.58-48.71 | 0.151 | 0.437 | 0.280 | 0.269 | 4 | 0.0 |
 | M3 | claude-w2 | 46.09 | 45.04-47.04 | 0.091 | 0.344 | 0.398 | 0.375 | 0 | 0.0 |
 | M2 | claude-w2 | 46.08 | 45.04-47.06 | 0.090 | 0.344 | 0.399 | 0.375 | 0 | 0.0 |
+| M9b | claude-w2 | 46.07 | 44.98-47.15 | 0.118 | 0.344 | 0.390 | 0.357 | 0 | 0.0 |
 | A3 | claude-w1 | 45.98 | 44.90-47.05 | 0.115 | 0.333 | 0.399 | 0.372 | 0 | 0.0 |
 | A6 | claude-w1 | 45.98 | 44.88-47.05 | 0.117 | 0.332 | 0.398 | 0.372 | 0 | 0.0 |
 | A8 | claude-w1 | 45.96 | 44.87-47.04 | 0.119 | 0.332 | 0.400 | 0.371 | 0 | 0.0 |
@@ -33,6 +34,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | M4 | claude-w2 | 45.72 | 44.59-46.80 | 0.136 | 0.344 | 0.398 | 0.372 | 0 | 0.0 |
 | M6 | claude-w2 | 45.52 | 44.46-46.54 | 0.154 | 0.344 | 0.399 | 0.376 | 0 | 0.0 |
 | M8 | claude-w2 | 44.89 | 43.63-46.04 | 0.147 | 0.344 | 0.443 | 0.413 | 0 | 0.0 |
+| L8 | claude-w1 | 43.12 | 42.45-43.77 | 0.120 | 0.992 | 0.237 | 0.217 | 6 | 0.0 |
 | M10 | claude-w2 | 38.59 | 37.29-39.93 | 0.144 | 0.344 | 0.976 | 0.754 | 0 | 0.0 |
 | B0 | claude | 30.00 | 30.00-30.00 | 1.000 | 1.000 | 1.000 | 1.000 | 1 | 0.0 |
 
@@ -64,7 +66,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | L5 | 3-state conditioning / log(1+y) levels vs win flag | claude | alive | results/L5.json |
 | L6 | partial pooling of coefficients to the type mean | claude | alive | results/L6.json |
 | L7 | per-machine sparse feature selection from the screen | claude | alive | results/L7.json |
-| L8 | mixture transition distribution (MTD) lags | claude | alive | - |
+| L8 | mixture transition distribution (MTD) lags | claude | alive | results/L8.json |
 | L9 | signal x lag and type x lag interactions | claude | alive | results/L9.json |
 | M1 | holdout-selected half-life variants (holdout length, grid, floor) | claude | neutral | results/M1.json; +0.01 [-0.01,+0.02]; 90 cells; hl 4-12 hurt at every holdout; floors hurt |
 | M2 | fixed-share over half-lives | claude | helps | results/M2.json; marginal: +0.26 [+0.02,+0.69], stable only (0.118->0.090); one cell (window 180 ~ whole history), dev-selected so optimistic; confirm on audit |
@@ -74,7 +76,8 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | M6 | JSD/TV-gated blend of short and long windows | claude | hurts | results/M6.json; -0.30 [-0.66,-0.06]; 324 cells; blend weight 0 |
 | M7 | CUSUM / rescaled-range drift features | claude | neutral | results/M7.json; -0.06 [-0.23,+0.10]; shared_change -0.011 but stable +0.02 |
 | M8 | HMM, 2-3 regimes | claude | hurts | results/M8.json; -0.94 [-1.35,-0.65]; improves toward stay->1 i.e. toward B3 |
-| M9 | changepoints shared across an episode's machines | claude | alive | results/M9.json; standalone +0.06 [-0.29,+0.37] but shared_change 0.375->0.350 (0.303 in pure-survival cells) while drift worsens; follow-up M9b: gate pooled vs own evidence by peer agreement |
+| M9 | changepoints shared across an episode's machines | claude | helps | results/M9.json; helps only in one condition (rule 5): shared_change -0.074 [-0.110,-0.042] at h=1/5000 but drift +0.236 [+0.052,+0.453] when ungated; superseded by M9b |
+| M9b | M9b: episode-shared BOCPD gated by k-of-others peer shift (W=80, k=2-3), B3 fallback | claude | helps | results/M9b.json; +0.25 [+0.12,+0.40] (lead re-scored 46.07); 298-cell search so ~0.25 selection optimism; drift -0.009 [-0.014,-0.003], shared_change -0.020 [-0.036,-0.006], stable 0.000; k=3 +0.21, k=1,4 weaker; validate on audit |
 | M10 | half-life implied by Kalman gain (sanity check) | claude | hurts | results/M10.json; diagnostic only: -7.2; corr(log hl, B3's) = 0.00, does not corroborate hl 16 |
 | P1 | simplex projection vs divide-by-sum vs softmax | claude | alive | - |
 | P2 | temperature / Dirichlet calibration, episodes held out | claude | alive | - |
@@ -92,4 +95,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | S7 | regularized multinomial logistic on full feature set | codex | alive | - |
 | S8 | small MLP | codex | alive | - |
 
-Counts: alive 30, baseline 4, helps 3, hurts 3, neutral 11
+Counts: alive 29, baseline 4, helps 5, hurts 3, neutral 11

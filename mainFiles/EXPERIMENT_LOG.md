@@ -108,3 +108,13 @@ Each A method tested (1) as B3's payout-size split / win prior with the pair-rid
   rates are far from type priors.
 - Standalone frequency models score 29.9-30.8 (~15 below B3); blend weight 0.00, zero stack value.
 - Implication: look at severity-given-win with lag features (L5 log levels / 3-state) rather than more shrinkage.
+
+### M9b peer-agreement-gated episode changepoints (follow-up to M9), worker report reviewed, lead re-scored: 46.07
+- No gate keeps M9's shared_change gain without the drift loss. Ungated pure-survival pooling: shared_change -0.074
+  [-0.110,-0.042] (real) but drift +0.236 [+0.052,+0.453]. The h=1/200 cell that looked best (0.303) is not CI-significant.
+- Common-shift z statistic cannot discriminate shared change from independent drift (both give large C).
+- Best cell: pool only if >=2 of 7 peers' own posteriors show a regime start in the last 80 ticks (W=40 never fires),
+  fall back to B3's holdout half-life. 46.07 [44.98,47.15], +0.25 [+0.12,+0.40] vs B3; drift 0.399->0.390, shared_change
+  0.377->0.357, stable unchanged. 298 cells searched, so expect ~0.25 selection optimism; neighbours k=3 +0.21.
+- Falling back to a machine's OWN BOCPD weights is terrible (drift 1.15); B3's holdout memory is the right fallback.
+- Verdicts: M9 helps (one condition, superseded), M9b helps (marginal, to validate on audit).
