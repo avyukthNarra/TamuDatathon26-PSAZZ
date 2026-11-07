@@ -4,6 +4,11 @@
 > (20% zhill rule model + 80% Pranav pair mixer): 55.37 [54.5,56.1] on our 24 audit episodes (dev 54.14), above our stack's 54.09.**
 > It is stdlib-only, deterministic and already packaged. Our stack adds only +0.15 (CI -0.05,+0.34) to it on dev. The sections below describe OUR models.
 
+> **UPDATE 2 (blending everything, volatility, gated/meta blends):** the full team stack (our members + teammates' models, simplex pw/shares weights fit on dev) scores
+> dev 54.29 (OOF) and **55.59 [54.89,56.17] on the 24 audit episodes**, vs 55.37 for the zhill combined model alone: a gain of about +0.2 that is within noise.
+> Volatility-gated blends (V1-V3), observable-evidence gates (G1), per-class/geometric pools (G2) and a tiny MLP meta-learner (G3) all land at 54.3-54.4 dev,
+> +0.1 to +0.25 over TM_COMBINED with CIs that mostly include 0. Blending is saturated near 54.3-54.4 dev; a better component (payout-size modelling) is what is needed.
+
 **Best: W5 stack = 54.09 points on the 24 reserved audit episodes (CI 53.08-54.90)**, scored once after all choices were made on the other 72.
 For reference, on the same audit set: pooled starter 30.00 by definition, original pair prototype B3 46.78, base B4 52.26 [50.95,53.35], simple composition C2 53.77 [52.71,54.66].
 

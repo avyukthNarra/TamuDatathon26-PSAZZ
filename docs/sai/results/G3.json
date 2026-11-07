@@ -1,0 +1,64 @@
+{
+ "id": "G3",
+ "owner": "claude",
+ "description": "tiny meta-learner (mlp {'alpha': 10.0}) on 7-member pool residual",
+ "params": {
+  "learner": "mlp",
+  "alpha": 10.0,
+  "members": [
+   "TM_MIXER",
+   "TM_RULE",
+   "TM_E7",
+   "TM_E6",
+   "C2",
+   "L7",
+   "L5"
+  ]
+ },
+ "scope": "dev",
+ "points": 54.36515339666524,
+ "ci95": [
+  53.41834915733284,
+  55.252584234572986
+ ],
+ "condition_ratios": {
+  "stable": 0.07608894354198725,
+  "short_history": 0.14095872537591872,
+  "drift": 0.09617067848337638,
+  "shared_change": 0.10137418117827617
+ },
+ "R": 0.10364813214488963,
+ "class_error_shares": {
+  "p_0": 0.45918692156139235,
+  "p_1": 0.2582495247603699,
+  "p_2": 0.20219798060080305,
+  "p_5": 0.07090047011653366,
+  "p_20": 0.009465102960901006
+ },
+ "runtime_seconds": 4.262212750007166,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "extra": {
+  "vs_TM_COMBINED": {
+   "diff": 0.22560338148054626,
+   "ci95": [
+    0.055872098425859745,
+    0.3916446964828907
+   ]
+  },
+  "vs_TEAM_stack": {
+   "diff": 0.07276898015889799,
+   "ci95": [
+    -0.07804761492040235,
+    0.2390060457778048
+   ]
+  },
+  "train_wmse": 0.018738380351331557,
+  "base_train_wmse": 0.019534416432690434,
+  "oof_wmse": 0.019480408706338055,
+  "base_oof_wmse": 0.019858229134424976
+ }
+}

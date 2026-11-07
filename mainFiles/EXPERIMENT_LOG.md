@@ -195,3 +195,10 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
   error rises with volatility equally for every member (Spearman ~ +0.3 for ewv_w16, vy16, garch_h), TM_COMBINED is best in almost every vol tercile.
 - V1/V2 gated blends: +0.13..+0.16 over TM_COMBINED (CI includes 0), gate slopes fit ~0 => it is the static stack gain. V3 vol-scaled shrinkage: 0.00, never shrinks.
 - Verdict: volatility is shared noise, not a selection or calibration signal for these models. 21 settings tried.
+
+### G1-G3 richer blends (worker report reviewed; lead re-scored G1-G3, match) and the full team stack on audit
+- G1 gated stack (observable evidence) 54.35, G2 per-class/geometric pool 54.31 (pw/shares on 7 members 54.38), G3 tiny MLP 54.37 (unstable; trees overfit):
+  all +0.17..+0.24 over TM_COMBINED (54.14), none beats the plain team stack (54.29 OOF) by more than noise. Error correlations: C1, A9, M9b, M2, M3, B4, L5 are 0.90-0.98 with each other, TM_MIXER 0.99 with TM_COMBINED; TM_E7 and L7 are the only distinct members (0.6-0.7).
+- Subset search over 12 models (298 subsets, dev OOF): best 1-member TM_COMBINED 54.14, best 2-member TM_COMBINED 79% + C2 21% = 54.27, best 3-member 54.28; composition (win prob TM_COMBINED, sizes avg(C1, TM)) 54.37.
+- Full team stack on audit (extra logged looks, who=W5_final / TEAM_COMPARE): 55.59 [54.89,56.17] vs TM_COMBINED 55.37 [54.5,56.1] vs our own stack 54.09.
+- Conclusion: blending is saturated near 54.3-54.4 dev / ~55.4-55.6 audit; the lever left is payout-size modelling (~54% of remaining error).

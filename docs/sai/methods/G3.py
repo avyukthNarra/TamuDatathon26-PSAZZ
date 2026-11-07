@@ -39,7 +39,7 @@ def fit_meta(learner, hp, v, Pm, tr, w):
         # weighted fit via row resampling with fixed seed (MLP has no sample_weight): replicate rows proportional to weight
         rng = np.random.RandomState(0)
         idx = rng.choice(tr, size=len(tr) * 2, p=w[tr] / w[tr].sum())
-        m = MLPRegressor((8,), activation="tanh", alpha=hp["alpha"], max_iter=300, random_state=0, tol=1e-6).fit(Xs[idx], R[idx])
+        m = MLPRegressor(hidden_layer_sizes=(8,), activation="tanh", alpha=hp["alpha"], max_iter=300, random_state=0, tol=1e-6).fit(Xs[idx], R[idx])
         pr = lambda rows: m.predict(Xs[rows])
     return dict(B=B, base=base_all, pr=pr)
 
@@ -60,17 +60,17 @@ def main():
     grid = []; best = None
     cells = [("gbt", {"rounds": 10}), ("gbt", {"rounds": 30}), ("mlp", {"alpha": 1.0}), ("mlp", {"alpha": 10.0})]
     for learner, hp in cells:
-        P = np.tile(np.array([0.5, 0.2, 0.15, 0.1, 0.05]), (v.n, 1)); trerr = []; basee = []
+        P = np.tile(np.array([0.5, 0.2, 0.15, 0.1, 0.05]), (v.n, 1)); trerr = []; basee = []; baseoof = np.zeros(v.n)
         for tr, te in folds:
-            st = fit_meta(learner, hp, v, Pm, tr, w); P[te] = apply(st, te)
+            st = fit_meta(learner, hp, v, Pm, tr, w); P[te] = apply(st, te); baseoof[te] = ((st['base'][te] - v.truth[te]) ** 2).sum(1)
             trerr.append(wmse(apply(st, tr), v, np.arange(v.n), w) if False else
                          float((w[tr] / w[tr].sum() * ((apply(st, tr) - v.truth[tr]) ** 2).sum(1)).sum()))
             basee.append(float((w[tr] / w[tr].sum() * ((st["base"][tr] - v.truth[tr]) ** 2).sum(1)).sum()))
         st = fit_meta(learner, hp, v, Pm, rows, w); P[arows] = apply(st, arows)
         oof = wmse(P, v, rows, w)
         r = report(P, v, TMC, TS, learner)
-        extra = {"train_wmse": float(np.mean(trerr)), "base_train_wmse": float(np.mean(basee)), "oof_wmse": oof}
-        print(learner, hp, fmt(r), f"| train wmse {np.mean(trerr):.5f} (base {np.mean(basee):.5f}) OOF wmse {oof:.5f}", flush=True)
+        extra = {"train_wmse": float(np.mean(trerr)), "base_train_wmse": float(np.mean(basee)), "oof_wmse": oof, "base_oof_wmse": float((w[rows] / w[rows].sum() * baseoof[rows]).sum())}
+        print(learner, hp, fmt(r), f"| train wmse {np.mean(trerr):.5f} (base {np.mean(basee):.5f}) OOF wmse {oof:.5f} (base OOF {extra['base_oof_wmse']:.5f})", flush=True)
         grid.append({"params": {"learner": learner, **hp}, "points": r["points"], "ci95": r["ci95"], "condition_ratios": r["ratios"],
                      "vs_TMC": r["vs_TMC"], "vs_TEAM": r["vs_TEAM"], **extra})
         if best is None or r["points"] > best[0]:

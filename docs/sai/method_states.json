@@ -425,5 +425,23 @@
   "claude",
   "neutral",
   "dev 54.13, 0.00 [-0.10,+0.06]; optimiser never shrinks: TM_COMBINED p_win is already calibrated w.r.t. volatility"
+ ],
+ "G1": [
+  "observable-evidence gated stack (no volatility)",
+  "claude",
+  "neutral",
+  "dev 54.35, +0.21 [-0.03,+0.43] vs TM_COMBINED, +0.06 vs team stack; 48 params; gates equal to ungated pool"
+ ],
+ "G2": [
+  "per-class / geometric pool",
+  "claude",
+  "neutral",
+  "dev 54.31 saved (per-class geometric); pw/shares on 7 members 54.38 [+0.01,+0.45] vs TM_COMBINED; extra params hurt"
+ ],
+ "G3": [
+  "tiny MLP / boosted-tree meta-learner",
+  "claude",
+  "neutral",
+  "dev 54.37, +0.23 [+0.06,+0.39] vs TM_COMBINED but unstable (alpha 1 vs 10 swings 0.4); trees overfit (train .0154 vs OOF .0200); ~250 weights"
  ]
 }

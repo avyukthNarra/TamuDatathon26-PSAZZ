@@ -6,6 +6,11 @@
 > (20% zhill rule model + 80% Pranav pair mixer): 55.37 [54.5,56.1] on our 24 audit episodes (dev 54.14), above our stack's 54.09.**
 > It is stdlib-only, deterministic and already packaged. Our stack adds only +0.15 (CI -0.05,+0.34) to it on dev. The sections below describe OUR models.
 
+> **UPDATE 2 (blending everything, volatility, gated/meta blends):** the full team stack (our members + teammates' models, simplex pw/shares weights fit on dev) scores
+> dev 54.29 (OOF) and **55.59 [54.89,56.17] on the 24 audit episodes**, vs 55.37 for the zhill combined model alone: a gain of about +0.2 that is within noise.
+> Volatility-gated blends (V1-V3), observable-evidence gates (G1), per-class/geometric pools (G2) and a tiny MLP meta-learner (G3) all land at 54.3-54.4 dev,
+> +0.1 to +0.25 over TM_COMBINED with CIs that mostly include 0. Blending is saturated near 54.3-54.4 dev; a better component (payout-size modelling) is what is needed.
+
 **Best: W5 stack = 54.09 points on the 24 reserved audit episodes (CI 53.08-54.90)**, scored once after all choices were made on the other 72.
 For reference, on the same audit set: pooled starter 30.00 by definition, original pair prototype B3 46.78, base B4 52.26 [50.95,53.35], simple composition C2 53.77 [52.71,54.66].
 
@@ -46,6 +51,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 
 | ID | owner | points | CI95 | stable | short | drift | shared | sec | det |
 |---|---|---|---|---|---|---|---|---|---|
+| G3 | claude | 54.37 | 53.42-55.25 | 0.076 | 0.141 | 0.096 | 0.101 | 4 | None |
 | G1 | claude | 54.35 | 53.44-55.20 | 0.069 | 0.142 | 0.102 | 0.103 | 4 | None |
 | G2 | claude | 54.31 | 53.23-55.32 | 0.078 | 0.142 | 0.098 | 0.101 | 7 | None |
 | V2 | sai-worker | 54.30 | 53.35-55.18 | 0.072 | 0.145 | 0.099 | 0.104 | 0 | None |
@@ -145,6 +151,9 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | E3 | episode-level drift stats as features | codex | neutral | results/E3.json; 45.81, vs B3 -0.01 [-0.20,+0.15]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base |
 | E4 | peer lagged associations vs null controls | codex | neutral | results/E4.json; 45.77, vs B3 -0.06 [-0.15,+0.03]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base |
 | E5 | latent factor model for episode state | codex | neutral | results/E5.json; 45.78, vs B3 -0.04 [-0.18,+0.09]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base |
+| G1 | observable-evidence gated stack (no volatility) | claude | neutral | results/G1.json; dev 54.35, +0.21 [-0.03,+0.43] vs TM_COMBINED, +0.06 vs team stack; 48 params; gates equal to ungated pool |
+| G2 | per-class / geometric pool | claude | neutral | results/G2.json; dev 54.31 saved (per-class geometric); pw/shares on 7 members 54.38 [+0.01,+0.45] vs TM_COMBINED; extra params hurt |
+| G3 | tiny MLP / boosted-tree meta-learner | claude | neutral | results/G3.json; dev 54.37, +0.23 [+0.06,+0.39] vs TM_COMBINED but unstable (alpha 1 vs 10 swings 0.4); trees overfit (train .0154 vs OOF .0200); ~250 weights |
 | L1 | one-hot lags 1-8 + missing flag, regularized multinomial | claude | neutral | results/L1.json; vs L2 -0.02: one-hot lags + missing flag matches L2 only when pairs present; one-hot lags alone 31.3; logistic worse than linear |
 | L2 | per-machine ridge on lags + pairs (B3 variants: lambda, lag set, pair set) | claude | helps | results/L2.json; BIG: 50.89 [49.8,51.9], +5.07 [+4.22,+5.89] vs B3 (lead re-scored). lam 0.05 (near-OLS), lag 7 only + pairs (1,3),(2,5),(4,7); B3's lags 1-5 hurt and lam=20 over-shrinks. New base B4. Conditions .106/.216/.211/.183 |
 | L3 | all pairs among lags 1-8 with null controls (9-16); triples | claude | neutral | results/L3.json; best = the same top-3 pairs as L2 (50.88); all 28 pairs 41.9, all triples 41.4, null pairs cost several points each |
@@ -195,4 +204,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | V2 | softmax-linear vol/history gate | claude | neutral | results/V2.json; dev 54.27-54.30, +0.13..+0.16 [-0.05,+0.34]; same conclusion, 20-36 params |
 | V3 | vol-scaled shrinkage of p_win toward longer memory | claude | neutral | results/V3.json; dev 54.13, 0.00 [-0.10,+0.06]; optimiser never shrinks: TM_COMBINED p_win is already calibrated w.r.t. volatility |
 
-Counts: alive 10, baseline 5, helps 18, hurts 7, neutral 33
+Counts: alive 10, baseline 5, helps 18, hurts 7, neutral 36
