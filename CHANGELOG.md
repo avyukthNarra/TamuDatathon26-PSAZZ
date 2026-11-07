@@ -23,6 +23,7 @@ How to add an entry (every PR):
 
 ### Changed
 - Playbook spells out PR flow: no pushes to `main`, one approval (own is fine), merge only when approved with no conflicts
+- Agents no longer flag unfilled project snapshot `TODO`s before kickoff; whoever adds a piece of the stack fills its row
 
 ### Deprecated
 

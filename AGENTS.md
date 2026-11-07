@@ -26,7 +26,7 @@ under-documented, so **do not assume anything is set up.** Run this loop before 
 Check the items below and tell the user, briefly, which are missing or unfilled. Don't fix
 them unless they block the task or the user asks; infrastructure gaps are their own PRs.
 
-- [ ] §0 snapshot still `TODO` (pitch, stack, install/run/lint/test commands, CI, team table, release captain)
+- [ ] §0 `TODO`s: **expected until kickoff, so don't flag them** unless one blocks your task (see the note under §0)
 - [ ] No source layout yet (`src/`, `notebooks/`, `pipelines/`, `tests/`)
 - [ ] No test runner or tests, so you can't prove the task works (say how you'll verify instead)
 - [ ] No lint/format config
@@ -71,7 +71,12 @@ step B, and open questions. Then stop. Don't poll CI.
 
 ---
 
-## 0. Project snapshot (FILL THIS IN FIRST)
+## 0. Project snapshot (fill in as the project starts)
+
+> **`TODO` here is expected until kickoff.** Stack, commands, and CI don't exist yet, so don't nag
+> about them. Whoever first introduces a piece fills in its row **in that same PR** (adding `pytest`
+> also fills Tests and the `TODO_LINT && TODO_TEST` line in §2 Step 4). Pitch, deadline, team table,
+> and release captain are the humans' to fill in. Agents only raise a `TODO` if it blocks the task.
 
 | Field | Value |
 |---|---|
@@ -161,7 +166,7 @@ git checkout -b sai/fix-null-dates
 
 Then run the **full** local check:
 ```bash
-# replace with the real commands from §0
+# replace with the real commands from §0 (still TODO until kickoff: say how you verified instead)
 TODO_LINT && TODO_TEST
 ```
 If something fails, fix it. **Never** skip, delete, or weaken a test to make it pass without saying so explicitly in the PR.
