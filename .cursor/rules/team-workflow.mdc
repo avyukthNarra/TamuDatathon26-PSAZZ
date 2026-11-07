@@ -1,0 +1,23 @@
+---
+description: Team workflow: branches, tests, Conventional Commits, changelog, semver, PR/MR rules
+globs:
+alwaysApply: true
+---
+
+# Team workflow (always applies)
+
+**Read and follow `AGENTS.md` at the repo root. It is the single source of truth.** @AGENTS.md
+
+Non-negotiables (details in AGENTS.md):
+
+- Never commit or push to `main`. Start every task with:
+  `git checkout main && git pull --ff-only && git checkout -b <name>/<short-desc>`
+  (e.g. `sai/genie-dashboard`: the human's first name, 2-4 kebab words).
+- Stay within the task's scope. One branch = one PR.
+- Commit messages: Conventional Commits (`feat(scope): ...`, `fix: ...`, `feat!: ...` for breaking) with a body for the next agent: why, approach, gotchas, how verified, follow-ups. As long as needed, no padding.
+- Tests: required for new logic, every bug fix (regression test), and data-pipeline changes (data checks). Run lint + tests before pushing. Never delete or weaken a test silently.
+- Add a user-facing line under `## [Unreleased]` in `CHANGELOG.md` (Keep a Changelog sections: Added / Changed / Deprecated / Removed / Fixed / Security).
+- Never choose a version number by hand; run `scripts/next-version.sh`.
+- Push the feature branch, open a PR/MR whose title is a Conventional Commit header, fill `.github/pull_request_template.md`, then report the link and stop.
+- Never merge, tag, force-push, delete branches, add dependencies, or spend cloud money without explicit human approval.
+- Append new gotchas/decisions as dated lines to AGENTS.md §12 / §13.
