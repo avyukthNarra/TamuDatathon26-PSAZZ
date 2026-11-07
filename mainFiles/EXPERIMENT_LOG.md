@@ -132,3 +132,15 @@ with B3's pairs (1,3),(2,5),(4,7) and single lag 7.
 - Error shares on L2: p0 0.49, p1 0.25, p2 0.19, p5 0.07: the SIZE side is now ~half the remaining error, so size/severity
   work (A methods, lag effects on severity) is worth much more on this base than it was on B3.
 - All earlier M and A results were measured on the weak B3 lam-20 model and must be re-tested on L2 (= "B4").
+
+### Codex W3/W4 first batch (E1-E5, S1), merged and re-scored by the lead through the harness (values reproduce)
+- E1-E5 (peer residual pooling, cosine/type/signal pooling, episode drift features, null-controlled peer lag screen,
+  latent factor): 45.75-45.81 on dev, within noise of B3; blend over B4 gains 0.00. Verdict neutral (built on old B3).
+- S1 HistGB residual on B3: 46.59, +0.77 [+0.07,+1.51] vs B3; drift .399->.339, shared .377->.297, stable worse
+  (.118->.162). Against B4 it adds only +0.06 [-0.06,+0.19]. Needs rebase onto B4 (note in docs/sai/CODEX_REBASE.md).
+
+### Codex W3/W4 first batch (E1-E5, S1), merged and re-scored by the lead through the harness (values reproduce)
+- E1-E5 (peer residual pooling, cosine/type/signal pooling, episode drift features, null-controlled peer lag screen,
+  latent factor): 45.75-45.81 on dev, within noise of B3; blend over B4 gains 0.00. Verdict neutral (built on old B3).
+- S1 HistGB residual on B3: 46.59, +0.77 [+0.07,+1.51] vs B3; drift .399->.339, shared .377->.297, stable worse
+  (.118->.162). Against B4 it adds only +0.06 [-0.06,+0.19]. Needs rebase onto B4 (note in docs/sai/CODEX_REBASE.md).

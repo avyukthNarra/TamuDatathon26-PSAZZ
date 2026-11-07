@@ -184,32 +184,38 @@
  "E1": [
   "recent residual pooling across peer machines",
   "codex",
-  "alive"
+  "neutral",
+  "45.75, vs B3 -0.07 [-0.15,+0.01]; blend over B4 0.00 [-0.04,+0.04]; lead re-scored via harness; built on the old B3 base"
  ],
  "E2": [
   "cosine-similarity subgroup pooling; pool by type and signal",
   "codex",
-  "alive"
+  "neutral",
+  "45.77, vs B3 -0.05 [-0.17,+0.07]; blend over B4 -0.02; lead re-scored via harness; built on the old B3 base"
  ],
  "E3": [
   "episode-level drift stats as features",
   "codex",
-  "alive"
+  "neutral",
+  "45.81, vs B3 -0.01 [-0.20,+0.15]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base"
  ],
  "E4": [
   "peer lagged associations vs null controls",
   "codex",
-  "alive"
+  "neutral",
+  "45.77, vs B3 -0.06 [-0.15,+0.03]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base"
  ],
  "E5": [
   "latent factor model for episode state",
   "codex",
-  "alive"
+  "neutral",
+  "45.78, vs B3 -0.04 [-0.18,+0.09]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base"
  ],
  "S1": [
   "GB / HistGB second stage on B3 output + features",
   "codex",
-  "alive"
+  "helps",
+  "HistGB residual on B3: 46.59, +0.77 [+0.07,+1.51] vs B3; drift .399->.339, shared .377->.297 but stable .118->.162; on B4 base blend only +0.06 [-0.06,+0.19] (w .12): must be rebased onto B4 (S1_B4)"
  ],
  "S2": [
   "CatBoost / LightGBM",

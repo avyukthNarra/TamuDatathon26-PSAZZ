@@ -16,6 +16,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | L9 | claude-w1 | 50.77 | 49.75-51.74 | 0.108 | 0.216 | 0.214 | 0.189 | 0 | 0.0 |
 | L7 | claude-w1 | 49.34 | 47.54-50.80 | 0.106 | 0.201 | 0.299 | 0.258 | 1 | 0.0 |
 | L4 | claude-w1 | 46.71 | 44.58-48.71 | 0.151 | 0.437 | 0.280 | 0.269 | 4 | 0.0 |
+| S1 | codex | 46.59 | 45.28-47.80 | 0.162 | 0.354 | 0.339 | 0.297 | 17 | 0.0 |
 | M3 | claude-w2 | 46.09 | 45.04-47.04 | 0.091 | 0.344 | 0.398 | 0.375 | 0 | 0.0 |
 | M2 | claude-w2 | 46.08 | 45.04-47.06 | 0.090 | 0.344 | 0.399 | 0.375 | 0 | 0.0 |
 | M9b | claude-w2 | 46.07 | 44.98-47.15 | 0.118 | 0.344 | 0.390 | 0.357 | 0 | 0.0 |
@@ -30,8 +31,13 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | M1 | claude-w2 | 45.83 | 44.75-46.89 | 0.118 | 0.344 | 0.399 | 0.375 | 0 | 0.0 |
 | A7 | claude-w1 | 45.82 | 44.75-46.90 | 0.118 | 0.344 | 0.399 | 0.377 | 0 | 0.0 |
 | B3 | claude | 45.82 | 44.75-46.90 | 0.118 | 0.344 | 0.399 | 0.377 | 1 | 0.0 |
+| E3 | codex | 45.81 | 44.79-46.79 | 0.118 | 0.346 | 0.400 | 0.376 | 3 | 0.0 |
+| E5 | codex | 45.78 | 44.75-46.75 | 0.118 | 0.347 | 0.401 | 0.375 | 5 | 0.0 |
+| E2 | codex | 45.77 | 44.69-46.81 | 0.120 | 0.349 | 0.405 | 0.369 | 1 | 0.0 |
+| E4 | codex | 45.77 | 44.72-46.77 | 0.118 | 0.349 | 0.401 | 0.377 | 2 | 0.0 |
 | M7 | claude-w2 | 45.76 | 44.62-46.83 | 0.137 | 0.344 | 0.397 | 0.366 | 0 | 0.0 |
 | M5 | claude-w2 | 45.75 | 44.63-46.85 | 0.129 | 0.344 | 0.398 | 0.375 | 0 | 0.0 |
+| E1 | codex | 45.75 | 44.68-46.81 | 0.118 | 0.351 | 0.404 | 0.372 | 1 | 0.0 |
 | M4 | claude-w2 | 45.72 | 44.59-46.80 | 0.136 | 0.344 | 0.398 | 0.372 | 0 | 0.0 |
 | M6 | claude-w2 | 45.52 | 44.46-46.54 | 0.154 | 0.344 | 0.399 | 0.376 | 0 | 0.0 |
 | M8 | claude-w2 | 44.89 | 43.63-46.04 | 0.147 | 0.344 | 0.443 | 0.413 | 0 | 0.0 |
@@ -60,11 +66,11 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | B2 | GB, HL 4/16/64/128 + LAGRESP (mainFiles/experiments/gb_proto.py) | claude | baseline | - |
 | B3 | pair-model prototype | claude | baseline | results/B3.json |
 | B4 | B4 = L2 structure (lam 0.05, lag 7 + 3 pairs); new base for all further tests | claude | baseline | results/B4.json |
-| E1 | recent residual pooling across peer machines | codex | alive | - |
-| E2 | cosine-similarity subgroup pooling; pool by type and signal | codex | alive | - |
-| E3 | episode-level drift stats as features | codex | alive | - |
-| E4 | peer lagged associations vs null controls | codex | alive | - |
-| E5 | latent factor model for episode state | codex | alive | - |
+| E1 | recent residual pooling across peer machines | codex | neutral | results/E1.json; 45.75, vs B3 -0.07 [-0.15,+0.01]; blend over B4 0.00 [-0.04,+0.04]; lead re-scored via harness; built on the old B3 base |
+| E2 | cosine-similarity subgroup pooling; pool by type and signal | codex | neutral | results/E2.json; 45.77, vs B3 -0.05 [-0.17,+0.07]; blend over B4 -0.02; lead re-scored via harness; built on the old B3 base |
+| E3 | episode-level drift stats as features | codex | neutral | results/E3.json; 45.81, vs B3 -0.01 [-0.20,+0.15]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base |
+| E4 | peer lagged associations vs null controls | codex | neutral | results/E4.json; 45.77, vs B3 -0.06 [-0.15,+0.03]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base |
+| E5 | latent factor model for episode state | codex | neutral | results/E5.json; 45.78, vs B3 -0.04 [-0.18,+0.09]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base |
 | L1 | one-hot lags 1-8 + missing flag, regularized multinomial | claude | neutral | results/L1.json; vs L2 -0.02: one-hot lags + missing flag matches L2 only when pairs present; one-hot lags alone 31.3; logistic worse than linear |
 | L2 | per-machine ridge on lags + pairs (B3 variants: lambda, lag set, pair set) | claude | helps | results/L2.json; BIG: 50.89 [49.8,51.9], +5.07 [+4.22,+5.89] vs B3 (lead re-scored). lam 0.05 (near-OLS), lag 7 only + pairs (1,3),(2,5),(4,7); B3's lags 1-5 hurt and lam=20 over-shrinks. New base B4. Conditions .106/.216/.211/.183 |
 | L3 | all pairs among lags 1-8 with null controls (9-16); triples | claude | neutral | results/L3.json; best = the same top-3 pairs as L2 (50.88); all 28 pairs 41.9, all triples 41.4, null pairs cost several points each |
@@ -96,7 +102,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | P5 | stack all helps members (episode-OOF) | claude | alive | - |
 | P6 | shrink ensemble toward the type prior | claude | alive | - |
 | P7 | clip bounds | claude | alive | - |
-| S1 | GB / HistGB second stage on B3 output + features | codex | alive | - |
+| S1 | GB / HistGB second stage on B3 output + features | codex | helps | results/S1.json; HistGB residual on B3: 46.59, +0.77 [+0.07,+1.51] vs B3; drift .399->.339, shared .377->.297 but stable .118->.162; on B4 base blend only +0.06 [-0.06,+0.19] (w .12): must be rebased onto B4 (S1_B4) |
 | S2 | CatBoost / LightGBM | codex | alive | - |
 | S3 | latent condition classifier + gating of specialists | codex | alive | - |
 | S4 | rolling virtual cutoffs (row multiplication) | codex | alive | - |
@@ -105,4 +111,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | S7 | regularized multinomial logistic on full feature set | codex | alive | - |
 | S8 | small MLP | codex | alive | - |
 
-Counts: alive 29, baseline 5, helps 7, hurts 4, neutral 16
+Counts: alive 23, baseline 5, helps 8, hurts 4, neutral 21
