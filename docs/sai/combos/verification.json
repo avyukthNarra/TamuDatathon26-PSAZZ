@@ -1,0 +1,13 @@
+{
+  "tests_passed": {
+    "search": 5,
+    "existing_mixer": 10,
+    "existing_verification": 8,
+    "pinned_mixer4": 12,
+    "pinned_zpool": 6
+  },
+  "total_tests_passed": 41,
+  "independent_dev_replay": "byte-identical results.json, ten deployment CSVs, ten OOF CSVs",
+  "frozen_dev_results_sha256": "9e45a867834d0ac5ef436cf7353a67bf4b8e77ebbd49416517cb86b8589cbd48",
+  "forecast_integrity": "all 20 combination CSVs: 768 unique expected IDs; finite probabilities in [0,1]; row sums within 1e-6"
+}

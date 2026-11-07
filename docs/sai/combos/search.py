@@ -252,6 +252,7 @@ def audit():
         (OUT / 'audit.partial.json').write_text(json.dumps(scores, indent=2) + '\n')
     doc['audit'] = scores
     path.write_text(json.dumps(doc, indent=2) + '\n')
+    (OUT / 'audit.partial.json').unlink()
 
 
 if __name__ == '__main__':

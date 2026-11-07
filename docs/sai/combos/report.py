@@ -56,7 +56,7 @@ def main():
         f"The best dev result is COMBO 1 at {score(best['dev'])} points out of 60, "
         f"a paired {difference(best['vs_reference'])} against the previous 20% rule + 80% mixer-v3 entry "
         f"(54.774 dev / 55.90 audit). All ten listed combinations fall in the best model's noise band; "
-        f"their numerical order does not establish a winner. The main change is mixer v4's win prior, "
+        f"their numerical order does not establish a winner. COMBO 7 is the cheaper stdlib linear alternative (24.05% Rule, 75.95% Mixer4). The main change is mixer v4's win prior, "
         f"which itself reads all validation targets. These are useful public-validation comparisons, not blind evidence of generalisation. "
         f"The {len(data['results'])}-structure search includes every teammate's available member; audit was opened once after freezing this ranking and all weights.",
         '',
@@ -126,7 +126,7 @@ def main():
                 'Package or port the non-stdlib member(s); Sai/Claude/Codex members need NumPy/SciPy and AvyE67 needs its neural environment. '
                 'Zero-weight components may be omitted only after checking deployment parity; no new entry is packaged here.')
         lines += ['', f'### {rank}. COMBO {rank} — {r["family"]}', '',
-                  f"Combines {weights(r)}. {explanations[r['family']]} Measured on OOF dev, "
+                  f"Search subset: {', '.join(r['members'])}. Full-dev deployment: {weights(r)}. {explanations[r['family']]} Measured on OOF dev, "
                   f"p0 MSE falls by {reduction(win, ref_win)} and conditional-size squared error at the true win rate falls by {reduction(size, ref_size)} "
                   f"relative to Ref (negative means an increase). The size diagnostic isolates size error by substituting the true win probability; "
                   f"it is not an additive decomposition of total loss.", '',
@@ -157,7 +157,8 @@ def main():
         'Dev replay uses a new output directory so it cannot rewrite the frozen record. '
         'Saved COMBO_<n>_validation.csv files use full-dev weights for all 768 queries; *_oof_validation.csv files use OOF predictions on dev and inert 0.2 placeholders on audit and must never be submitted.', '',
         'Validation performed: five synthetic search tests; ten existing copied mixer tests; eight existing verification tests; '
-        'twelve pinned v4 mixer tests; six pinned pooled-memory tests; Python compilation, whitespace and forecast integrity checks. '
+        'twelve pinned v4 mixer tests; six pinned pooled-memory tests (41 total passed); Python compilation, whitespace and forecast integrity checks. '
+        'An independent full dev replay reproduced results.json and all ten deployment/OOF CSVs byte for byte. '
         'There is no configured lint command or CI. No dependencies or configuration were changed.',
         '', '## Caveats and next steps', '',
         '- Teammate models/settings were tuned using all 96 validation episodes. Mixer3 reads all validation size targets; Mixer4 additionally fits a win prior from them. '
