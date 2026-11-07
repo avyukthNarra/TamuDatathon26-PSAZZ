@@ -63,6 +63,8 @@ class ShapeHeadForecaster(PairLogisticForecaster):
             return None
         rows, ys, ws = [], [], []
         for tick, pay in seq.items():
+            if tick >= cutoff:
+                continue
             x = self._features(seq, tick)
             if x is None:
                 continue
@@ -80,7 +82,7 @@ class ShapeHeadForecaster(PairLogisticForecaster):
         prior = self.shape_prior.get(f"{query.machine_type}|{query.signal}", np.full(4, 0.25))
         c = self.shape_strength * prior
         for tick, pay in seq.items():
-            if pay > 0:
+            if pay > 0 and tick < query.cutoff:
                 age = query.cutoff - 1 - tick
                 c[POSITIVE.index(pay)] += 1.0 if self.shape_half_life is None else 2.0 ** (-age / self.shape_half_life)
         return c / c.sum()
