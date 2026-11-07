@@ -1,0 +1,44 @@
+[
+ {
+  "params": {
+   "variant": "machine",
+   "pooled_sigma": 0.12
+  },
+  "points": 31.513305338641327,
+  "condition_ratios": {
+   "stable": 0.9232865245865813,
+   "short_history": 0.9315022746137919,
+   "drift": 0.9430935267322765,
+   "shared_change": 0.8179484293932346
+  },
+  "diff_vs_BEST": -23.260680314829035
+ },
+ {
+  "params": {
+   "variant": "pooled",
+   "pooled_sigma": 0.12
+  },
+  "points": 31.082470026178385,
+  "condition_ratios": {
+   "stable": 0.9853831034782106,
+   "short_history": 0.9879784760777597,
+   "drift": 0.930961274401268,
+   "shared_change": 0.817071224372649
+  },
+  "diff_vs_BEST": -23.691515627291977
+ },
+ {
+  "params": {
+   "variant": "bma",
+   "pooled_sigma": 0.12
+  },
+  "points": 31.343450501858676,
+  "condition_ratios": {
+   "stable": 0.9272708753884872,
+   "short_history": 0.9464485569993633,
+   "drift": 0.9467794435828946,
+   "shared_change": 0.8366032030032315
+  },
+  "diff_vs_BEST": -23.430535151611686
+ }
+]

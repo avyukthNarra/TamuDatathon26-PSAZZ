@@ -1,0 +1,41 @@
+{
+ "id": "K1",
+ "owner": "sai-worker",
+ "description": "convex blend of BEST with C2 (episode-OOF, dev)",
+ "params": {
+  "members": [
+   "TM_COMBINED3",
+   "C2"
+  ],
+  "w": [
+   0.85,
+   0.15
+  ]
+ },
+ "scope": "dev",
+ "points": 54.850043693529194,
+ "ci95": [
+  53.854643049718284,
+  55.73533016644153
+ ],
+ "condition_ratios": {
+  "stable": 0.06414982506348992,
+  "short_history": 0.14027834579815945,
+  "drift": 0.08079460493879906,
+  "shared_change": 0.09034347426460718
+ },
+ "R": 0.0938915625162639,
+ "class_error_shares": {
+  "p_0": 0.5239639911671811,
+  "p_1": 0.238604394465966,
+  "p_2": 0.17276484167025583,
+  "p_5": 0.059420696047787894,
+  "p_20": 0.005246076648809246
+ },
+ "runtime_seconds": 0.0,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72
+}

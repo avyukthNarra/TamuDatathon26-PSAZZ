@@ -207,3 +207,8 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
 - Size given win is exactly one of two mixes per machine type (6 constants), switched by big wins at lags 1,2,3,4 (our A9 had found lags 1,2,4 statistically). Mixer v3: dev 54.59, audit 55.77.
 - 20% rule model + 80% mixer v3: dev 54.77 [53.7,55.7], audit 55.90 [55.1,56.6]; +0.63 [+0.35,+0.90] over the previous best (old TM_COMBINED 54.14). Our C2 adds +0.07 [-0.03,+0.17].
 - Error shares now p0 .52, p1 .24, p2 .17, p5 .06: win probability is the larger error again. Modes are read from validation targets (round two must re-derive them from the new kit's validation targets).
+
+### K1 combination search around BEST (TM_COMBINED3 54.77), worker report reviewed, K1a-c re-scored by the lead
+- 324 pw x shares compositions: none beats BEST (best 54.72). 154 convex blends of 2-4 members: best 0.85 BEST + 0.15 C2 = 54.85, +0.08 [-0.03,+0.17] over BEST.
+- Nested selection check (10 half-splits, 478 combos): held-out gain +0.007 => the +0.08 is selection optimism. Only C2 gets any weight (0.15, stable across folds); TM_E7, L7, TM_RULE, TM_E6 get ~0.
+- Verdict: BEST is saturated under blending of the available members.
