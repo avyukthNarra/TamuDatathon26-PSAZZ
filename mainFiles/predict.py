@@ -1,27 +1,30 @@
 """Recreate our test forecast: python predict.py --data <public folder> --out <submission.csv>
 
-Combined model (validation 54.45 / 60): 20% our rule model + 80% the team's pair mixer
-(slot_forecasting/pair_mixer.py, COMBINED_SOLUTIONS branch). Both refit on <data>/train
-(deterministic, no randomness), then predict <data>/test. Standard library only.
-Works unchanged for the main round and round two (adaptation).
+Combined model: a weighted blend of our rule model (rule_model.py) and the team's pair mixer
+(slot_forecasting/pair_mixer.py). The blend weights live in blend_config.json, written by
+auto_tune.py after it checks a blend on the audit half of validation. Without that file the default
+is 20% rule + 80% mixer (validation 54.45 / 60 on main).
+
+Every model refits on <data>/train (deterministic, no randomness), then predicts <data>/test.
+Standard library only. Works unchanged for the main round and round two (adaptation).
 """
 import argparse
+import json
 from pathlib import Path
 
 from slot_forecasting.io import load_inputs, read_labels, write_submission
-from slot_forecasting.pair_mixer import adapt
+from slot_forecasting.pair_mixer import ALL_PAIRS, PairMixer, adapt
 
 from rule_model import RuleForecaster
 
-# Weight of our rule model in the final blend; the pair mixer gets the rest.
-# Validation (true odds): 0.2 -> 54.45, 0.3 -> 54.48, mixer alone 54.21, rule model alone 52.89.
-# Independent check (fit on validation, Brier on train outcomes): mixer alone best; 0.2 costs
-# +0.0011, 0.3 costs +0.0021 (95% range -0.0001..+0.0042). Each check is biased toward what was
-# tuned on it, so 0.2 is the compromise. The rule model helps most on stable machines.
-RULE_WEIGHT = 0.2
+HERE = Path(__file__).resolve().parent
 
+# Default blend. On main: 0.2 rule -> 54.45, 0.3 -> 54.48, mixer alone 54.21, rule alone 52.89.
+# An independent check (fit on validation, Brier on train outcomes) slightly favoured the mixer
+# alone, so 0.2 is the compromise. auto_tune.py may replace this via blend_config.json.
+DEFAULT_WEIGHTS = {"rule": 0.2, "mixer": 0.8}
 
-# v4 (validation 52.89 / 60): average of two rule models that make different mistakes.
+# Rule model v4 (52.89 / 60 alone): average of two variants that make different mistakes.
 #  - "full":     rules are graded on predicting the exact payout
 #  - "win/lose": rules are graded on win vs lose only (better for short histories)
 # Both take payout SIZE from the machine's own wins blended toward its type's average, then refine
@@ -31,6 +34,8 @@ SETTINGS = dict(size_strength=80.0, strength=0.5, trust_forget=0.99,
 
 
 class Blend:
+    """Equal average of several models; fit() fits each."""
+
     def __init__(self, models):
         self.models = models
 
@@ -58,14 +63,33 @@ class Weighted:
                 for key in forecasts[0][1]}
 
 
-def build(data, log=lambda *_: None):
+def rule_model():
+    return Blend([RuleForecaster(**SETTINGS), RuleForecaster(**SETTINGS, binary=True)])
+
+
+def blend_weights():
+    path = HERE / "blend_config.json"
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))["weights"]
+    return dict(DEFAULT_WEIGHTS)
+
+
+def build(data, weights=None, log=lambda *_: None):
     data = Path(data)
+    weights = weights or blend_weights()
     queries, history = load_inputs(data / "train")
     labels = read_labels(data / "train" / "labels.csv", queries)
-    rules = Blend([RuleForecaster(**SETTINGS), RuleForecaster(**SETTINGS, binary=True)])
-    rules.fit(queries, history, labels)
-    mixer = adapt(queries, history, labels, log=log)  # rediscovers lag pairs on this round's train
-    return Weighted([(RULE_WEIGHT, rules), (1.0 - RULE_WEIGHT, mixer)])
+    fitted = {}
+    if "mixer" in weights or "mixer_all" in weights:
+        fitted["mixer"] = adapt(queries, history, labels, log=log)  # lag pairs rediscovered on train
+    if "mixer_all" in weights:
+        fitted["mixer_all"] = PairMixer(pairs=ALL_PAIRS, cell_mode=fitted["mixer"].cell_mode).fit(queries, history)
+    if "rule" in weights:
+        fitted["rule"] = rule_model().fit(queries, history, labels)
+    unknown = set(weights) - set(fitted)
+    if unknown:
+        raise SystemExit(f"blend_config.json names unknown models: {sorted(unknown)}")
+    return Weighted([(w, fitted[name]) for name, w in weights.items() if w > 0])
 
 
 def main():

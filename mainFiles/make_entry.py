@@ -53,7 +53,8 @@ toward its machine type's average mix, refined by per-machine size rules (same t
 rule search, applied to the sizes of past wins). The final forecast averages two variants: rules graded on
 the exact payout, and rules graded on win/lose only.
 
-The final forecast is 20% this rule model + 80% the team's pair mixer
+The final forecast is a weighted blend (weights in `blend_config.json` if present,
+else 20% rule + 80% mixer) of this rule model and the team's pair mixer
 (`slot_forecasting/pair_mixer.py`): a per-machine online mixture of lag-pair experts
 (match/differ cells, fast and slow memory, weights from recent squared error), with lag pairs
 rediscovered on `/data/train`.
@@ -83,6 +84,8 @@ def main():
         shutil.copyfile(HERE / "slot_forecasting" / name, entry / "slot_forecasting" / name)
     shutil.copyfile(HERE / "predict.py", entry / "predict.py")
     shutil.copyfile(HERE / "rule_model.py", entry / "rule_model.py")
+    if (HERE / "blend_config.json").exists():  # blend weights chosen by auto_tune.py
+        shutil.copyfile(HERE / "blend_config.json", entry / "blend_config.json")
     (entry / "reproduce.json").write_text(json.dumps({
         "image": "python",
         "command": ["python", "predict.py", "--data", "/data", "--out", "/output/submission.csv"]}, indent=2) + "\n")

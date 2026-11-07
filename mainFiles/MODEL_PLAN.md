@@ -342,19 +342,28 @@ show("my test", bench.run(RuleForecaster(strength=0.5, size_strength=80.0))[0])
 
 ## 10. Round two
 
-Round two is worth **40 points**. When the new kit is released (Saturday 9 PM Central):
+Round two is worth **40 points**. The organizers say it "changes which temporal relationships recur", so the
+best lag pairs, memories and blend weight may move. Both models re-learn their rules from the new `train/`,
+and `auto_tune.py` re-picks the blend on the new `validation/`. When the kit is released (Saturday 9 PM Central):
 
-1. Extract it into a separate folder and check `public/metadata.json` says `"round": "adaptation"`.
-2. Run, pointing at the new data:
+1. Extract it into a separate folder; check `public/metadata.json` says `"round": "adaptation"`.
+2. Re-tune the blend on the new data (about 1 minute):
+   ```sh
+   python3 auto_tune.py --data <new-kit>/public --out runs/tune-round2-1
+   ```
+   It prints every single model and the top blends, then either **ACCEPTED** (writes `blend_config.json`)
+   or **KEPT CURRENT**. It only accepts a blend that gains ≥ 0.15 points on the tune half *and* holds on
+   the audit half. Also read the `lag pairs found on train:` line: if it's not (1,3), (2,5), (4,7), the
+   rules changed and the models have already followed.
+3. Build and check the entry:
    ```sh
    python3 make_entry.py --data <new-kit>/public --out runs/round2-v1
    python3 check_submission.py runs/round2-v1/validation_predictions.csv --split validation --data <new-kit>/public
    ```
-3. Compare the per-condition scores with main. If a condition got much worse, the rules may have changed
-   (e.g. new lag pairs), so check which rules win with `RuleForecaster().fit(...).rule_wins`.
 4. Upload under **Adaptation**, well before 11 AM Sunday.
 
----
+Run `auto_tune.py` again after any model change ("another attempt"). Each run is kept in its own `runs/`
+folder with every blend's scores in `auto_tune.json`.
 
 ## 11. Files
 
@@ -363,6 +372,8 @@ Round two is worth **40 points**. When the new kit is released (Saturday 9 PM Ce
 | `rule_model.py` | The model (`RuleForecaster`) |
 | `predict.py` | Organizer entry point: `python predict.py --data /data --out /output/submission.csv`. Holds `SETTINGS` and the 50/50 blend |
 | `make_entry.py` | One command: forecasts + code ZIP + fresh-folder reproduction check |
+| `auto_tune.py` | Re-picks the blend on a round's validation; keeps it only if it beats the current one by ≥ 0.15 on the tune half and holds on the audit half |
+| `blend_config.json` | Blend weights chosen by `auto_tune.py` (absent = default 0.2 rule + 0.8 mixer) |
 | `eval_lag.py` | Validation bench using the kit's scorer (all / tune / audit + conditions) |
 | `lag_model.py` | The failed single-lag attempt, kept for reference |
 
@@ -428,3 +439,20 @@ is under ~0.3 points. **These are all estimates: the test score is hidden until 
 `predict.py` fits both models on `/data/train` (the mixer rediscovers its lag pairs there, so round two
 adapts automatically), predicts with each, and writes `0.2 × rule + 0.8 × mixer`. The weight is
 `RULE_WEIGHT` in `predict.py`. Total runtime is about 105 s per split, deterministic.
+
+---
+
+## 14. Attempt log (Nov 7, after the combined model)
+
+| Attempt | Result | Kept? |
+|---|---|---|
+| Add any of 60 Sai/Codex models (`codex/w3-w4`, best A9 51.90) via greedy selection on the tune half | Nothing improved the blend | ❌ |
+| Add Avyukth's E6 signed-L1 logistic (48.37) at 5–20% | Worse at every weight (54.45 → 53.92) | ❌ |
+| Episode-level change gate: lean on a fast-memory mixer when the episode's recent errors say "changed" | Worse (53.79); the fast mixer is worse in every condition, even shared_change | ❌ |
+| Sharpen the win chance (calibration), global or per type | +0.04 to +0.09: noise | ❌ |
+| Mixer over all 28 pairs as a blend member | 53.52 alone; no blend gain on main. Kept as a round-two candidate in `auto_tune.py` | candidate |
+| `auto_tune.py` re-pick of the blend on main | Best 0.3/0.7 is only +0.05 on tune → kept 0.2/0.8 | ✅ tool |
+
+Why mixing more stopped helping: every team model found the same match/differ lag-pair rule; the weaker ones
+make the same mistakes as the pair mixer, so they only add noise. Main is near the ceiling of these
+approaches; remaining error is mostly short_history (0.147) and payout size.
