@@ -28,7 +28,11 @@ CLASSES = len(PAYOUTS)
 CLASS_INDEX = {value: index for index, value in enumerate(PAYOUTS)}
 ALL_PAIRS = tuple(itertools.combinations(range(1, 9), 2))
 DEFAULT_PAIRS = ((1, 3), (4, 7), (2, 5))
-DEFAULT_SIZE_KEYS = ((), (1,), (1, 2))  # machine-level, lag-1 and lag-(1,2) payout-size experts
+# Payout-size experts: machine-level plus lags 1, (1,2), 2 and (2,3), each cell keyed on the
+# EXACT earlier payout (size_cell="class"). Idea from a second team's rule model, which keys
+# size rules on big/small earlier payouts. Train cutoff dR -0.0145 [-0.029,-0.001], validation
+# 53.75 -> 54.21. Keyed on win/loss only (the old default) these experts can't see payout size.
+DEFAULT_SIZE_KEYS = ((), (1,), (1, 2), (2,), (2, 3))
 MIN_PROBABILITY = 1e-4
 
 
@@ -38,12 +42,19 @@ class PairMixer:
     def __init__(self, pairs=DEFAULT_PAIRS, pair_prior=None, half_life=(12.0, 40.0), k_win=0.25, eta=16.0,
                  size_keys=DEFAULT_SIZE_KEYS, size_half_life=80.0, k_size=16.0, k_machine=32.0,
                  size_eta=8.0, type_size_priors=None, rate_prior=(1.0, 2.0), cell_mode="parity",
-                 decay_missing=True, alpha=0.0):
+                 decay_missing=True, alpha=0.0, size_cell="class"):
+        # size_cell: what a size expert's cell records at each lag: "win" (paid or not),
+        # "big" (lost / paid 1-2x / paid 5-20x) or "class" (the exact payout).
         self.pairs = tuple(tuple(p) for p in pairs)
         self.pair_prior = list(pair_prior) if pair_prior is not None else [0.0] * len(self.pairs)
         self.k_win = k_win
         self.eta = eta
         self.size_keys = tuple(tuple(k) for k in size_keys)
+        # size_cell may also be a list with one entry per size key.
+        self.size_cell = (tuple(size_cell) if isinstance(size_cell, (list, tuple))
+                          else (size_cell,) * len(self.size_keys))
+        if len(self.size_cell) != len(self.size_keys) or any(m not in ("win", "big", "class") for m in self.size_cell):
+            raise ValidationError("size_cell must be win, big or class (one per size key if a list).")
         self.size_half_life = size_half_life
         self.k_size = k_size
         self.k_machine = k_machine
@@ -107,13 +118,18 @@ class PairMixer:
         type_size = self._size_prior(machine_type)
         a0, b0 = self.rate_prior
 
-        def cell_of(t, lags):
+        def cell_of(t, lags, how="win"):
             values = []
             for lag in lags:
                 v = own[t - lag] if t - lag >= 0 else None
                 if v is None:
                     return None
-                values.append(v > 0)
+                if how == "win":
+                    values.append(v > 0)
+                elif how == "big":
+                    values.append(0 if v == 0 else 1 if v <= 2 else 2)  # lost / 1-2x / 5-20x
+                else:
+                    values.append(v)
             return tuple(values)
 
         for t in range(stop + 1):
@@ -139,7 +155,7 @@ class PairMixer:
                 w, n = win_tab[i].get(key, (0.0, 0.0))
                 win_keys.append(key)
                 win_preds.append((w + self.k_win * base) / (n + self.k_win))
-            size_cells = [cell_of(t, key) for key in self.size_keys]
+            size_cells = [cell_of(t, key, how) for key, how in zip(self.size_keys, self.size_cell)]
             size_preds = []
             for i, cell in enumerate(size_cells):
                 sc = size_tab[i].get(cell) if cell is not None else None

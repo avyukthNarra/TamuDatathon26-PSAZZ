@@ -428,6 +428,7 @@ A task is done only when **all** are true:
 - YYYY-MM-DD (@handle): _example: the shared cluster restarts at 02:00; save work before then._
 - 2026-11-07 (@pkhanna29): in train history, a machine's own payout 7 ticks back shifts its win chance by ~0.17 on average (sd ~0.2 across machines); lags 1-6 and 8 are ~0.01-0.08, and neighbour-machine lagged effects are indistinguishable from noise → model per-machine lag-7 response; "shared change" is episode-wide level shifts, not one machine driving another.
 - 2026-11-07 (@pkhanna29): House Edge win chance = whether a machine's results at two lags MATCH or DIFFER (pairs (1,3)/(4,7)/(2,5)); and ticks inside history.csv rank model settings differently from the cutoff tick → tune on train labels.csv at the cutoff (`mainFiles/tune_pair_mixer.py`), confirm on validation; don't trust history-tick Brier for tuning.
+- 2026-11-07 (@pkhanna29): payout SIZE given a win follows the exact sizes of the previous 1-2 payouts; size experts keyed only on win/loss miss it. Keying them on the payout class took validation 53.75 -> 54.21 (idea from another team's rule-model write-up).
 
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->

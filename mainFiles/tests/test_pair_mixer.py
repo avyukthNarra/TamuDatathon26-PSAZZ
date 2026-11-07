@@ -87,6 +87,25 @@ class PairMixerTest(unittest.TestCase):
         self.assertGreater(predicted_win if expected else 1 - predicted_win, 0.8)
         self.assertEqual(discover_pairs(queries, history, top=1)[0][0], (1, 3))
 
+    def test_size_experts_see_earlier_payout_size(self):
+        """When a win's size copies the previous win's size, exact-payout size cells must pick it up."""
+        rng = random.Random(3)
+        query = Query("e1-m0-next", "e1", "e1-m0", "balanced", 0, 300)
+        plays, last = [], 1
+        for t in range(300):
+            payout = 0 if t % 2 else PAYOUTS[last]  # wins on even ticks, losses on odd ticks
+            if payout and rng.random() < 0.1:
+                last = rng.randint(1, 4)
+                payout = PAYOUTS[last]
+            plays.append(Play("e1", "e1-m0", t, payout))
+        history = tuple(plays)
+        size_given_win = {}
+        for mode in ("win", "class"):
+            probs = PairMixer(size_cell=mode).fit((query,), history).predict((query,), history)[query.query_id]
+            size_given_win[mode] = probs[last] / (1 - probs[0])
+        self.assertGreater(size_given_win["class"], 0.6)
+        self.assertGreater(size_given_win["class"], size_given_win["win"] + 0.1)
+
     def test_adapts_to_new_lag_pairs(self):
         """Round two may use different pairs: rediscovery must find them and the mixer must use them."""
         queries, history = make_data(seed=7, cutoff=220, rule=True, lags=(2, 6))

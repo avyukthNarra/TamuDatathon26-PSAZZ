@@ -4,7 +4,7 @@ A running log of the requests (to Claude Code or any coding agent) that led to
 real score gains, and the ones that didn't. Use it to steer the next agent fast,
 especially in round two. Validation points are out of 60; the pooled baseline is 30.
 
-## Paste-ready prompt (rebuilds the 53.75 model from the starter kit)
+## Paste-ready prompt (rebuilds the 54.21 model from the starter kit)
 
 Copy everything inside the box into a fresh coding agent opened in the repo root.
 It describes the finished model exactly, so the agent doesn't have to rediscover it.
@@ -17,7 +17,7 @@ submission_contract.py), and the organizers' baseline in run_starter.py (it alwa
 scores ~30/60 because "pooled" IS the reference model; points = 60/(1+R)).
 Read AGENTS.md first and follow it: work on a feature branch, never commit to main.
 
-GOAL: build a forecaster that scores ~53.75/60 on validation, plus a verified entry ZIP.
+GOAL: build a forecaster that scores ~54.21/60 on validation, plus a verified entry ZIP.
 
 HARD CONSTRAINTS
 - Python standard library only. Deterministic, no randomness.
@@ -32,7 +32,8 @@ WHAT THE DATA ACTUALLY DOES (already established; don't re-research)
   MATCH or DIFFER (XNOR/XOR). On main-round train only three pairs matter:
   (1,3), (4,7), (2,5), each used by ~1/3 of machines. Cell win rates are 96-100% vs 2-4%.
 - Neighbour machines carry no lagged signal. "shared_change" = episode-wide level shifts.
-- Payout size given a win: two shapes per machine type; lag 1 and lags (1,2) help a bit.
+- Payout size given a win: two shapes per machine type; the exact size of the payouts
+  1 and 2 spins back helps (win/loss alone at those lags does not carry it).
 - Tune at the QUERY CUTOFF tick (train/labels.csv), NOT on ticks inside history.csv;
   history ticks rank settings differently. Confirm on validation once.
 
@@ -47,8 +48,9 @@ BUILD mainFiles/slot_forecasting/pair_mixer.py with:
      half_life. If a lag is missing, the expert predicts base.
    - Mix win experts with exponential weights: log_w -= eta*(p - won)^2, eta = 16,
      uniform prior, NO Fixed-Share (alpha = 0; it hurt by +0.10-0.14 R).
-   - Size given win (4 classes): experts keyed on () machine-level, (1,) and (1,2).
-     Each keeps decayed counts per cell (size half-life 80), smoothed toward the
+   - Size given win (4 classes): experts keyed on () machine-level, (1,), (1,2), (2,)
+     and (2,3). A size cell is the EXACT earlier payout class at those lags (0/1x/2x/5x/20x),
+     not just won/lost. Each keeps decayed counts per cell (size half-life 80), smoothed toward the
      machine's own size mix with k_size = 16; the machine mix is smoothed toward a
      per-machine-type prior with k_machine = 32. Mix size experts with
      log_w -= size_eta * squared error (size_eta = 8), only on winning ticks.
@@ -86,14 +88,14 @@ VERIFY (and report the actual output)
   python run_pair_mixer.py --out runs/pair-mixer
   python check_submission.py runs/pair-mixer/submission.csv
   python check_submission.py runs/pair-mixer/validation_predictions.csv --split validation
-Expect validation ~53.75/60 (R ~0.116: stable ~0.096, short_history ~0.151,
-drift ~0.104, shared_change ~0.114). The reference build's test submission SHA-256 is
-9fcb96c5f072740a217be37b8ce43b15eb6130a84030e449249c1cc835d18795. A rebuild will
+Expect validation ~54.21/60 (R ~0.107: stable ~0.083, short_history ~0.151,
+drift ~0.093, shared_change ~0.100). The reference build's test submission SHA-256 is
+068259d6be6d47b05c10eebdfebc7ecec1291fedb0615239e5ada54218b37b90. A rebuild will
 only match it byte for byte if the arithmetic order is identical, so treat the score
 as the check. Upload runs/pair-mixer/submission.csv and runs/pair-mixer/entry.zip.
 ````
 
-The shortcut, if the branch `pranav/adaptive-mixer` is available, is to check it out and
+The shortcut, if the branch `COMBINED_SOLUTIONS` is available, is to check it out and
 run the VERIFY commands. The prompt above is for rebuilding without it.
 
 ## What moved the score (in order)
@@ -111,6 +113,7 @@ run the VERIFY commands. The prompt above is for rebuilding without it.
 | 8 | "Split the remaining error into win part vs size part per condition" | Now ~50/50. Payout size has exactly two shapes per machine type and the mode isn't predictable from history, so sizes are near their floor | (diagnosis) |
 | 9 | **"Build a tuning harness that scores on train labels at the cutoff, per condition, as an estimated change in R with an episode-bootstrap interval; keep a change only if it ALSO improves validation"** | Two memory lengths per pair (half-lives 12 and 40) | 53.56 |
 | 10 | **"Re-test ideas you rejected on history ticks, now at the cutoff"** | Payout-size experts keyed on lag 1 and lags (1,2), rejected earlier, actually help at cutoffs | **53.75** |
+| 11 | **"Compare with another team's write-up (rule model v4, 52.89) and test each idea it has that we don't"** | Their size rules look at earlier payout SIZE, ours only at win/loss. Keying size experts on the exact earlier payout, with lags (), 1, (1,2), 2, (2,3): train cutoff dR -0.0145 [-0.029,-0.001] | **54.21** |
 
 ## Prompt patterns that work
 
@@ -133,6 +136,11 @@ run the VERIFY commands. The prompt above is for rebuilding without it.
   30-minute runtime, a test that proves no future data leaks in.
 
 ## Prompts that did NOT help much
+
+- From the other team's rule model, tested on train cutoffs + validation and NOT kept:
+  single-lag experts (lag 7, lags 7+8, all 8: validation 53.65 / 53.59 / 53.36), a
+  never-forget memory (half-life 1e9 or 200: dR +0.001), blending parity + 4-cell experts
+  (53.44), size prior strength 80 (noise), lost/small/big size cells (dR +0.008, worse).
 
 - A 2-state hidden "size mode" tracker: no real gain. (Lag-keyed size tables looked useless
   on history ticks but DID help at cutoffs; see row 10.)
