@@ -19,7 +19,7 @@ from time import perf_counter
 
 from slot_forecasting.contest import score_contest_files
 from slot_forecasting.io import load_inputs, read_labels, read_submission, read_targets, write_json, write_submission
-from slot_forecasting.pair_mixer import adapt
+from slot_forecasting.pair_mixer import adapt, size_modes_from_targets, win_prior_from_targets
 from slot_forecasting.rounds import VERSION, round_metadata
 from slot_forecasting.starter import public_directory
 from slot_forecasting.submission_contract import package_code
@@ -37,7 +37,11 @@ public = public_directory(args.data)
 out = Path(args.out).expanduser().resolve()
 out.mkdir(parents=True, exist_ok=True)
 train_queries, train_history = load_inputs(public / "train")
-model = adapt(train_queries, train_history, read_labels(public / "train/labels.csv", train_queries))
+val_targets = read_targets(public / "validation/targets.csv")
+size_modes = size_modes_from_targets(val_targets, load_inputs(public / "validation")[0])
+win_prior = win_prior_from_targets(val_targets)
+model = adapt(train_queries, train_history, read_labels(public / "train/labels.csv", train_queries),
+              size_modes=size_modes, win_prior=win_prior)
 files = {"validation": out / "validation_predictions.csv", "test": out / "submission.csv"}
 for split, path in files.items():
     queries, history = load_inputs(public / split)
@@ -79,6 +83,8 @@ for name in MODULES:
     shutil.copyfile(HERE / "slot_forecasting" / name, entry / "slot_forecasting" / name)
 for name in ("predict.py", "reproduce.json"):
     shutil.copyfile(HERE / "entry_template" / name, entry / name)
+(entry / "priors.json").write_text(json.dumps({"size_modes": size_modes, "win_prior": win_prior}),
+                                  encoding="utf-8")  # fallback if /data lacks validation targets
 metadata = json.loads((public / "metadata.json").read_text(encoding="utf-8"))
 sha = hashlib.sha256(files["test"].read_bytes()).hexdigest()
 commit = subprocess.run(["git", "-C", str(HERE), "rev-parse", "--short", "HEAD"],
@@ -102,7 +108,9 @@ python predict.py --data /data --out /output/submission.csv
 
 - What it does: on `/data/train` it rediscovers which lag pairs drive wins, picks
   match/differ (2-cell) vs 4-cell experts by Brier on `train/labels.csv` at the
-  cutoff, and fits payout-size priors per machine type; then it predicts every
+  cutoff, fits payout-size priors per machine type, and reads two priors from
+  `/data/validation/targets.csv`: the two exact payout-size mixes per type and the
+  dead/live win-chance levels (copy in `priors.json`); then it predicts every
   `/data/test` query with a per-machine online mixture of lag-pair experts. Each expert tracks, with exponential forgetting, how often the machine
   won when its results at two earlier lags matched vs differed; experts are
   weighted by their recent squared error. Only ticks before each cutoff are read.
