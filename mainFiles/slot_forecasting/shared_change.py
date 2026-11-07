@@ -128,7 +128,7 @@ class SharedChangeForecaster(PairLogisticForecaster):
     """E1 pair-logistic model with an episode-wide shared-change boundary."""
 
     def __init__(self, before_weight=0.1, evidence_threshold=5.0,
-                 min_side=16, change_step=4, **kwargs):
+                 min_side=16, change_step=4, change_scope="episode", **kwargs):
         super().__init__(**kwargs)
         self.before_weight = float(before_weight)
         if not 0.0 <= self.before_weight <= 1.0:
@@ -136,6 +136,9 @@ class SharedChangeForecaster(PairLogisticForecaster):
         self.evidence_threshold = float(evidence_threshold)
         self.min_side = int(min_side)
         self.change_step = int(change_step)
+        if change_scope not in ("episode", "machine"):
+            raise ValueError("change_scope must be 'episode' or 'machine'")
+        self.change_scope = change_scope
         self.change_diagnostics = {}
 
     def predict(self, queries, history):
@@ -162,26 +165,45 @@ class SharedChangeForecaster(PairLogisticForecaster):
                 }
                 for query in episode_queries
             }
-            change = estimate_shared_change(
-                streams, cutoff, min_side=self.min_side, step=self.change_step,
-                evidence_threshold=self.evidence_threshold,
-            )
-            changes[(episode_id, cutoff)] = change
-            self.change_diagnostics[(episode_id, cutoff)] = {
-                "boundary": change.boundary,
-                "evidence": change.evidence,
-                "raw_gain": change.raw_gain,
-                "candidates": change.candidates,
-                "directions": change.directions,
-            }
+            if self.change_scope == "episode":
+                change = estimate_shared_change(
+                    streams, cutoff, min_side=self.min_side, step=self.change_step,
+                    evidence_threshold=self.evidence_threshold,
+                )
+                changes[(episode_id, cutoff)] = change
+                self.change_diagnostics[(episode_id, cutoff)] = {
+                    "boundary": change.boundary,
+                    "evidence": change.evidence,
+                    "raw_gain": change.raw_gain,
+                    "candidates": change.candidates,
+                    "directions": change.directions,
+                }
+            else:
+                for query in episode_queries:
+                    machine_stream = {query.machine_id: streams[query.machine_id]}
+                    change = estimate_shared_change(
+                        machine_stream, cutoff, min_side=self.min_side, step=self.change_step,
+                        evidence_threshold=self.evidence_threshold,
+                    )
+                    key = (episode_id, cutoff, query.machine_id)
+                    changes[key] = change
+                    self.change_diagnostics[key] = {
+                        "boundary": change.boundary,
+                        "evidence": change.evidence,
+                        "raw_gain": change.raw_gain,
+                        "candidates": change.candidates,
+                        "directions": change.directions,
+                    }
 
         # Keep E1's pooled payout shape, routing each query its episode's
         # boundary explicitly so identical streams in other episodes cannot collide.
         base = self.base.predict(queries, history)
         output = {}
         for (episode_id, cutoff), episode_queries in by_episode_cutoff.items():
-            boundary = changes[(episode_id, cutoff)].boundary
             for query in episode_queries:
+                change_key = ((episode_id, cutoff) if self.change_scope == "episode"
+                              else (episode_id, cutoff, query.machine_id))
+                boundary = changes[change_key].boundary
                 sequence = {
                     play.tick: play.payout
                     for play in indexed.get((episode_id, query.machine_id), ())

@@ -153,6 +153,31 @@ class SharedChangeTests(unittest.TestCase):
         self.assertEqual(batch["target-b"], separate_b["target-b"])
         self.assertNotEqual(batch["target-a"], batch["target-b"])
 
+    def test_machine_scope_does_not_use_neighbor_evidence(self):
+        queries = (
+            Query("q-target", "episode", "target", "steady", 0, 96),
+            Query("q-neighbor", "episode", "neighbor", "balanced", 1, 96),
+        )
+        history = tuple(
+            Play("episode", machine, tick, payout)
+            for machine, payout_fn in (
+                ("target", lambda tick: 0),
+                ("neighbor", lambda tick: 1 if tick < 48 else 0),
+            )
+            for tick in range(96)
+            for payout in (payout_fn(tick),)
+        )
+        labels = {"q-target": 0, "q-neighbor": 1}
+        model = SharedChangeForecaster(
+            C=3, lags=2, pairs=False, min_rows=12,
+            evidence_threshold=0, min_side=16, change_scope="machine",
+        ).fit(queries, history, labels)
+        model.predict(queries, history)
+        target = model.change_diagnostics[("episode", 96, "target")]
+        neighbor = model.change_diagnostics[("episode", 96, "neighbor")]
+        self.assertIsNone(target["boundary"])
+        self.assertEqual(neighbor["boundary"], 48)
+
 
 if __name__ == "__main__":
     unittest.main()
