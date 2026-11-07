@@ -70,6 +70,14 @@ class Split:
         t = np.flatnonzero(~np.isnan(self.grid[i]))
         return {int(k): int(self.grid[i, k]) for k in t}
 
+    def subset(self, rows):
+        rows = np.asarray(rows)
+        a = {k: getattr(self, k)[rows] for k in ("qid", "episode", "machine", "mtype", "signal", "cutoff", "grid")}
+        for k in ("outcome", "condition", "truth", "ref", "truth_outcome"):
+            if getattr(self, k) is not None:
+                a[k] = getattr(self, k)[rows]
+        return Split(self.name + "-subset", a, self.meta)
+
     def frame(self):
         import pandas as pd
         return pd.DataFrame({"query_id": self.qid, "episode_id": self.episode, "machine_id": self.machine,

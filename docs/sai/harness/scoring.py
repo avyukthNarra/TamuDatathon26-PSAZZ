@@ -45,6 +45,8 @@ def scope_episodes(split, scope):
         return [e for e in split.episodes if e not in a]
     if scope == "all":
         return list(split.episodes)
+    if scope == "smoke":
+        return list(split.episodes)
     raise ValueError("scope must be dev|audit|all")
 
 
@@ -131,3 +133,18 @@ def class_shares(P, split, scope="dev"):
     rows = np.concatenate([split.episode_rows(e) for e in scope_episodes(split, scope)])
     se = ((np.asarray(P)[rows] - split.truth[rows]) ** 2).mean(0)
     return {k: float(v / se.sum()) for k, v in zip(PC, se)}
+
+
+def smoke_split(split, per_condition=6):
+    """24 DEV episodes (6 per condition, sha256-ordered, never audit). Score with scope="smoke"."""
+    a = audit_episodes(split)
+    by = {c: [] for c in CONDITIONS}
+    for e in split.episodes:
+        if e not in a:
+            by[split.condition[split.episode_rows(e)[0]]].append(e)
+    rows = []
+    for c in CONDITIONS:
+        by[c].sort(key=lambda e: hashlib.sha256(f"smoke-v1|{e}".encode()).hexdigest())
+        for e in by[c][:per_condition]:
+            rows += split.episode_rows(e).tolist()
+    return split.subset(sorted(rows))
