@@ -1,5 +1,7 @@
 """Small CPU-only checks for the E7 contextual win head."""
+import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 
@@ -99,6 +101,22 @@ class NeuralContextForecasterTests(unittest.TestCase):
                if p.machine_id == query.machine_id}
         self.assertEqual(self.model.win_probability(seq, query.cutoff),
                          second.win_probability(seq, query.cutoff))
+
+    def test_saved_artifact_round_trips_predictions_without_refitting(self):
+        query = self.training[0][0]
+        history = [play for play in self.training[1]
+                   if play.machine_id == query.machine_id and play.tick < query.cutoff]
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'model.pt'
+            self.model.save_artifact(path, metadata={'purpose': 'roundtrip-test'})
+            restored = NeuralContextForecaster.load_artifact(path)
+            before = self.model.predict([query], history)[query.query_id]
+            after = restored.predict([query], history)[query.query_id]
+            np.testing.assert_allclose(before, after, rtol=0, atol=1e-8)
+            self.assertEqual(restored.training_diagnostics,
+                             self.model.training_diagnostics)
+            self.assertEqual(restored._artifact_configuration(),
+                             self.model._artifact_configuration())
 
     def test_predict_returns_valid_five_probability_distribution(self):
         query = self.training[0][0]

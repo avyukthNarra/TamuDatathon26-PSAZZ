@@ -7,8 +7,10 @@ runtime dependency of the baseline forecasters.
 """
 from copy import deepcopy
 import hashlib
+import json
 from itertools import combinations
 from math import log
+from pathlib import Path
 from time import perf_counter
 
 import numpy as np
@@ -21,7 +23,9 @@ class NeuralContextForecaster(PairLogisticForecaster):
     """E1 payout-shape head with a train-only learned contextual win head.
 
     ``recent_half_life`` adds a second, recency-weighted set of prefix
-    sufficient statistics. ``None`` uses only all-history statistics.
+    sufficient statistics. ``None`` uses only all-history statistics. Fitted
+    artifacts can be written with ``save_artifact`` and restored with
+    ``load_artifact`` without refitting.
     """
 
     def __init__(self, *, recent_half_life=32.0, min_context=16,
@@ -277,3 +281,88 @@ class NeuralContextForecaster(PairLogisticForecaster):
             logit = (output[:, :-1] * query).sum(dim=1) + output[:, -1]
             probability = torch.sigmoid(logit)[0].item()
         return float(np.clip(probability, self.clip, 1.0 - self.clip))
+
+    def _artifact_configuration(self):
+        return {
+            'recent_half_life': self.recent_half_life,
+            'min_context': self.min_context,
+            'examples_per_machine': self.examples_per_machine,
+            'max_epochs': self.max_epochs,
+            'patience': self.patience,
+            'batch_size': self.batch_size,
+            'learning_rate': self.learning_rate,
+            'seed': self.seed,
+            'lags': self.lags,
+            'C': self.C,
+            'half_life': self.half_life,
+            'min_rows': self.min_rows,
+            'base_half_life': self.base.half_life,
+            'clip': self.clip,
+        }
+
+    def save_artifact(self, path, metadata=None):
+        """Save weights, constructor configuration, and fitted shape priors."""
+        if self.network is None or self.training_diagnostics is None:
+            raise ValueError('fit the forecaster before saving an artifact')
+        import torch
+
+        payload = {
+            'format_version': 1,
+            'configuration': self._artifact_configuration(),
+            'network_state': self.network.state_dict(),
+            'training_diagnostics': self.training_diagnostics,
+            'base_forecaster': {
+                'method': self.base.method,
+                'prior_strength': self.base.prior_strength,
+                'half_life': self.base.half_life,
+                'global_prior': self.base.global_prior,
+                'context_priors': self.base.context_priors,
+            },
+            'metadata': {} if metadata is None else metadata,
+        }
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        torch.save(payload, path)
+        manifest = {key: value for key, value in payload.items()
+                    if key != 'network_state'}
+        path.with_suffix(path.suffix + '.json').write_text(
+            json.dumps(manifest, indent=2, sort_keys=True) + '\n', encoding='utf-8'
+        )
+
+    @classmethod
+    def load_artifact(cls, path):
+        """Restore a fitted forecaster from ``save_artifact`` without training."""
+        import torch
+
+        try:
+            payload = torch.load(path, map_location='cpu', weights_only=True)
+        except TypeError:  # PyTorch versions before the weights_only argument.
+            payload = torch.load(path, map_location='cpu')
+        if not isinstance(payload, dict) or payload.get('format_version') != 1:
+            raise ValueError('unsupported or malformed neural context artifact')
+        configuration = payload.get('configuration')
+        base_state = payload.get('base_forecaster')
+        if not isinstance(configuration, dict) or not isinstance(base_state, dict):
+            raise ValueError('artifact is missing configuration or base forecaster state')
+        model = cls(**configuration)
+        lag_width = model.lags + model.lags * (model.lags - 1) // 2
+        stats_width = 2 * lag_width + 2
+        if model.recent_half_life is not None:
+            stats_width *= 2
+        model.network = torch.nn.Sequential(
+            torch.nn.Linear(stats_width, 64),
+            torch.nn.ReLU(),
+            torch.nn.Linear(64, lag_width + 1),
+        )
+        model.network.load_state_dict(payload['network_state'])
+        model.network.eval()
+        model._torch = torch
+        model.training_diagnostics = payload.get('training_diagnostics')
+        model.base.method = base_state['method']
+        model.base.prior_strength = float(base_state['prior_strength'])
+        model.base.half_life = float(base_state['half_life'])
+        model.base.global_prior = tuple(base_state['global_prior'])
+        model.base.context_priors = {
+            key: tuple(values) for key, values in base_state['context_priors'].items()
+        }
+        return model
