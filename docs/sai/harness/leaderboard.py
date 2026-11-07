@@ -23,7 +23,7 @@ for r in rows:
 out += ["", "## Method status (every catalog ID)", "", "| ID | method | owner | state | evidence |", "|---|---|---|---|---|"]
 def key(i):
     digits = ''.join(ch for ch in i[1:] if ch.isdigit())
-    return (i[0], int(digits), i[1 + len(digits):])
+    return (i.split('_')[0] if i.startswith('TM') else i[0], int(digits) if digits else 0, i)
 for mid in sorted(states, key=key):
     v = states[mid]
     ev = f"results/{mid}.json" if mid in results else "-"

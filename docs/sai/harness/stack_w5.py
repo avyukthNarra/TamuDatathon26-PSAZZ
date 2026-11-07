@@ -21,6 +21,12 @@ HERE = Path(__file__).resolve().parents[1]
 PW = ["M9b_B4", "M2_B4", "M3_B4", "L5", "L7", "B4", "S2", "S1"]          # win-probability members
 SH = ["C1", "A9", "A1_B4", "B4", "L5", "S2", "S1"]                        # size-share members
 FOLDS = 6
+import os
+TEAM = os.environ.get("TEAM") == "1"          # add the teammates' models as extra members
+if TEAM:
+    PW += ["TM_MIXER", "TM_COMBINED", "TM_RULE", "TM_E6"]
+    SH += ["TM_MIXER", "TM_COMBINED", "TM_RULE"]
+TAG = "team_" if TEAM else ""
 
 
 def load(v, name):
@@ -92,11 +98,12 @@ def main(mode):
         wa.append(a); wb.append(b)
         oof[te] = combine([m[te] for m in PWm], [m[te] for m in SHm], a, b)
     ev = evaluate(oof, v, "dev", bootstrap=1000)
-    C2 = load(v, "C2"); B4 = load(v, "B4")
+    C2 = load(v, "C2"); B4 = load(v, "B4"); TMC = load(v, "TM_COMBINED") if TEAM else C2
     print(f"STACK dev OOF: {ev['points']:.3f} CI {[round(x,2) for x in ev['ci95']]} ratios",
           {k[:5]: round(x, 3) for k, x in ev["condition_ratios"].items()})
     print("  vs C2:", {k: (round(x, 3) if not isinstance(x, list) else [round(y, 2) for y in x]) for k, x in diff_ci(oof, C2, v, "dev").items()},
           " vs B4:", {k: (round(x, 3) if not isinstance(x, list) else [round(y, 2) for y in x]) for k, x in diff_ci(oof, B4, v, "dev").items()})
+    print("  vs TM_COMBINED:" if TEAM else "  (vs C2 again):", {k: (round(x, 3) if not isinstance(x, list) else [round(y, 2) for y in x]) for k, x in diff_ci(oof, TMC, v, "dev").items()})
     print("  mean pw weights :", {n: round(float(np.mean([x[i] for x in wa])), 2) for i, n in enumerate(PW)})
     print("  mean share wts  :", {n: round(float(np.mean([x[i] for x in wb])), 2) for i, n in enumerate(SH)})
     a, b = fit(PWm, SHm, v, rows, w)
@@ -115,7 +122,7 @@ def main(mode):
         for k in ("B3", "B4", "C2"):
             print(f"AUDIT {k}:", round(out["audit"][k]["points"], 3), [round(x, 2) for x in out["audit"][k]["ci95"]])
         print("AUDIT stack vs B4:", out["audit"]["stack_vs_B4"], " vs C2:", out["audit"]["stack_vs_C2"])
-    (HERE / "results" / f"W5_{mode}.json").write_text(json.dumps(out, indent=1))
+    (HERE / "results" / f"W5_{TAG}{mode}.json").write_text(json.dumps(out, indent=1))
 
 
 if __name__ == "__main__":

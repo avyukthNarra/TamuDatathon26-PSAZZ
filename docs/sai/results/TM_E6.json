@@ -1,0 +1,34 @@
+{
+ "id": "TM_E6",
+ "owner": "teammates",
+ "description": "Avyukth E6 signed-L1 interaction logistic (branch avyukth/entry-final; E7 neural not runnable here, no torch)",
+ "params": {
+  "source_branch": "origin/avyukth/entry-final"
+ },
+ "scope": "dev",
+ "points": 47.689837195511245,
+ "ci95": [
+  46.32498666637047,
+  48.99666182552525
+ ],
+ "condition_ratios": {
+  "stable": 0.20727526958886394,
+  "short_history": 0.3268748262546869,
+  "drift": 0.27668315055977366,
+  "shared_change": 0.22168550630463704
+ },
+ "R": 0.2581296881769904,
+ "class_error_shares": {
+  "p_0": 0.5566489944087377,
+  "p_1": 0.2254293659263558,
+  "p_2": 0.15805103942098148,
+  "p_5": 0.05446419487055961,
+  "p_20": 0.005406405373365433
+ },
+ "runtime_seconds": 0.0,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72
+}

@@ -1,0 +1,34 @@
+{
+ "id": "TM_COMBINED",
+ "owner": "teammates",
+ "description": "zhill-branch final: 20% rule model + 80% pair mixer (stdlib, deterministic)",
+ "params": {
+  "source_branch": "origin/zhill-branch"
+ },
+ "scope": "dev",
+ "points": 54.139550015184696,
+ "ci95": [
+  53.071273132159796,
+  55.11533076882959
+ ],
+ "condition_ratios": {
+  "stable": 0.07668532635805103,
+  "short_history": 0.15612014586587936,
+  "drift": 0.09432649894724532,
+  "shared_change": 0.10585648057410851
+ },
+ "R": 0.10824711293632105,
+ "class_error_shares": {
+  "p_0": 0.4594919622646291,
+  "p_1": 0.2557359392718667,
+  "p_2": 0.19976053715027905,
+  "p_5": 0.07717309737138617,
+  "p_20": 0.007838463941838954
+ },
+ "runtime_seconds": 0.0,
+ "seed": 0,
+ "stdlib_only": true,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72
+}

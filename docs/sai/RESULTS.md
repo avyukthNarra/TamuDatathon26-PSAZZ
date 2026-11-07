@@ -2,6 +2,10 @@
 
 ## FINAL: best score found (main round, public validation)
 
+> **UPDATE (after pulling teammates' branches, see `TEAM_COMPARISON.md`): the best model is the teammates' combined model on `zhill-branch`
+> (20% zhill rule model + 80% Pranav pair mixer): 55.37 [54.5,56.1] on our 24 audit episodes (dev 54.14), above our stack's 54.09.**
+> It is stdlib-only, deterministic and already packaged. Our stack adds only +0.15 (CI -0.05,+0.34) to it on dev. The sections below describe OUR models.
+
 **Best: W5 stack = 54.09 points on the 24 reserved audit episodes (CI 53.08-54.90)**, scored once after all choices were made on the other 72.
 For reference, on the same audit set: pooled starter 30.00 by definition, original pair prototype B3 46.78, base B4 52.26 [50.95,53.35], simple composition C2 53.77 [52.71,54.66].
 
@@ -42,6 +46,9 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 
 | ID | owner | points | CI95 | stable | short | drift | shared | sec | det |
 |---|---|---|---|---|---|---|---|---|---|
+| TM_COMBINED | teammates | 54.14 | 53.07-55.12 | 0.077 | 0.156 | 0.094 | 0.106 | 0 | None |
+| TM_MIXER | teammates | 53.87 | 52.76-54.87 | 0.091 | 0.159 | 0.096 | 0.109 | 0 | None |
+| TM_RULE | teammates | 52.89 | 51.78-53.94 | 0.057 | 0.210 | 0.133 | 0.136 | 0 | None |
 | C2 | claude | 52.08 | 51.15-52.96 | 0.090 | 0.191 | 0.184 | 0.142 | 0 | 0.0 |
 | C1 | claude-w1 | 51.72 | 50.76-52.67 | 0.090 | 0.191 | 0.200 | 0.159 | 0 | 0.0 |
 | A9 | claude-w1 | 51.47 | 50.50-52.38 | 0.090 | 0.203 | 0.203 | 0.167 | 0 | 0.0 |
@@ -61,6 +68,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | L6 | claude-w1 | 50.77 | 49.75-51.74 | 0.108 | 0.216 | 0.214 | 0.189 | 0 | 0.0 |
 | L9 | claude-w1 | 50.77 | 49.75-51.74 | 0.108 | 0.216 | 0.214 | 0.189 | 0 | 0.0 |
 | L7 | claude-w1 | 49.34 | 47.54-50.80 | 0.106 | 0.201 | 0.299 | 0.258 | 1 | 0.0 |
+| TM_E6 | teammates | 47.69 | 46.32-49.00 | 0.207 | 0.327 | 0.277 | 0.222 | 0 | None |
 | S2 | codex | 46.77 | 45.66-47.86 | 0.115 | 0.329 | 0.357 | 0.331 | 25 | 0.0 |
 | S2 | codex | 46.77 | 45.66-47.86 | 0.115 | 0.329 | 0.357 | 0.331 | 18 | 0.0 |
 | L4 | claude-w1 | 46.71 | 44.58-48.71 | 0.151 | 0.437 | 0.280 | 0.269 | 4 | 0.0 |
@@ -170,5 +178,9 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | S6 | smoothed pseudo-targets from a future window (train only) | codex | hurts | results/S6.json; 34.74 (-11.08 vs B3): future-window pseudo-targets average through drift; built on old B3; lead re-scored via harness |
 | S7 | regularized multinomial logistic on full feature set | codex | neutral | results/S7.json; 44.73 (-1.09 vs B3), blend over B4 +0.09 [-0.02,+0.22]; built on old B3; lead re-scored via harness |
 | S8 | small MLP | codex | hurts | results/S8.json; 39.92 (-5.90 vs B3), blend over B4 +0.05; hit iteration cap; built on old B3; lead re-scored via harness |
+| TM_COMBINED | zhill-branch combined 20% rule + 80% mixer | teammates | helps | results/TM_COMBINED.json; BEST SINGLE MODEL: dev 54.14 [53.1,55.1], audit 55.37 [54.5,56.1] (+1.3 over our stack 54.09); stdlib, deterministic, entry already built; tuned on all validation so optimistic |
+| TM_MIXER | Pranav pair mixer | teammates | helps | results/TM_MIXER.json; dev 53.87 [52.8,54.9], +1.79 [+0.98,+2.63] vs our C2; audit 55.20; stdlib only; their win model (p0 share .45 vs our .54) is much better on drift (.096 vs .184) and shared_change |
+| TM_RULE | zhill rule model v4 | teammates | helps | results/TM_RULE.json; dev 52.89, +0.81 [-0.19,+1.76] vs C2; best stable (.057); audit 52.85 |
+| TM_E6 | Avyukth E6 signed-L1 logistic | teammates | neutral | results/TM_E6.json; dev 47.69, below B4; adds +0.22 [+0.02,+0.41] to C2 as a blend member (w .17); his E7 neural net not run (no torch locally); his blend claims 50.02 on a different 48-episode audit split |
 
-Counts: alive 10, baseline 5, helps 15, hurts 7, neutral 27
+Counts: alive 10, baseline 5, helps 18, hurts 7, neutral 28
