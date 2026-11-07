@@ -4,7 +4,7 @@ A running log of the requests (to Claude Code or any coding agent) that led to
 real score gains, and the ones that didn't. Use it to steer the next agent fast,
 especially in round two. Validation points are out of 60; the pooled baseline is 30.
 
-## Paste-ready prompt (rebuilds the 54.21 model from the starter kit)
+## Paste-ready prompt (rebuilds the 54.90 model from the starter kit)
 
 Copy everything inside the box into a fresh coding agent opened in the repo root.
 It describes the finished model exactly, so the agent doesn't have to rediscover it.
@@ -17,7 +17,7 @@ submission_contract.py), and the organizers' baseline in run_starter.py (it alwa
 scores ~30/60 because "pooled" IS the reference model; points = 60/(1+R)).
 Read AGENTS.md first and follow it: work on a feature branch, never commit to main.
 
-GOAL: build a forecaster that scores ~54.21/60 on validation, plus a verified entry ZIP.
+GOAL: build a forecaster that scores ~54.90/60 on validation, plus a verified entry ZIP.
 
 HARD CONSTRAINTS
 - Python standard library only. Deterministic, no randomness.
@@ -32,8 +32,11 @@ WHAT THE DATA ACTUALLY DOES (already established; don't re-research)
   MATCH or DIFFER (XNOR/XOR). On main-round train only three pairs matter:
   (1,3), (4,7), (2,5), each used by ~1/3 of machines. Cell win rates are 96-100% vs 2-4%.
 - Neighbour machines carry no lagged signal. "shared_change" = episode-wide level shifts.
-- Payout size given a win: two shapes per machine type; the exact size of the payouts
-  1 and 2 spins back helps (win/loss alone at those lags does not carry it).
+- Payout size given a win is EXACTLY one of two fixed mixes per machine type (a "small" and
+  a "big" mode), readable from validation/targets.csv (RULES.md: learn from training AND
+  validation). The mode switches spin to spin: for many machines it is set by whether the
+  spin 1, 2 or 4 back was a big win. Mode is NOT persistent (a machine's whole past size
+  record predicts it no better than a coin flip), and the win chance is continuous (no modes).
 - Tune at the QUERY CUTOFF tick (train/labels.csv), NOT on ticks inside history.csv;
   history ticks rank settings differently. Confirm on validation once.
 
@@ -48,12 +51,15 @@ BUILD mainFiles/slot_forecasting/pair_mixer.py with:
      half_life. If a lag is missing, the expert predicts base.
    - Mix win experts with exponential weights: log_w -= eta*(p - won)^2, eta = 16,
      uniform prior, NO Fixed-Share (alpha = 0; it hurt by +0.10-0.14 R).
-   - Size given win (4 classes): experts keyed on () machine-level, (1,), (1,2), (2,)
-     and (2,3). A size cell is the EXACT earlier payout class at those lags (0/1x/2x/5x/20x),
-     not just won/lost. Each keeps decayed counts per cell (size half-life 80), smoothed toward the
-     machine's own size mix with k_size = 16; the machine mix is smoothed toward a
-     per-machine-type prior with k_machine = 32. Mix size experts with
+   - Size given win (4 classes): experts keyed on () machine-level, (1,), (2,), (3,), (4,).
+     A size cell is the EXACT earlier payout class at that lag (0/1x/2x/5x/20x). Each keeps
+     decayed counts of the 4 sizes per cell (size half-life 80). TWO-MODE prediction: with
+     the type's (small, big) mixes, llr = sum_k count_k * log(big_k / small_k) (floor 1e-3),
+     P(big) = sigmoid(llr) (clip llr to +-50), cell forecast = (1-P)*small + P*big. An empty
+     cell uses the machine-level counts the same way. Mix size experts with
      log_w -= size_eta * squared error (size_eta = 8), only on winning ticks.
+     Fallback when no modes are available: keys (), (1,), (1,2), (2,), (2,3) with free
+     frequencies, smoothed toward the machine mix (k_size 16) and a type prior (k_machine 32).
    - Decay all tables every tick, including missing ticks (decay_missing = True).
    - Output [1 - pw] + [pw * s_k], floor each prob at 1e-4, renormalize.
 2. fit(): per machine_type size prior = counts of each winning payout size over train
@@ -62,43 +68,145 @@ BUILD mainFiles/slot_forecasting/pair_mixer.py with:
    4 cells best separate its win rate (weighted between-cell variance, need >= 20 obs);
    count winners. choose_pairs(): keep pairs with count >= 0.3 x the top count
    (fallback (1,3),(4,7),(2,5)).
-4. adapt(train_queries, train_history, labels): pairs = choose_pairs(train); build
-   "parity" and "full" models; pick the one with the lower 5-class Brier vs
+4. adapt(train_queries, train_history, labels, size_modes): pairs = choose_pairs(train);
+   build "parity" and "full" models; pick the one with the lower 5-class Brier vs
    train/labels.csv at the cutoff. Print the pairs and both Briers.
+5. size_modes_from_targets(targets, queries): per type, the true size-given-win vectors
+   p[1:]/(1-p[0]) (skip p_win < 0.05), rounded and merged within 0.02; return the two biggest
+   groups as (small = more 1x, big). Return {} unless each type shows exactly two clear modes.
 
 ALSO CREATE
-- mainFiles/entry_template/predict.py: loads train, calls adapt(), predicts --split
-  (default test), writes the CSV. Insert its own folder on sys.path first.
+- mainFiles/entry_template/predict.py: loads train, reads size modes from
+  <data>/validation/targets.csv (else from size_modes.json saved next to it), calls adapt(),
+  predicts --split (default test), writes the CSV. Insert its own folder on sys.path first.
   entry_template/reproduce.json:
   {"image": "python", "command": ["python", "predict.py", "--data", "/data", "--out", "/output/submission.csv"]}
 - mainFiles/run_pair_mixer.py --out runs/pair-mixer: adapt on train, write
   validation_predictions.csv and submission.csv, score validation with
   contest.score_contest_files (print per-condition table, R and points), copy
   __init__.py, schema.py, io.py, pair_mixer.py + predict.py + reproduce.json + a README
-  into entry/, zip it with submission_contract.package_code, then RE-RUN entry/predict.py
+  + size_modes.json into entry/, zip it with submission_contract.package_code, then RE-RUN entry/predict.py
   in a fresh process and fail if any probability differs by > 1e-8.
 - mainFiles/tests/test_pair_mixer.py (unittest): (a) mutating or deleting any rows at
   tick >= t never changes predictions at t; (b) walk emits before absorbing;
   (c) on synthetic data whose wins follow lags (2,6) with XNOR, adapt() finds (2,6)
-  and predicts confidently.
+  and predicts confidently; (d) size_modes_from_targets recovers two known mixes;
+  (e) with modes, size experts learn "big mode iff the spin 2 back paid 5x+" exactly.
 - Make sure mainFiles/runs/ is git-ignored.
 
 VERIFY (and report the actual output)
   cd mainFiles && python -m unittest discover -s tests
-  python run_pair_mixer.py --out runs/pair-mixer
-  python check_submission.py runs/pair-mixer/submission.csv
-  python check_submission.py runs/pair-mixer/validation_predictions.csv --split validation
-Expect validation ~54.21/60 (R ~0.107: stable ~0.083, short_history ~0.151,
-drift ~0.093, shared_change ~0.100). The reference build's test submission SHA-256 is
-068259d6be6d47b05c10eebdfebc7ecec1291fedb0615239e5ada54218b37b90. A rebuild will
+  python run_pair_mixer.py --out runs/combined-v2
+  python check_submission.py runs/combined-v2/submission.csv
+  python check_submission.py runs/combined-v2/validation_predictions.csv --split validation
+Expect validation ~54.90/60 (R ~0.093: stable ~0.073, short_history ~0.147,
+drift ~0.070, shared_change ~0.082). The reference build's test submission SHA-256 is
+1fbdda9bb494682ad49e03c814d92a7697ea7306b43fd740b9c39ca49a70b864. A rebuild will
 only match it byte for byte if the arithmetic order is identical, so treat the score
-as the check. Upload runs/pair-mixer/submission.csv and runs/pair-mixer/entry.zip.
+as the check. Upload runs/combined-v2/submission.csv and runs/combined-v2/entry.zip.
 ````
 
 The shortcut, if the branch `COMBINED_SOLUTIONS` is available, is to check it out and
-run the VERIFY commands. The prompt above is for rebuilding without it.
+run the VERIFY commands (current reference: 54.90). The prompt above is for rebuilding without it.
 
-## What changed on `COMBINED_SOLUTIONS` (53.75 -> 54.21)
+## What changed on `COMBINED_SOLUTIONS`, round 2 (54.21 -> 54.90)
+
+Source: a second team's handoff notes, `HOUSE_EDGE_EXPERIMENT_RESULTS.md` (E0-E11 plus a
+final E6+E7 blend; best 50.02 audit). Their best is below ours, so nothing was copied
+wholesale. Their *processes* were tested on our model instead, and one of them led to the gain.
+
+**Kept: payout size is a two-mode switch, and each size cell estimates which mode is on.**
+- Found by checking validation `targets.csv`: every true size-given-win vector is exactly one
+  of **two** mixes per machine type (e.g. steady: small `[.75 .20 .05 .00]`,
+  big `[.46 .44 .11 .00]`).
+- The mode is **not** a per-machine constant: a machine's whole past size record predicts it
+  no better than 50/50. It switches spin to spin; a per-machine rule search on train found
+  it is set by whether the spin **1, 2 or 4 back was a big win** for many machines.
+- Model change: `PairMixer(size_modes=...)`. Each size cell now holds one number, P(big
+  mode), computed by Bayes' rule from its decayed size counts, instead of 4 free
+  frequencies. Size keys are now `()`, `(1,)`, `(2,)`, `(3,)`, `(4,)` (lag 4 was missing).
+- Where the modes come from: `size_modes_from_targets()` reads them from the round's
+  `validation/targets.csv` at run time (RULES.md: "learn from the main training and
+  validation data"). The entry also saves a copy as `size_modes.json` as a fallback. Without
+  either, the model falls back to the old free-frequency size experts.
+- Verified: the unzipped entry gives a byte-identical CSV even with `targets.csv` deleted.
+
+| Condition | 53.75 | 54.21 | **54.90 (now)** | Their best (E6+E7, audit) |
+|---|---|---|---|---|
+| stable | 0.096 | 0.083 | **0.073** | 0.148 |
+| short_history | 0.151 | 0.151 | **0.147** | 0.235 |
+| drift | 0.104 | 0.093 | **0.070** | 0.212 |
+| shared_change | 0.114 | 0.100 | **0.082** | 0.203 |
+| **Points** | 53.75 | 54.21 | **54.90** | 50.02 |
+
+**More reliable testing (process change):** `tune_pair_mixer.py --val` now also prints the
+kit's **tuning / audit halves** of validation (48 episodes each; same split as their
+`episode_folds`). A change is kept only if the train-cutoff dR improves (95% interval below
+zero), validation improves, and **both halves** improve.
+
+Every idea tested this round (train cutoff dR, negative = better; validation; halves):
+
+| Idea (source) | Train dR [95% interval] | Validation (halves) | Kept? |
+|---|---|---|---|
+| Size prior by type + signal (their E5) | -0.0007 [-0.0013, -0.0002] | 54.21 (54.07 / 54.38) | no, too small |
+| Size memory doesn't fade on missing ticks | -0.0022 [-0.0046, +0.0002] | 54.22 | no, noise |
+| Short-history win calibration x0.8 / x1.2 / x1.5 (their E9) | +0.002 / +0.002 / +0.007 | 54.10 / 54.16 / 53.98 | no, already calibrated |
+| Pair x lag-8 experts (their "lag 7/8 alone") | +0.0037 | 54.16 | no |
+| Two-pair experts (pair x pair) | +0.0117 | 53.84 | no |
+| ...with a head start for simple rules (their prior_weight) | +0.0095 | 54.04 | no |
+| Episode-pooled memory choice (their E4) | worse on train | 53.68-53.90 | no, our fast/slow experts already do it |
+| Per-machine memory choice (their E2) | worse on train | 53.74-54.04 | no |
+| Size key lag 4 added (free frequencies) | -0.0058 [-0.013, +0.003] | 54.45 (54.15 / 54.80) | led to the next row |
+| **Two-mode size experts, lags 1,2,4** | -0.0192 [-0.040, +0.005] | 55.00 (54.55 / 55.53) | close; interval touches 0 |
+| **Two-mode size experts, lags 1,2,3,4** | **-0.0233 [-0.042, -0.001]** | **54.90 (54.44 / 55.43)** | **YES**: interval clear of 0 |
+| Two-mode, other strengths/memories (temp 0.7/1.3, size half-life 40/160, size_eta 4/16) | -0.016 to -0.021 | 54.82-55.04 | plateau: the gain is robust |
+| Two-mode, lags 1-5 / 1-8 | -0.019 / -0.010 | 54.92 / 54.59 | no gain |
+
+Rebuild and check it (from `mainFiles/`):
+```sh
+python run_pair_mixer.py --out runs/combined-v2
+python check_submission.py runs/combined-v2/validation_predictions.csv --split validation   # 54.90
+python check_submission.py runs/combined-v2/submission.csv   # SHA-256 1fbdda9b...
+```
+
+### Prompts used this round (paste these to repeat it)
+
+1. Compare with another solution:
+````text
+Read <path to the other team's notes>. Compare it with our model on branch
+COMBINED_SOLUTIONS (mainFiles/slot_forecasting/pair_mixer.py, validation <score>). Our model
+is better overall, so don't copy it: list each PROCESS or idea they used that we haven't
+(memory selection, shrinkage, priors, calibration, evaluation protocol) and test each one on
+our model with mainFiles/tune_pair_mixer.py '<json>' --val. Keep a change only if the
+train-cutoff dR interval is below zero AND validation AND both validation halves improve.
+````
+2. Find where the error is before building anything:
+````text
+Using validation targets.csv, break the remaining error down: win part vs size part per
+condition, and for the win part, queries whose true win chance is in the middle (0.15-0.85)
+vs near 0/1. Then check whether the true win chance and the true size mix take only a few
+distinct values per machine type.
+````
+3. Turn a discrete structure into a model:
+````text
+The true size-given-win mix is exactly one of two vectors per machine type. Check whether
+the mode is a persistent per-machine state (does the machine's past size record predict
+it?) or switches by a rule on earlier spins (search per machine on train history: which
+lag or lag pair, on won/lost or big/small, best explains the size of its wins). Then make
+the size experts predict P(big mode) per cell by Bayes' rule from the two known mixes,
+read the mixes from validation targets.csv at run time with a saved fallback, and test it.
+````
+4. Lock it in reliably:
+````text
+Check the settings around the best one (strength, memory, keys). If they all score about
+the same, pick the one whose train-cutoff interval clears zero, not the top validation
+number. Revert the model file and re-apply only the change that worked (no dead options).
+Rebuild, run the tests and check_submission.py, prove the unzipped entry reproduces the CSV
+exactly even if validation/targets.csv is missing, update docs/MODEL_PROMPTS.md,
+CHANGELOG.md and AGENTS.md section 12, then commit and push to the same branch.
+````
+
+## What changed on `COMBINED_SOLUTIONS`, round 1 (53.75 -> 54.21)
 
 Source: another team's write-up of their "rule model v4" (52.89 / 60). It scored worse than ours
 overall but better on **stable** (0.068 vs our 0.096). Every idea it had that our model didn't
@@ -168,10 +276,11 @@ run the tests and check_submission.py, and commit and push.
 | 5 | **"The pair's effect changes over time, so test it online: per-machine decayed win table per candidate pair, mixed by recent accuracy (Fixed-Share style)"** | Win-chance error vs outcomes 0.214 -> 0.121 on train | **50.29** |
 | 6 | **"Print the 4-cell win rates of each machine's best pair and look for a shape"** | Cells are HLLH or LHHL: the machine wins when the two lags *match* (or *differ*), 96-100% vs 2-4%. Experts switched to 2 cells (match/differ) | **52.92** |
 | 7 | **"Train and validation disagree on the best half-life; find out why before trusting either"** | Ticks *inside* the history prefer short memory (6), but the *cutoff tick* prefers longer (10-14), on train labels.csv and validation truth alike. Tune on train labels at the cutoff | **53.35** |
-| 8 | "Split the remaining error into win part vs size part per condition" | Now ~50/50. Payout size has exactly two shapes per machine type and the mode isn't predictable from history, so sizes are near their floor | (diagnosis) |
+| 8 | "Split the remaining error into win part vs size part per condition" | Now ~50/50. Payout size has exactly two shapes per machine type. (Concluded the mode wasn't predictable; row 12 shows it is, from lags 1-4) | (diagnosis) |
 | 9 | **"Build a tuning harness that scores on train labels at the cutoff, per condition, as an estimated change in R with an episode-bootstrap interval; keep a change only if it ALSO improves validation"** | Two memory lengths per pair (half-lives 12 and 40) | 53.56 |
 | 10 | **"Re-test ideas you rejected on history ticks, now at the cutoff"** | Payout-size experts keyed on lag 1 and lags (1,2), rejected earlier, actually help at cutoffs | **53.75** |
 | 11 | **"Compare with another team's write-up (rule model v4, 52.89) and test each idea it has that we don't"** | Their size rules look at earlier payout SIZE, ours only at win/loss. Keying size experts on the exact earlier payout, with lags (), 1, (1,2), 2, (2,3): train cutoff dR -0.0145 [-0.029,-0.001] | **54.21** |
+| 12 | **"Compare with a second team's experiment log; test their processes on our model; find where the error is; check if the truth takes few distinct values"** | Payout size is exactly one of two mixes per type, switched by whether the spin 1, 2 or 4 back was a big win. Size cells now estimate P(big mode) by Bayes' rule with the two mixes read from validation targets. Train cutoff dR -0.0233 [-0.042,-0.001]; both validation halves up | **54.90** |
 
 ## Prompt patterns that work
 
@@ -189,18 +298,26 @@ run the tests and check_submission.py, and commit and push.
   disagreement exposed that the query (cutoff) tick behaves differently from history ticks.
 - **Score where the test is.** Evaluate at the cutoff tick (train `labels.csv`), not on
   arbitrary history ticks.
+- **Check whether the truth is discrete.** Looking at the distinct true size vectors per type
+  showed exactly two, which turned a 4-number-per-cell estimate into 1 number per cell (row 12).
+- **Use both halves of validation.** A gain must show on the kit's tuning AND audit halves,
+  not just the total; pick from a plateau, not a single best point.
 - **Package the safe model before improving it.** Main entries can't be replaced after 9 PM.
 - **Say what can't change:** standard-library Python, no lookahead, missing tick ≠ 0,
   30-minute runtime, a test that proves no future data leaks in.
 
 ## Prompts that did NOT help much
 
+- From the second team's experiment log (round 2), NOT kept: size prior by type+signal,
+  short-history shrinkage/calibration, episode-pooled or per-machine memory selection,
+  pair x lag-8 and two-pair experts (with or without a head start). Details in the round 2 table.
 - From the other team's rule model, tested on train cutoffs + validation and NOT kept:
   single-lag experts (lag 7, lags 7+8, all 8: validation 53.65 / 53.59 / 53.36), a
   never-forget memory (half-life 1e9 or 200: dR +0.001), blending parity + 4-cell experts
   (53.44), size prior strength 80 (noise), lost/small/big size cells (dR +0.008, worse).
 
-- A 2-state hidden "size mode" tracker: no real gain. (Lag-keyed size tables looked useless
+- A 2-state hidden "size mode" tracker as a persistent per-machine state: no real gain,
+  because the mode isn't persistent; it follows earlier spins (row 12). (Lag-keyed size tables looked useless
   on history ticks but DID help at cutoffs; see row 10.)
 - Fixed-Share switching (alpha > 0) between pair experts: much worse (+0.10 to +0.14 in R).
   Machines don't switch pairs, so any weight left on a confidently wrong expert costs.
@@ -215,8 +332,10 @@ run the tests and check_submission.py, and commit and push.
 
 ## For round two (the relationships change)
 
-The entry already adapts: `predict.py` rediscovers the lag pairs on `/data/train`
-and picks match/differ vs 4-cell experts by train cutoff Brier. At 9 PM:
+The entry already adapts: `predict.py` rediscovers the lag pairs on `/data/train`,
+picks match/differ vs 4-cell experts by train cutoff Brier, and reads the two payout-size
+mixes per type from the round's `/data/validation/targets.csv` (it prints "two per type"
+or falls back to free frequencies if round two's sizes don't show two clear modes). At 9 PM:
 
 ```sh
 cd mainFiles
@@ -231,3 +350,5 @@ verified `runs/round2/entry.zip` plus `submission.csv`. Then prompt:
 - "Use tune_pair_mixer.py on round-two data to re-check half_life and the size experts;
   keep a change only if train cutoff dR and validation both improve."
 - "Split round-two validation error into win vs size part per condition before changing anything."
+- "Do the true size-given-win vectors in round-two validation still take exactly two values
+  per type? If not, how many? Which lags set the mode now (rerun the per-machine size-rule search)?"
