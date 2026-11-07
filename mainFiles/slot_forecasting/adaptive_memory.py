@@ -70,7 +70,7 @@ class AdaptiveMemorySelector:
             if isinstance(c, bool) or not isfinite(c) or c <= 0:
                 raise ValueError("Cs must contain only finite positive values")
         # Stable ordering resolves close ties toward no decay, then longer
-        # finite memory, and lower regularization strength.
+        # finite memory, and lower C (stronger regularization).
         ordered_half_lives = sorted(
             set(half_lives), key=lambda hl: (hl is not None, -(hl or 0))
         )
