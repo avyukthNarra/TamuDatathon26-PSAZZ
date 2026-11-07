@@ -47,7 +47,7 @@ Points are tuning /60 unless noted. The loss ratios are in `_coord/RESULTS.md`.
 |---|---|---|---|---|
 | E0 | kit | `pooled_recent` baseline | 31.06 (audit 30.57) | Reference |
 | E1 | Claude | Per-machine L2 logistic regression for P(win) on lag 1–8 win indicators + all 28 lag pairs, recency weighted | 35.41 (C=3), **36.22** (C=10) | ✅ Foundation. No pairs: 29.46 |
-| E2 | Codex | Per-machine memory/C chosen by prequential Brier (soft expert weights) | 36.22 vs 35.41 for E1 C=3 (95% CI +0.23 to +1.38) | ⚠️ Matches E1 at C=10; fair comparison pending. Draft PR #8 |
+| E2 | Codex | Per-machine memory/C chosen by prequential Brier (soft expert weights) | 36.22 vs 35.41 for E1 C=3 (95% CI +0.23 to +1.38) | ✅ Fair check done: at C=10, E2 scores **37.15** vs fixed E1 C=10 at 36.22 (+0.93, mostly stable/drift). Real but small next to E6/E7. A candidate for adding memory selection to E6 in round 2. Draft PR #8 |
 | E3 | Codex | Learn which lag pairs matter from train machines (top-K / sparse pairs) | 35.41 at best (= full pairs) | ❌ Negative. Draft PR #9 |
 | E4 (Codex) | Codex | Shared change-point (GLR) across episode, downweight before boundary | 36.06 | ❌ Weak (CI includes 0). Draft PR #10 |
 | E5 | Claude | Separate payout-shape head (type\|signal prior, strength 50) | **36.45** (audit 38.08) | ✅ Small gain. Payout-size inputs overfit: 34.51 |
