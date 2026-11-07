@@ -6,3 +6,11 @@ __pycache__/
 *.pyc
 .venv/
 .ipynb_checkpoints/
+
+# Model outputs: each run lives in mainFiles/runs/<name>/ and stays local
+mainFiles/runs/
+mainFiles/outputs/
+mainFiles/experiments/
+mainFiles/experiments-*/
+mainFiles/entry*.zip
+mainFiles/*-entry.zip

@@ -7,7 +7,7 @@ Copy this into your submission as `README.md`. Replace the bracketed fields with
 - Team ID: [team ID]
 - Round: [main or adaptation]
 - Season ID: [copy `season_id` from this round's `public/metadata.json`]
-- Forecast file: [path to your submitted CSV]
+- Forecast file: [path to your submitted CSV, for example `runs/<name>/submission.csv`]
 - Forecast SHA-256: [printed by `check_submission.py`]
 - Code version: [commit ID or archive/version name]
 - Environment: [`python` in `reproduce.json`; list any extra packages below]
