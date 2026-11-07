@@ -63,7 +63,9 @@ and put it in the PR. A new dependency or CI change needs the user's OK first (�
 | Stop and ask if the task needs > 2x the expected effort (§9) | Silently expand scope |
 
 ### D. Hand off and stop
-The **user reviews, approves, and merges**. You never merge, tag, or force-push. Report: branch,
+The **user reviews and approves** (their own approval is fine). You never push to `main`, tag, or
+force-push, and you merge only if they say "merge" in chat and the PR is approved with no conflicts
+(§2 Step 9). Report: branch,
 PR link, actual test output summary, changelog line, semver impact, the "what's missing" list from
 step B, and open questions. Then stop. Don't poll CI.
 
@@ -104,12 +106,12 @@ step B, and open questions. Then stop. Don't poll CI.
 
 ## 1. Golden rules (non-negotiable)
 
-1. **Never commit or push directly to `main`.** Every change lands through a PR/MR.
+1. **Never commit or push directly to `main`.** Every change lands through a PR/MR: branch, work, PR, approval, merge. **GitHub does not enforce this** (the repo is private on a free plan, so there is no branch protection), which makes it a rule you must follow yourself, not one the platform will stop you from breaking.
 2. **One branch = one feature/fix = one PR.** No drive-by unrelated changes.
 3. **`main` must always be demo-able.** If it is broken, fixing it beats everything else.
 4. **Every PR updates `CHANGELOG.md` → `## [Unreleased]`** (unless it is purely `chore`/`ci`/`docs` with no user-visible effect, and even then adding a line is welcome).
 5. **Commit messages are Conventional Commits with a useful body** (§5). The version number is *derived* from them. Never invent a version by hand.
-6. **Do not merge your own PR** unless the team has explicitly agreed to it for that PR (e.g. 10 minutes before demo freeze). Agents **never** merge.
+6. **A PR needs one approval before it merges.** The approver can be a teammate **or the human you are working for; approving their own PR is fine.** Agents never approve their own work, and never merge unless the human says so in chat (§2 Step 9).
 7. **No secrets in git**: tokens, `.env`, Databricks PATs, connection strings. Use `.env` (git-ignored) or the platform secret store.
 8. **No force-push to shared branches** (`main`, `release/*`, a branch with someone else's name on it). `--force-with-lease` on *your own* feature branch only.
 9. **Small PRs** (aim < 400 changed lines). Big feature? Split it, or put it behind a flag.
@@ -194,15 +196,22 @@ glab mr create --target-branch main --fill --title "feat: add Genie dashboard"
 - Link the issue (`Closes #12`).
 - Request a reviewer from the ownership table (§0).
 
-### Step 8: Wait (don't merge)
-- Wait for **CI green** and **≥ 1 approval** (or whatever §0 says).
-- **Agents:** after opening the PR, report the PR/MR link, CI status, and anything left for a human, then **stop**. Do not merge, do not keep polling for minutes. If asked to check later: `gh pr checks` / `gh pr view --comments` (or `glab mr view`).
+### Step 8: Wait for approval
+- Wait for **one approval** (a teammate's, or the human's own is fine) and **CI green** if CI exists.
+- **Agents:** after opening the PR, report the PR/MR link, CI status, and anything left for a human, then **stop**. Don't merge, and don't poll for minutes. If asked to check later: `gh pr checks` / `gh pr view --comments` (or `glab mr view`).
 - Address review comments with **new commits** (don't rewrite history mid-review), reply to each comment, re-request review.
 - If CI fails: read the log (`gh run view --log-failed`), fix on the same branch, push.
 
-### Step 9: Merge (human)
+### Step 9: Merge
+Merge only when **all** are true: approved, CI green (if any), and no conflicts
+(`gh pr view --json mergeable,reviewDecision`; `mergeable` must be `MERGEABLE`).
+- **Who:** the human merges. An agent merges only when the human says "merge" in chat for that PR, and
+  only after checking the conditions above. That chat OK covers that PR only.
+- **Conflicts:** never merge a PR that has them, and never "just resolve" them. Understand both
+  sides first (§3), then rebase or merge `main` into the branch, re-run tests, push, and get approval
+  again if the resolution changed more than `CHANGELOG.md`.
 - **Squash merge** (default) so `main` gets one Conventional Commit per PR.
-- Delete the branch after merge.
+- Delete the branch after merge (needs the human's OK for an agent, §4).
 - Everyone else: `git pull` on `main` and rebase their branches when convenient.
 
 ### Step 10: Release (release captain, §7)
@@ -210,6 +219,18 @@ glab mr create --target-branch main --fill --title "feat: add Genie dashboard"
 ---
 
 ## 3. Keeping in sync & resolving conflicts
+**Understand a conflict before you touch it.** Never blanket-accept "ours" or "theirs", never delete
+conflict markers to make it go away, and never resolve by guessing.
+1. See what happened on each side: `git log --oneline main..HEAD` for yours and
+   `git log --oneline HEAD..origin/main` for theirs, and `git show <sha>` / `gh pr view <n>` for the
+   intent behind the other change.
+2. Work out what each side was trying to do and whether both can hold. The resolution should keep both
+   intents unless they truly contradict.
+3. If they contradict, or you can't tell what the other side intended, **stop and ask** the human or the
+   other change's author. Don't pick a winner.
+4. After resolving, re-run lint and tests, read the final diff once, and say in the PR what the
+   conflict was and how you resolved it.
+
 - Rebase/merge `main` into your branch at least every couple of hours during a hackathon.
 - **`CHANGELOG.md` conflicts are expected**: resolve by **keeping both sides' lines** in the right subsection. Never drop someone else's entry.
 - Lockfile conflicts: take `main`'s version, then re-run the install command to regenerate.
@@ -222,8 +243,8 @@ glab mr create --target-branch main --fill --title "feat: add Genie dashboard"
 - Read this file before starting any task. Re-read §2 before pushing.
 - State the plan briefly, then act. Work on **one** feature branch per task.
 - **Allowed without asking:** creating a feature branch, committing to it, running tests/linters, pushing the feature branch, opening a PR/MR.
-- **Ask first:** merging anything, tagging/releasing, deleting branches, force-pushing, changing CI, adding a new dependency, touching another person's owned area, anything that costs money (cloud clusters, paid APIs), editing secrets/config.
-- **Never:** push to `main`, merge your own PR, commit secrets, disable tests or CI checks, rewrite published history, run destructive commands on shared data (`DROP TABLE`, `rm -rf`, `DELETE` without `WHERE`) without explicit approval.
+- **Ask first:** merging (only on the human's "merge" in chat, with approval and no conflicts, §2 Step 9), tagging/releasing, deleting branches, force-pushing, changing CI, adding a new dependency, touching another person's owned area, anything that costs money (cloud clusters, paid APIs), editing secrets/config.
+- **Never:** push to `main`, approve your own work, merge without the human's go-ahead, commit secrets, disable tests or CI checks, rewrite published history, run destructive commands on shared data (`DROP TABLE`, `rm -rf`, `DELETE` without `WHERE`) without explicit approval.
 - When done, report: branch name, PR link, test results (actual output summary), changelog line added, semver impact, open questions.
 - If the instructions here conflict with a direct request from a human teammate, follow the human, and suggest updating this file.
 
