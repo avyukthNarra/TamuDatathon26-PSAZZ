@@ -37,6 +37,9 @@ DEFAULT_SIZE_KEYS = ((), (1,), (1, 2), (2,), (2, 3))
 # 1-4: on main train the size mode is set by whether the spin 1, 2 or 4 back was a big win.
 # Train cutoff dR -0.023 [-0.042, -0.001]; validation 54.21 -> 54.90 (tuning/audit halves 54.44 / 55.43).
 MODE_SIZE_KEYS = ((), (1,), (2,), (3,), (4,))
+# With a win_prior (true win chances are U-shaped: most near a "dead" or a "live" level), the
+# expert weights learn best with eta 8. Validation 54.90 -> 55.34 (halves 55.03 / 55.71).
+WIN_PRIOR_ETA = 8.0
 MIN_PROBABILITY = 1e-4
 
 
@@ -46,7 +49,13 @@ class PairMixer:
     def __init__(self, pairs=DEFAULT_PAIRS, pair_prior=None, half_life=(12.0, 40.0), k_win=0.25, eta=16.0,
                  size_keys=None, size_half_life=80.0, k_size=16.0, k_machine=32.0,
                  size_eta=8.0, type_size_priors=None, rate_prior=(1.0, 2.0), cell_mode="parity",
-                 decay_missing=True, alpha=0.0, size_cell="class", size_modes=None, mode_temp=1.0):
+                 decay_missing=True, alpha=0.0, size_cell="class", size_modes=None, mode_temp=1.0, win_prior=None):
+        # win_prior: [(weight, mean, strength), ...] - a mixture of Beta priors for each win cell's
+        #   rate (e.g. a "dead" level near 0.03 and a "live" level near 0.93). A cell's estimate is
+        #   its posterior mean, pulled toward whichever level its counts favour, instead of toward
+        #   the machine's overall win rate. None = the k_win / base smoothing.
+        self.win_prior = [(float(w), float(m) * float(k), (1 - float(m)) * float(k))
+                          for w, m, k in win_prior] if win_prior else None
         # size_modes: {machine_type: (small_mix, big_mix)}, the two exact payout-size mixes
         #   (1x, 2x, 5x, 20x) a machine of that type switches between (size_modes_from_targets).
         #   Each size cell then holds one number, P(big mode), from its decayed size counts by
@@ -169,7 +178,7 @@ class PairMixer:
                 key = (agree,) if mode == "parity" else cell
                 w, n = win_tab[i].get(key, (0.0, 0.0))
                 win_keys.append(key)
-                win_preds.append((w + self.k_win * base) / (n + self.k_win))
+                win_preds.append(self._cell_rate(w, n) if self.win_prior else (w + self.k_win * base) / (n + self.k_win))
             size_cells = [cell_of(t, key, how) for key, how in zip(self.size_keys, self.size_cell)]
             size_preds = []
             for i, cell in enumerate(size_cells):
@@ -246,6 +255,17 @@ class PairMixer:
                 for i, cell in enumerate(size_cells):
                     if cell is not None:
                         size_tab[i].setdefault(cell, [0.0] * sizes)[value - 1] += 1.0
+
+    def _cell_rate(self, w, n):
+        """Posterior mean win rate of a cell with (decayed) w wins in n spins under the Beta-mixture prior."""
+        logs, means = [], []
+        for weight, a, b in self.win_prior:
+            logs.append(math.log(weight) + math.lgamma(a + w) + math.lgamma(b + n - w) - math.lgamma(a + b + n)
+                        - math.lgamma(a) - math.lgamma(b) + math.lgamma(a + b))
+            means.append((a + w) / (a + b + n))
+        top = max(logs)
+        post = [math.exp(v - top) for v in logs]
+        return math.fsum(p * m for p, m in zip(post, means)) / math.fsum(post)
 
     def predict(self, queries, history, baseline=None):
         query_map = unique_queries(queries)
@@ -355,6 +375,23 @@ def size_modes_from_targets(targets, queries):
     return modes
 
 
+def win_prior_from_targets(targets, strength=6.0):
+    """Beta-mixture prior for win cells, read from validation targets.csv.
+
+    True win chances are U-shaped: most sit near a "dead" level or a "live" level. Uses the median
+    true win chance below and above 0.5 as the two levels (main round: 0.044 and 0.898), each with
+    weight 0.45 and the given strength, plus a weak middle component (0.1, mean 0.5, strength 2).
+    Returns None if either side has too few targets to estimate a level.
+    """
+    wins = sorted(1.0 - t.probabilities[0] for t in targets)
+    dead = [w for w in wins if w < 0.5]
+    live = [w for w in wins if w >= 0.5]
+    if len(dead) < 20 or len(live) < 20:
+        return None
+    return [(0.45, round(dead[len(dead) // 2], 4), strength), (0.45, round(live[len(live) // 2], 4), strength),
+            (0.1, 0.5, 2.0)]
+
+
 def cutoff_brier(model, queries, history, labels):
     """Mean 5-class Brier vs labels.csv outcomes at each query's cutoff tick."""
     predictions = model.predict(queries, history)
@@ -362,15 +399,18 @@ def cutoff_brier(model, queries, history, labels):
                                for k, p in enumerate(predictions[q])) for q in labels) / len(labels)
 
 
-def adapt(queries, history, labels=None, log=print, size_modes=None):
+def adapt(queries, history, labels=None, log=print, size_modes=None, win_prior=None):
     """Round-two helper: rediscover the lag pairs and pick the cell mode on this round's train data.
 
     size_modes: from size_modes_from_targets on this round's validation targets, if available.
+    win_prior: from win_prior_from_targets on the same targets, if available.
     """
     pairs = choose_pairs(queries, history)
     log(f"lag pairs found on train: {pairs}")
     log(f"payout-size modes: {'two per type, from validation targets' if size_modes else 'none (free frequencies)'}")
-    candidates = [PairMixer(pairs=pairs, cell_mode=mode, size_modes=size_modes).fit(queries, history)
+    log(f"win-cell prior: {[tuple(c) for c in win_prior] if win_prior else 'none (smooth toward base rate)'}")
+    extra = {"win_prior": win_prior, "eta": WIN_PRIOR_ETA} if win_prior else {}
+    candidates = [PairMixer(pairs=pairs, cell_mode=mode, size_modes=size_modes, **extra).fit(queries, history)
                   for mode in ("parity", "full")]
     if labels is None:
         return candidates[0]

@@ -3,7 +3,7 @@ import random
 import unittest
 
 from slot_forecasting.pair_mixer import (CLASS_INDEX, PairMixer, adapt, choose_pairs, discover_pairs,
-                                         size_modes_from_targets)
+                                         size_modes_from_targets, win_prior_from_targets)
 from slot_forecasting.schema import PAYOUTS, Play, Query, Target
 
 MACHINES = ("e1-m0", "e1-m1", "e1-m2")
@@ -132,6 +132,20 @@ class PairMixerTest(unittest.TestCase):
         want = big if payouts[398] >= 5 else small
         size = [p / (1 - probs[0]) for p in probs[1:]]
         self.assertLess(max(abs(a - b) for a, b in zip(size, want)), 0.01)  # free frequencies: 0.033
+
+    def test_win_prior_levels_from_targets(self):
+        wins = [0.02, 0.03, 0.05] * 10 + [0.88, 0.9, 0.95] * 10
+        targets = [Target(f"q{i}", "e1", (1 - w, w, 0.0, 0.0, 0.0), 0) for i, w in enumerate(wins)]
+        prior = win_prior_from_targets(targets)
+        self.assertEqual([(c[0], c[1]) for c in prior[:2]], [(0.45, 0.03), (0.45, 0.9)])
+        self.assertIsNone(win_prior_from_targets(targets[:30]))  # no live side -> no prior
+
+    def test_win_prior_pulls_cells_to_the_nearest_level(self):
+        """A cell with 3 wins in 3 spins should read near the live level, not the 0.5-ish base rate."""
+        model = PairMixer(win_prior=[(0.45, 0.03, 6), (0.45, 0.93, 6), (0.1, 0.5, 2)])
+        self.assertGreater(model._cell_rate(3.0, 3.0), 0.85)
+        self.assertLess(model._cell_rate(0.0, 3.0), 0.1)
+        self.assertAlmostEqual(model._cell_rate(0.0, 0.0), 0.45 * 0.03 + 0.45 * 0.93 + 0.1 * 0.5, places=9)
 
     def test_adapts_to_new_lag_pairs(self):
         """Round two may use different pairs: rediscovery must find them and the mixer must use them."""

@@ -23,6 +23,7 @@ How to add an entry (every PR):
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 
 ### Changed
+- Pair mixer pulls each noisy win estimate toward the nearer typical level (dead ~0.04 / live ~0.90, read from validation targets); validation 54.90 -> 55.34 / 60
 - Pair mixer predicts payout size as a switch between two exact size mixes per machine type (read from validation targets), keyed on the last four spins; validation 54.21 -> 54.90 / 60
 - Pair mixer's payout-size experts now read the exact earlier payouts (lags 1, 2, (1,2), (2,3)); validation 53.75 -> 54.21 / 60
 - Model outputs go to `mainFiles/runs/<name>/`, which is git-ignored, so prediction files are no longer committed; run docs updated to match (#7)
