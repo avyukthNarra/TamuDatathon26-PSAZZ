@@ -1,5 +1,5 @@
 ---
-description: Team workflow: branches, tests, Conventional Commits, changelog, semver, PR/MR rules
+description: Team workflow: branches, tests, Conventional Commits, changelog, semver, PR rules
 globs:
 alwaysApply: true
 ---
@@ -18,6 +18,6 @@ Non-negotiables (details in AGENTS.md):
 - Tests: required for new logic, every bug fix (regression test), and data-pipeline changes (data checks). Run lint + tests before pushing. Never delete or weaken a test silently.
 - Add a user-facing line under `## [Unreleased]` in `CHANGELOG.md` (Keep a Changelog sections: Added / Changed / Deprecated / Removed / Fixed / Security).
 - Never choose a version number by hand; run `scripts/next-version.sh`.
-- Push the feature branch, open a PR/MR whose title is a Conventional Commit header, fill `.github/pull_request_template.md`, then report the link and stop.
+- Push the feature branch, open a PR whose title is a Conventional Commit header, fill `.github/pull_request_template.md`, then report the link and stop.
 - Never merge, tag, force-push, delete branches, add dependencies, or spend cloud money without explicit human approval.
 - Append new gotchas/decisions as dated lines to AGENTS.md §12 / §13.
