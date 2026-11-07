@@ -426,6 +426,7 @@ A task is done only when **all** are true:
 ## 12. Learnings & gotchas (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): what happened → what to do instead -->
 - YYYY-MM-DD (@handle): _example: the shared cluster restarts at 02:00; save work before then._
+- 2026-11-07 (@Saibot913): House Edge win model: lag 7 + pairs (1,3),(2,5),(4,7) at ridge lambda 0.05 beats the starter-style lambda 20 by ~5 points (B3 over-shrank), payout size depends on lags 1,2,4 instead; harness and all verdicts live in docs/sai (RESULTS.md, FINAL.md). Round two: rerun the lag and severity screens first.
 
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->

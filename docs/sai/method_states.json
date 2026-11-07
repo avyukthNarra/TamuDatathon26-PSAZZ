@@ -283,7 +283,7 @@
   "stack all helps members (episode-OOF)",
   "claude",
   "helps",
-  "stack over pw members (M9b_B4 .52, L7 .23, M2_B4 .12, L5 .08, S1 .04) and size-share members (C1 .77, A9 .20): dev OOF 52.32 [51.33,53.25], +1.43 vs B4, +0.23 [-0.02,+0.50] vs C2; audit not yet scored"
+  "FINAL: audit 54.09 [53.08,54.90], +1.83 [+1.18,+2.60] vs B4, +0.32 [-0.05,+0.67] vs C2; weights M9b_B4 .52 L7 .23 M2_B4 .12 L5 .08 S1 .04 / C1 .77 A9 .20; dev OOF 52.32"
  ],
  "P6": [
   "shrink ensemble toward the type prior",

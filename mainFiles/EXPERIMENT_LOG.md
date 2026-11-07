@@ -177,3 +177,9 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
 - Best cell is L5's coding (centred log1p at lag 7): 51.10, +0.21 [-0.03,+0.45] vs B4; composed with C1 shares 51.90, -0.18 vs C2.
 - Payout-level lags 1,2,4 (which drive severity in A9) carry NO win signal; every extra feature set hurt (47.6-50.6).
   Win lags {7, pairs} and size lags {1,2,4} are disjoint, which is why the two gains compose independently.
+
+### FINAL: W5 stack scored once on the reserved audit set (24 episodes)
+- Stack 54.09 [53.08,54.90]; B4 52.26 [50.95,53.35]; C2 53.77 [52.71,54.66]; B3 46.78 [45.21,48.52]. Stack vs B4 +1.83 [+1.18,+2.60];
+  stack vs C2 +0.32 [-0.05,+0.67]. Dev OOF stack 52.32. Gains hold on episodes no choice was made on (audit is somewhat easier than dev).
+- Winner = stack, but C2 (M9b win memory + C1 sizes, no fitted stacking weights) is within noise of it and simpler.
+- Not done: Codex rebase onto B4 (S1_B4, S2_B4, S5_B4), stdlib port (dropped by request). See docs/sai/FINAL.md.
