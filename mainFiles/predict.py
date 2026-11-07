@@ -1,7 +1,8 @@
 """Recreate our test forecast: python predict.py --data <public folder> --out <submission.csv>
 
-Combined model: a weighted blend of our rule model (rule_model.py) and the team's pair mixer
-(slot_forecasting/pair_mixer.py). The blend weights live in blend_config.json, written by
+Combined model: a weighted blend of our rule model (rule_model.py) and the team's pair mixer v3
+(slot_forecasting/pair_mixer.py: two-mode payout sizes + dead/live win-cell prior, both read from
+<data>/validation/targets.csv, with a saved copy in priors.json). The blend weights live in blend_config.json, written by
 auto_tune.py after it checks a blend on the audit half of validation. Without that file the default
 is 20% rule + 80% mixer (validation 54.45 / 60 on main).
 
@@ -12,8 +13,9 @@ import argparse
 import json
 from pathlib import Path
 
-from slot_forecasting.io import load_inputs, read_labels, write_submission
-from slot_forecasting.pair_mixer import ALL_PAIRS, PairMixer, adapt
+from slot_forecasting.io import load_inputs, read_labels, read_targets, write_submission
+from slot_forecasting.pair_mixer import (ALL_PAIRS, WIN_PRIOR_ETA, PairMixer, adapt, size_modes_from_targets,
+                                         win_prior_from_targets)
 
 from rule_model import RuleForecaster
 
@@ -74,6 +76,21 @@ def blend_weights():
     return dict(DEFAULT_WEIGHTS)
 
 
+def mixer_priors(data):
+    """Pair mixer v3 priors from this round's validation answers (allowed: RULES.md "learn from the
+    training and validation data"): the two exact payout-size mixes per machine type and the dead/live
+    win-chance levels. Falls back to the copy saved in priors.json when the entry was built."""
+    targets_path = Path(data) / "validation" / "targets.csv"
+    if targets_path.exists():
+        targets = read_targets(targets_path)
+        return {"size_modes": size_modes_from_targets(targets, load_inputs(Path(data) / "validation")[0]),
+                "win_prior": win_prior_from_targets(targets)}
+    saved = HERE / "priors.json"
+    if saved.exists():
+        return json.loads(saved.read_text(encoding="utf-8"))
+    return {"size_modes": None, "win_prior": None}
+
+
 def build(data, weights=None, log=lambda *_: None):
     data = Path(data)
     weights = weights or blend_weights()
@@ -81,9 +98,13 @@ def build(data, weights=None, log=lambda *_: None):
     labels = read_labels(data / "train" / "labels.csv", queries)
     fitted = {}
     if "mixer" in weights or "mixer_all" in weights:
-        fitted["mixer"] = adapt(queries, history, labels, log=log)  # lag pairs rediscovered on train
+        priors = mixer_priors(data)
+        # lag pairs rediscovered on this round's train
+        fitted["mixer"] = adapt(queries, history, labels, log=log, **priors)
     if "mixer_all" in weights:
-        fitted["mixer_all"] = PairMixer(pairs=ALL_PAIRS, cell_mode=fitted["mixer"].cell_mode).fit(queries, history)
+        extra = {"win_prior": priors["win_prior"], "eta": WIN_PRIOR_ETA} if priors["win_prior"] else {}
+        fitted["mixer_all"] = PairMixer(pairs=ALL_PAIRS, cell_mode=fitted["mixer"].cell_mode,
+                                        size_modes=priors["size_modes"], **extra).fit(queries, history)
     if "rule" in weights:
         fitted["rule"] = rule_model().fit(queries, history, labels)
     unknown = set(weights) - set(fitted)

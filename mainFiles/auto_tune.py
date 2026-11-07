@@ -6,7 +6,7 @@
 What it does:
   1. Fits every candidate model on <data>/train:
        rule       our rule model (all 37 lag rules, rules + payout-size rules)
-       mixer      team pair mixer, lag pairs rediscovered on this round's train
+       mixer      team pair mixer v3 (pairs rediscovered on train; size modes + win prior from validation)
        mixer_all  pair mixer over all 28 lag pairs (safer if round two spreads rules out)
   2. Predicts <data>/validation with each, and scores every blend on a 0.1 grid.
   3. Picks the blend with the best score on the TUNE half of validation episodes, then checks it on
@@ -29,7 +29,7 @@ from pathlib import Path
 from slot_forecasting.contest import contest_score
 from slot_forecasting.experiments import episode_folds
 from slot_forecasting.io import load_inputs, read_labels, read_rows, read_submission, read_targets, write_json
-from slot_forecasting.pair_mixer import ALL_PAIRS, PairMixer, adapt
+from slot_forecasting.pair_mixer import ALL_PAIRS, WIN_PRIOR_ETA, PairMixer, adapt
 from slot_forecasting.rounds import VERSION, round_metadata
 from slot_forecasting.schema import CONDITIONS
 
@@ -37,13 +37,18 @@ import predict
 
 HERE = Path(__file__).resolve().parent
 CONFIG = HERE / "blend_config.json"
+DATA = None  # set in main()
 
 
 def candidates(queries, history, labels, log):
     """Name -> fitted model. Each must have predict(queries, history)."""
+    data = DATA
+    priors = predict.mixer_priors(data)
     rules = predict.rule_model().fit(queries, history, labels)
-    mixer = adapt(queries, history, labels, log=log)
-    mixer_all = PairMixer(pairs=ALL_PAIRS, cell_mode=mixer.cell_mode).fit(queries, history)
+    mixer = adapt(queries, history, labels, log=log, **priors)
+    extra = {"win_prior": priors["win_prior"], "eta": WIN_PRIOR_ETA} if priors["win_prior"] else {}
+    mixer_all = PairMixer(pairs=ALL_PAIRS, cell_mode=mixer.cell_mode, size_modes=priors["size_modes"],
+                          **extra).fit(queries, history)
     return {"rule": rules, "mixer": mixer, "mixer_all": mixer_all}
 
 
@@ -72,6 +77,8 @@ def main():
     if out.exists():
         raise SystemExit(f"{out} already exists; pick a new --out so earlier attempts are kept.")
     out.mkdir(parents=True)
+    global DATA
+    DATA = data
     meta = round_metadata(data)
     log = lambda *a: print(*a, flush=True)
     log(f"round={meta['round']} season={meta['season_id']} max_points={meta['max_points']}")

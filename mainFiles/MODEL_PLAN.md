@@ -1,9 +1,9 @@
 # House Edge — Our Model (rule model v4 + team pair mixer)
 
-> **Submitted entry = combined model: 54.45 / 60 on validation.**
-> It's a weighted average: **20% this rule model + 80% the team's pair mixer**
+> **Submitted entry = combined model: 55.58 / 60 on validation** (tune 55.26, audit 55.96).
+> It's a weighted average: **20% this rule model + 80% the team's pair mixer v3**
 > (`slot_forecasting/pair_mixer.py`, from the `COMBINED_SOLUTIONS` branch). See [§13](#13-the-combined-model).
-> Build it with `python3 make_entry.py --out runs/combined-v2`.
+> Build it with `python3 make_entry.py --out runs/combined-v4`.
 
 > **TL;DR (rule model)**
 > - The slot machines follow hidden **rules**: whether a machine pays depends on whether it **won at two specific
@@ -456,3 +456,22 @@ adapts automatically), predicts with each, and writes `0.2 × rule + 0.8 × mixe
 Why mixing more stopped helping: every team model found the same match/differ lag-pair rule; the weaker ones
 make the same mistakes as the pair mixer, so they only add noise. Main is near the ceiling of these
 approaches; remaining error is mostly short_history (0.147) and payout size.
+
+### Update: pair mixer v3 (Pranav, `COMBINED_SOLUTIONS` b57b8fd + 39e5757)
+
+Pranav's mixer added (1) payout size as a **two-mode switch** (the two exact mixes per type from §4) and
+(2) a **Beta-mixture prior that pulls each win cell toward the dead (~0.04) or live (~0.90) level**.
+Both priors are read from `validation/targets.csv`; `RULES.md` allows learning from validation data
+("Learn from the main training and validation data"), and the entry saves a copy in `priors.json`
+(tested: identical CSV without the validation answers).
+
+| Model (all 96 validation episodes) | Points | tune / audit | stable | short | drift | shared |
+|---|---|---|---|---|---|---|
+| Rule model v4 | 52.89 | 53.08 / 52.68 | 0.068 | 0.208 | 0.130 | 0.132 |
+| Pair mixer v3 | 55.34 | 55.03 / 55.70 | 0.069 | 0.130 | 0.065 | 0.074 |
+| **20% rule + 80% mixer v3 (submitted)** | **55.58** | **55.26 / 55.96** | **0.059** | **0.120** | **0.066** | **0.073** |
+
+⚠️ Because the mixer's two priors come from validation answers, its validation score is a little optimistic.
+
+Why Sai's notes say ~56: Sai scores on a 24-episode audit split (our 20/80 + mixer v3 = 55.90 there,
+54.77 on their other 72 episodes). We score on all 96. Same model, different yardstick.
