@@ -1,3 +1,34 @@
+# Top 10 ways to combine the team's models
+
+## Read this first (plain English)
+
+- **The 55.90 run is reproducible.** Re-running `mainFiles/combo/predict.py` from source matches the saved forecast to 2e-16 (dev 54.77), so its audit score is unchanged at 55.90.
+- **All ten top combinations are the same idea:** about **20-26% zhill's rule model + 74-76% Pranav's mixer v4**, sometimes with a 4-8% pinch of our C1/C2. They score dev 55.31-55.36 and audit 56.21-56.31, vs 54.77 / 55.90 for the old run. Their differences from each other are noise.
+- **What changed is mixer v4,** whose dead/live win prior fixes short-history machines (short-history error ratio .149 -> .121). Swapping v3 for v4 in the 55.90 recipe gives +0.57 dev [+0.21, +1.02].
+- **Simplest entry to ship: COMBO 7 or plain 20/80** (rule + mixer v4). Both are standard-library only. COMBO 7's 24/76 weight is a tie with 20/80 (zhill's dev-only autotune also kept 20/80).
+- **The validation-target "hardcode" is not inflating these scores.** v3/v4 read the size modes and win levels from public validation answers (allowed by RULES.md; the code re-reads them every round). Fitting them on half the episodes and scoring the other half gives 55.35 vs 55.34 in-sample (`combos/crossfit_priors.py`).
+- **Our own models add nothing on top of v4** (C1/C2 ≤ +0.03, CI includes 0). Neither does anything in "Improvement attempts" below.
+
+## Improvement attempts on the weak spots (dev only, all vs reference with paired CI)
+
+Diagnosis of the 55.90 run: short_history (64 observed spins) has ratio .149, about double the other conditions (halving it is worth ~+0.95 points); jackpot machines have error/base .149 vs ~.08 elsewhere, 69% of it win probability; win-probability tails are slightly off.
+
+| Attempt | Who | Base | Result |
+|---|---|---|---|
+| Win-prob logit recalibration (global / per type / per type x short) | Haiku | v3 combo | -0.13 to +0.04, noise |
+| Blend weights gated on machine type and short-vs-long history (7 members) | Haiku | v3 combo | +0.52, but only because mixer v4 is a member; = COMBINED4 |
+| Shrink short-history forecasts to a type prior | Haiku | v3 combo | -0.01 |
+| Train-learned lag-pair prior (M1) | Codex | v3 / v4 | +0.06 / +0.05, noise on v4 |
+| Type-level shrinkage of win cells (M2) | Codex | v3 / v4 | +0.23 / +0.00 |
+| Pool evidence across episode peers (M3) | Codex | v3 / v4 | +0.20 / +0.00 (train check: peers share changepoints, not rules) |
+| Train-only jackpot win prior (M4) | Codex | v3 / v4 | +0.23 on v3; on v4 only as a jackpot-only swap: +0.12 [-0.07, +0.36] |
+| M1+M2+M4 together (M5) | Codex | v3 / v4 | +0.34 / +0.05 |
+| Add our C1, C2, M9b, S5 or Avyukth's E67 to COMBINED4 | Claude | v4 combo | ≤ +0.03, CI includes 0 |
+
+Mixer v4 already captures what these fixes were aiming at. The one lead left is the train-only jackpot prior swap (+0.12, not CI-clear), which would make the jackpot part of v4 independent of validation answers. Code and per-run numbers: `improve/gated.py`, `improve/model/`, `preds/IMP_*`.
+
+## Full search results
+
 The best dev result is COMBO 1 at 55.359 [54.548, 56.105] points out of 60, a paired +0.585 [+0.251, +0.996] against the previous 20% rule + 80% mixer-v3 entry (54.774 dev / 55.90 audit). All ten listed combinations fall in the best model's noise band; their numerical order does not establish a winner. COMBO 7 is the cheaper stdlib linear alternative (24.05% Rule, 75.95% Mixer4). The main change is mixer v4's win prior, which itself reads all validation targets. These are useful public-validation comparisons, not blind evidence of generalisation. The 660-structure search includes every teammate's available member; audit was opened once after freezing this ranking and all weights.
 
 | Rank | Name | Members + full-dev weights | Family | Dev OOF [95% CI] | Δ vs previous entry, dev [paired CI] | Audit [95% CI] | Stdlib? |
