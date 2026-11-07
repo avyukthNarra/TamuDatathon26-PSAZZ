@@ -1,0 +1,40 @@
+{
+ "id": "Q2",
+ "owner": "claude",
+ "description": "Q2 volatility-linked grid filter (Q2a) as member of TM_COMBINED3",
+ "params": {
+  "model": "grid log-odds filter, 121 pts on [-6,6], prior N(type logit,2^2), sigma=exp(c0+c1*z)",
+  "c0": -2.5,
+  "c1": -0.5,
+  "pair": null,
+  "z": "standardised EWMA(hl16) var of win flag",
+  "w_step": 0.05,
+  "member_with": "TM_COMBINED3"
+ },
+ "scope": "dev",
+ "points": 54.77398565347036,
+ "ci95": [
+  53.695027143501555,
+  55.70654247586954
+ ],
+ "condition_ratios": {
+  "stable": 0.06556259302236582,
+  "short_history": 0.14885998143040835,
+  "drift": 0.07603375601643553,
+  "shared_change": 0.09118574170660068
+ },
+ "R": 0.09541051804395259,
+ "class_error_shares": {
+  "p_0": 0.5220787669068069,
+  "p_1": 0.24020390432454716,
+  "p_2": 0.1728121600319445,
+  "p_5": 0.059469274116486906,
+  "p_20": 0.005435894620214574
+ },
+ "runtime_seconds": 133.34797310829163,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": 0.0,
+ "python": "3.13.3",
+ "n_episodes": 72
+}

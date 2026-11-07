@@ -222,3 +222,7 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
 - 1681 pw-set x shares-set structures (each 1-3 members), 6-fold dev OOF: best 54.91, +0.13 [-0.00,+0.30] over BEST (54.77); the top structures are within 0.002 of each other.
   win = TM_COMBINED3 + TM_E7 + M9b_B4, shares = TM_MIXER3 + C1 + C2. Searching 1681 structures inflates it, same as K1's nested check (held-out gain ~0).
 - No observable gate (observed-tick fraction, cutoff, machine type) beats its ungated pair by more than 0.1; some gate fits go unstable.
+
+### Q2 volatility-linked random-walk filter and lag-pair-cell filters (Haiku worker report reviewed)
+- Standalone 31-36 dev, member weight 0.00 in all 6 OOF folds for every candidate (loss rises monotonically with w), filter pw correlates 0.53 with BEST pw. Verdict hurts/no value.
+- Overall: random walk (geometric Brownian motion) on log-odds, volatility-linked noise, gated and neural blends and a 1681-structure search all fail to beat the best model by more than noise.

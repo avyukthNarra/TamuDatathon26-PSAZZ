@@ -6,6 +6,11 @@
 > (20% zhill rule model + 80% Pranav pair mixer): 55.37 [54.5,56.1] on our 24 audit episodes (dev 54.14), above our stack's 54.09.**
 > It is stdlib-only, deterministic and already packaged. Our stack adds only +0.15 (CI -0.05,+0.34) to it on dev. The sections below describe OUR models.
 
+> **UPDATE 4 (more blending, volatility, geometric-motion, extensive combination search):** K1 (324 compositions, 154 blends, nested check), K2 (1681 two-stage structures, gates),
+> V1-V3 (volatility), G1-G3 (gated/per-class/MLP blends), Q1-Q3 (random walk on log-odds, volatility-linked, pair-cell) all end within +0.0..+0.25 dev points of the best model
+> (20% rule + 80% mixer v3, dev 54.77, audit 55.90), and nested checks put the held-out gain of the searched combos at about +0.007. That model is saturated under blending of the available members.
+> The only combination worth considering is 15% of our C2 (+0.08, CI includes 0). Real gains now need a better win-probability component (the largest remaining error, p0 share .52).
+>
 > **UPDATE 3 (latest teammate push): Pranav's commit 6a8098c adds a two-mode payout-size model. The 20% rule + 80% mixer-v3 blend scores dev 54.77 [53.7,55.7] and
 > audit 55.90 [55.1,56.6] through our harness: the best model found. Our C2 adds +0.07 (CI includes 0) to it. Details: `TEAM_COMPARISON.md`.
 >
@@ -57,6 +62,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | Q3 | sai-worker | 54.95 | 53.93-55.84 | 0.068 | 0.144 | 0.067 | 0.088 | 4 | None |
 | K2 | claude | 54.91 | 53.97-55.78 | 0.067 | 0.135 | 0.080 | 0.089 | 45 | None |
 | K1 | sai-worker | 54.85 | 53.85-55.74 | 0.064 | 0.140 | 0.081 | 0.090 | 0 | None |
+| Q2 | claude | 54.77 | 53.70-55.71 | 0.066 | 0.149 | 0.076 | 0.091 | 133 | 0.0 |
 | TM_COMBINED3 | teammates | 54.77 | 53.74-55.71 | 0.066 | 0.149 | 0.076 | 0.091 | 0 | None |
 | TM_MIXER3 | teammates | 54.59 | 53.52-55.58 | 0.079 | 0.152 | 0.073 | 0.092 | 0 | None |
 | G3 | claude | 54.37 | 53.42-55.25 | 0.076 | 0.141 | 0.096 | 0.101 | 4 | None |
@@ -198,6 +204,7 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | P6 | shrink ensemble toward the type prior | claude | alive | - |
 | P7 | clip bounds | claude | alive | - |
 | Q1 | GBM/log-odds local-level filter per machine (grid filter, random walk on log-odds) | claude | hurts | results/Q1.json; standalone 31.51 dev, ~23 below BEST: win flags carry almost no slow level-drift signal; win probability follows lag-pair parity, which a local-level filter cannot represent; train log-lik nearly flat across sigma |
+| Q2 | volatility-linked sigma + lag-pair-cell log-odds filters | claude | hurts | results/Q2.json; standalone 31-36 dev (cell filters 34-36), no skill; as a member of BEST OOF weight 0.00 in all 6 folds for every candidate (loss rises monotonically in w); filter pw correlates 0.53 with BEST pw; sigma=exp(-2.5-0.5z) learned on train |
 | Q3 | Q1 as a win-probability member of BEST (logit blend) | claude | neutral | results/Q3.json; 54.95, +0.18 [-0.00,+0.35] vs BEST; fitted coefficient is NEGATIVE (-0.146): BEST slightly over-shrinks toward the slow level; noise-level; vol-gated shrink never opens (as V3); 9 cells |
 | S1 | GB / HistGB second stage on B3 output + features | codex | alive | results/S1.json; 46.59 (+0.77 vs B3) but blend over B4 +0.06 [-0.07,+0.19]; rebase pending (S1_B4); built on old B3; lead re-scored via harness |
 | S2 | CatBoost / LightGBM | codex | alive | results/S2.json; CatBoost/LightGBM residual on B3: 46.77 (+0.94 vs B3, best learner) but blend over B4 +0.01 [-0.07,+0.09]; stable fixed (.115); rebase pending; built on old B3; lead re-scored via harness |
@@ -219,4 +226,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | V2 | softmax-linear vol/history gate | claude | neutral | results/V2.json; dev 54.27-54.30, +0.13..+0.16 [-0.05,+0.34]; same conclusion, 20-36 params |
 | V3 | vol-scaled shrinkage of p_win toward longer memory | claude | neutral | results/V3.json; dev 54.13, 0.00 [-0.10,+0.06]; optimiser never shrinks: TM_COMBINED p_win is already calibrated w.r.t. volatility |
 
-Counts: alive 10, baseline 5, helps 20, hurts 8, neutral 39
+Counts: alive 10, baseline 5, helps 20, hurts 9, neutral 39

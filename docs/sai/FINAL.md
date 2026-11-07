@@ -4,6 +4,11 @@
 > (20% zhill rule model + 80% Pranav pair mixer): 55.37 [54.5,56.1] on our 24 audit episodes (dev 54.14), above our stack's 54.09.**
 > It is stdlib-only, deterministic and already packaged. Our stack adds only +0.15 (CI -0.05,+0.34) to it on dev. The sections below describe OUR models.
 
+> **UPDATE 4 (more blending, volatility, geometric-motion, extensive combination search):** K1 (324 compositions, 154 blends, nested check), K2 (1681 two-stage structures, gates),
+> V1-V3 (volatility), G1-G3 (gated/per-class/MLP blends), Q1-Q3 (random walk on log-odds, volatility-linked, pair-cell) all end within +0.0..+0.25 dev points of the best model
+> (20% rule + 80% mixer v3, dev 54.77, audit 55.90), and nested checks put the held-out gain of the searched combos at about +0.007. That model is saturated under blending of the available members.
+> The only combination worth considering is 15% of our C2 (+0.08, CI includes 0). Real gains now need a better win-probability component (the largest remaining error, p0 share .52).
+>
 > **UPDATE 3 (latest teammate push): Pranav's commit 6a8098c adds a two-mode payout-size model. The 20% rule + 80% mixer-v3 blend scores dev 54.77 [53.7,55.7] and
 > audit 55.90 [55.1,56.6] through our harness: the best model found. Our C2 adds +0.07 (CI includes 0) to it. Details: `TEAM_COMPARISON.md`.
 >

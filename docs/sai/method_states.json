@@ -479,5 +479,11 @@
   "claude",
   "neutral",
   "best 54.91, +0.13 [-0.00,+0.30] vs BEST: win = TM_COMBINED3+TM_E7+M9b_B4, shares = TM_MIXER3+C1+C2; top structures within 0.002 of each other; no gate (obs-fraction, cutoff, type) beats its ungated pair by >0.1; searching 1681 structures inflates this"
+ ],
+ "Q2": [
+  "volatility-linked sigma + lag-pair-cell log-odds filters",
+  "claude",
+  "hurts",
+  "standalone 31-36 dev (cell filters 34-36), no skill; as a member of BEST OOF weight 0.00 in all 6 folds for every candidate (loss rises monotonically in w); filter pw correlates 0.53 with BEST pw; sigma=exp(-2.5-0.5z) learned on train"
  ]
 }
