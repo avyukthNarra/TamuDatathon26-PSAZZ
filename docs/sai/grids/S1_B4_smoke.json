@@ -1,0 +1,52 @@
+[
+ {
+  "params": {
+   "family": "hist",
+   "iterations": 20,
+   "leaves": 7,
+   "l2": 10
+  },
+  "strength": 0,
+  "points": 50.14035692715878
+ },
+ {
+  "params": {
+   "family": "hist",
+   "iterations": 20,
+   "leaves": 7,
+   "l2": 10
+  },
+  "strength": 0.1,
+  "points": 50.209025290219785
+ },
+ {
+  "params": {
+   "family": "hist",
+   "iterations": 20,
+   "leaves": 7,
+   "l2": 10
+  },
+  "strength": 0.25,
+  "points": 50.1575612809792
+ },
+ {
+  "params": {
+   "family": "hist",
+   "iterations": 20,
+   "leaves": 7,
+   "l2": 10
+  },
+  "strength": 0.5,
+  "points": 49.64686641333249
+ },
+ {
+  "params": {
+   "family": "hist",
+   "iterations": 20,
+   "leaves": 7,
+   "l2": 10
+  },
+  "strength": 1,
+  "points": 47.30886395966401
+ }
+]
