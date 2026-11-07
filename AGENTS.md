@@ -89,7 +89,7 @@ step B, and open questions. Then stop. Don't poll CI.
 | Install | `TODO` (e.g. `pip install -r requirements.txt`) |
 | Run locally | `TODO` |
 | Lint / format | `TODO` (e.g. `ruff check . && ruff format .`) |
-| Tests | `TODO` (e.g. `pytest -q`) |
+| Tests | `cd mainFiles && python -m unittest discover -s tests` (standard library, no install) |
 | CI | `TODO` (e.g. GitHub Actions: lint + tests on every PR) |
 
 ### Team & ownership
@@ -167,7 +167,7 @@ git checkout -b sai/fix-null-dates
 Then run the **full** local check:
 ```bash
 # replace with the real commands from §0 (still TODO until kickoff: say how you verified instead)
-TODO_LINT && TODO_TEST
+TODO_LINT && (cd mainFiles && python -m unittest discover -s tests)
 ```
 If something fails, fix it. **Never** skip, delete, or weaken a test to make it pass without saying so explicitly in the PR.
 
@@ -426,6 +426,7 @@ A task is done only when **all** are true:
 ## 12. Learnings & gotchas (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): what happened → what to do instead -->
 - YYYY-MM-DD (@handle): _example: the shared cluster restarts at 02:00; save work before then._
+- 2026-11-07 (@pkhanna29): in train history, a machine's own payout 7 ticks back shifts its win chance by ~0.17 on average (sd ~0.2 across machines); lags 1-6 and 8 are ~0.01-0.08, and neighbour-machine lagged effects are indistinguishable from noise → model per-machine lag-7 response; "shared change" is episode-wide level shifts, not one machine driving another.
 
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->
