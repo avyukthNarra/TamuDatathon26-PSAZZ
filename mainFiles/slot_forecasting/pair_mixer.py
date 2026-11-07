@@ -407,7 +407,7 @@ def adapt(queries, history, labels=None, log=print, size_modes=None, win_prior=N
     """
     pairs = choose_pairs(queries, history)
     log(f"lag pairs found on train: {pairs}")
-    log(f"payout-size modes: {'two per type, from validation targets' if size_modes else 'none (free frequencies)'}")
+    log(f"payout-size modes: {'two per type, supplied priors' if size_modes else 'none (free frequencies)'}")
     log(f"win-cell prior: {[tuple(c) for c in win_prior] if win_prior else 'none (smooth toward base rate)'}")
     extra = {"win_prior": win_prior, "eta": WIN_PRIOR_ETA} if win_prior else {}
     candidates = [PairMixer(pairs=pairs, cell_mode=mode, size_modes=size_modes, **extra).fit(queries, history)

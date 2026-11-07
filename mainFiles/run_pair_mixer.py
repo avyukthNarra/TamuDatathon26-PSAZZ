@@ -19,17 +19,20 @@ from time import perf_counter
 
 from slot_forecasting.contest import score_contest_files
 from slot_forecasting.io import load_inputs, read_labels, read_submission, read_targets, write_json, write_submission
-from slot_forecasting.pair_mixer import adapt, size_modes_from_targets, win_prior_from_targets
+from r0_model import make_model
+from slot_forecasting.pair_mixer import size_modes_from_targets, win_prior_from_targets
 from slot_forecasting.rounds import VERSION, round_metadata
 from slot_forecasting.starter import public_directory
 from slot_forecasting.submission_contract import package_code
 
 HERE = Path(__file__).resolve().parent
-MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py")
+MODULES = ("__init__.py", "schema.py", "io.py", "baseline.py", "pair_mixer.py")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", default=str(HERE / "public"))
 parser.add_argument("--out", default="runs/pair-mixer")
+parser.add_argument("--prior-source", choices=("train", "validation"), default="train",
+                    help="train is safe for submission; validation is diagnostic only")
 args = parser.parse_args()
 
 started = perf_counter()
@@ -37,17 +40,23 @@ public = public_directory(args.data)
 out = Path(args.out).expanduser().resolve()
 out.mkdir(parents=True, exist_ok=True)
 train_queries, train_history = load_inputs(public / "train")
-val_targets = read_targets(public / "validation/targets.csv")
-size_modes = size_modes_from_targets(val_targets, load_inputs(public / "validation")[0])
-win_prior = win_prior_from_targets(val_targets)
-model = adapt(train_queries, train_history, read_labels(public / "train/labels.csv", train_queries),
-              size_modes=size_modes, win_prior=win_prior)
+labels = read_labels(public / "train/labels.csv", train_queries)
+provided_priors = None
+size_modes = win_prior = None
+if args.prior_source == "validation":
+    diagnostic_targets = read_targets(public / "validation/targets.csv")
+    size_modes = size_modes_from_targets(diagnostic_targets, load_inputs(public / "validation")[0])
+    win_prior = win_prior_from_targets(diagnostic_targets)
+    provided_priors = {"size_modes": size_modes, "win_prior": win_prior}
+model = make_model(prior_source=args.prior_source, provided_priors=provided_priors)
+model.fit(train_queries, train_history, labels)
 files = {"validation": out / "validation_predictions.csv", "test": out / "submission.csv"}
 for split, path in files.items():
     queries, history = load_inputs(public / split)
     write_submission(path, model.predict(queries, history))
 
 # --- validation: official contest score + win-chance vs payout-size error split ---
+val_targets = read_targets(public / "validation/targets.csv")
 event = {"max_points": round_metadata(public)["max_points"], "version": VERSION}
 val = public / "validation"
 report = score_contest_files(files["validation"], val / "targets.csv", val / "queries.csv",
@@ -81,10 +90,19 @@ if entry.exists():
 (entry / "slot_forecasting").mkdir(parents=True)
 for name in MODULES:
     shutil.copyfile(HERE / "slot_forecasting" / name, entry / "slot_forecasting" / name)
-for name in ("predict.py", "reproduce.json"):
+shutil.copyfile(HERE / "slot_forecasting" / "train_priors.py", entry / "slot_forecasting" / "train_priors.py")
+for name in ("predict.py",):
     shutil.copyfile(HERE / "entry_template" / name, entry / name)
-(entry / "priors.json").write_text(json.dumps({"size_modes": size_modes, "win_prior": win_prior}),
-                                  encoding="utf-8")  # fallback if /data lacks validation targets
+for name in ("r0_model.py", "rule_model.py"):
+    shutil.copyfile(HERE / name, entry / name)
+if args.prior_source == "validation":
+    (entry / "priors.json").write_text(json.dumps({"size_modes": size_modes, "win_prior": win_prior}),
+                                      encoding="utf-8")
+(entry / "reproduce.json").write_text(json.dumps({
+    "image": "python",
+    "command": ["python", "predict.py", "--data", "/data", "--out", "/output/submission.csv",
+                "--prior-source", args.prior_source],
+}, indent=2) + "\n", encoding="utf-8")
 metadata = json.loads((public / "metadata.json").read_text(encoding="utf-8"))
 sha = hashlib.sha256(files["test"].read_bytes()).hexdigest()
 commit = subprocess.run(["git", "-C", str(HERE), "rev-parse", "--short", "HEAD"],
@@ -103,14 +121,13 @@ commit = subprocess.run(["git", "-C", str(HERE), "rev-parse", "--short", "HEAD"]
 Run from the archive root:
 
 ```sh
-python predict.py --data /data --out /output/submission.csv
+python predict.py --data /data --out /output/submission.csv --prior-source {args.prior_source}
 ```
 
+- Prior source: `{args.prior_source}` (`train` is the submission-safe default; `validation` is diagnostic only).
 - What it does: on `/data/train` it rediscovers which lag pairs drive wins, picks
   match/differ (2-cell) vs 4-cell experts by Brier on `train/labels.csv` at the
-  cutoff, fits payout-size priors per machine type, and reads two priors from
-  `/data/validation/targets.csv`: the two exact payout-size mixes per type and the
-  dead/live win-chance levels (copy in `priors.json`); then it predicts every
+  cutoff, fits payout-size priors per machine type, and {('estimates win and size priors from training histories' if args.prior_source == 'train' else 'uses validation-derived diagnostic priors')}; then it predicts every
   `/data/test` query with a per-machine online mixture of lag-pair experts. Each expert tracks, with exponential forgetting, how often the machine
   won when its results at two earlier lags matched vs differed; experts are
   weighted by their recent squared error. Only ticks before each cutoff are read.
@@ -126,7 +143,8 @@ package_code(entry, zip_path)
 
 # --- reproduction check from a fresh process, run from inside the entry folder ---
 repro = out / "repro_check.csv"
-subprocess.run([sys.executable, "predict.py", "--data", str(public), "--out", str(repro)],
+subprocess.run([sys.executable, "predict.py", "--data", str(public), "--out", str(repro),
+                "--prior-source", args.prior_source],
                cwd=entry, check=True, capture_output=True)
 original = read_submission(files["test"])
 again = read_submission(repro)

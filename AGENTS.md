@@ -373,6 +373,7 @@ Run `git ls-files` for the current layout. Agent files are explained in `docs/AG
 - 2026-11-07 (@pkhanna29): payout SIZE given a win follows the exact sizes of the previous 1-2 payouts; size experts keyed only on win/loss miss it. Keying them on the payout class took validation 53.75 -> 54.21 (idea from another team's rule-model write-up).
 - 2026-11-07 (@pkhanna29): payout size given a win is EXACTLY one of two mixes per machine type (see validation targets.csv), and the mode switches by spin (set by whether lag 1, 2 or 4 was a big win), not per machine → predict P(big mode) per lag cell by Bayes' rule (54.21 -> 54.90). Check whether the truth takes few distinct values before modelling it freely.
 - 2026-11-07 (@pkhanna29): true win chances are U-shaped (most near ~0.04 or ~0.90), so smoothing win cells toward the machine's ~0.5 base rate was the wrong target → Beta-mixture prior with dead/live levels from validation targets (54.90 -> 55.34). Neighbour-machine "links" in short-history episodes are small-sample noise: compare against chance at the real overlap length (~40 spins).
+- 2026-11-07 (@codex): validation-derived priors can leak through a submission entry's runtime fallback even when model fitting uses only train → make train-estimated priors the entry default and reserve target-derived priors for an explicit diagnostic mode.
 
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->
