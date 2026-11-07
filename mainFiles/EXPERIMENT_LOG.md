@@ -165,3 +165,27 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
 - M2_B4 +0.22 [-0.01,+0.53] (one cell, window 190 = grid max) and M3_B4 +0.20 [-0.03,+0.51]: the B3 "helps" does not hold up on B4 (CI includes 0). Neutral.
 - M1_B4 = B4 exactly: holdout-40 B3-grid memory is at a plateau; half-lives 4-12, floors, longer holdouts still hurt with the near-OLS ridge.
 - Lambda 0.05/0.5/2 does not reopen gains for any memory method.
+
+### C1 (B4 + A9 severity + alpha-64 size prior) and C2 (composition with M9b_B4), lead re-scored
+- C1 = 51.72 [50.78,52.67], +0.83 [+0.53,+1.16] vs B4, +0.25 [+0.09,+0.45] vs A9 alone: the two gains add (predicted +0.85, got +0.82).
+  Plain pre-declared combo (alpha 64, A9 lam 20) 51.715. Re-screening severity with lag 7 / pairs adds <= 0.006. 15 cells.
+- C2 = win probability of M9b_B4 + size shares of C1: 52.09 [51.16,52.97], +1.19 vs B4, +0.36 [+0.16,+0.57] vs C1.
+  Conditions: stable .090, short .191, drift .184, shared .142 (B4 .106/.216/.211/.183). No new fitted parameters; the
+  win model and the size model are independent so their gains compose. Members were each selected on dev (optimism carries over).
+
+### L10 payout-level features in the win model (B4 base), worker report reviewed
+- Best cell is L5's coding (centred log1p at lag 7): 51.10, +0.21 [-0.03,+0.45] vs B4; composed with C1 shares 51.90, -0.18 vs C2.
+- Payout-level lags 1,2,4 (which drive severity in A9) carry NO win signal; every extra feature set hurt (47.6-50.6).
+  Win lags {7, pairs} and size lags {1,2,4} are disjoint, which is why the two gains compose independently.
+
+### FINAL: W5 stack scored once on the reserved audit set (24 episodes)
+- Stack 54.09 [53.08,54.90]; B4 52.26 [50.95,53.35]; C2 53.77 [52.71,54.66]; B3 46.78 [45.21,48.52]. Stack vs B4 +1.83 [+1.18,+2.60];
+  stack vs C2 +0.32 [-0.05,+0.67]. Dev OOF stack 52.32. Gains hold on episodes no choice was made on (audit is somewhat easier than dev).
+- Winner = stack, but C2 (M9b win memory + C1 sizes, no fitted stacking weights) is within noise of it and simpler.
+- Not done: Codex rebase onto B4 (S1_B4, S2_B4, S5_B4), stdlib port (dropped by request). See docs/sai/FINAL.md.
+
+### Teammates' pushed work pulled and re-scored through the harness (see docs/sai/TEAM_COMPARISON.md)
+- zhill-branch combined (20% rule model + 80% Pranav pair mixer), stdlib: dev 54.14 [53.1,55.1], audit 55.37 [54.5,56.1]. Pair mixer alone 53.87 / 55.20; rule model 52.89 / 52.85; Avyukth E6 47.69 / 50.37.
+- This beats our best (stack 52.32 dev OOF / 54.09 audit; C2 52.09 / 53.77): TM_COMBINED - C2 on audit +1.59 [+0.91,+2.24]. Their win model is far better on drift and shared_change.
+- Team stack (ours + theirs) 54.29 dev OOF, only +0.15 [-0.05,+0.34] over TM_COMBINED; size-share averaging with C1 gives 54.37 dev (+0.23 [+0.10,+0.35]).
+- Lesson: our "half-lives 4-12 hurt" was specific to the near-OLS ridge; their mixer's short memories (12, 40) fix drift. Remaining TM_COMBINED error is ~54% payout size.

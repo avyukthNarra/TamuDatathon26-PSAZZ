@@ -1,0 +1,34 @@
+{
+ "id": "TM_E7",
+ "owner": "teammates",
+ "description": "Avyukth E7 neural hypernetwork over prefix statistics (saved artifact, torch 2.9.1 in an isolated venv)",
+ "params": {
+  "source_branch": "origin/avyukth/entry-final"
+ },
+ "scope": "dev",
+ "points": 49.423743449204785,
+ "ci95": [
+  48.132711812500936,
+  50.76044101351677
+ ],
+ "condition_ratios": {
+  "stable": 0.20296041576469576,
+  "short_history": 0.22481582865389077,
+  "drift": 0.21739358047078255,
+  "shared_change": 0.21079581532280572
+ },
+ "R": 0.21399141005304373,
+ "class_error_shares": {
+  "p_0": 0.5160233153436881,
+  "p_1": 0.24212992475106396,
+  "p_2": 0.17405102241315065,
+  "p_5": 0.06131737873298863,
+  "p_20": 0.0064783587591087
+ },
+ "runtime_seconds": 0.0,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72
+}

@@ -1,0 +1,35 @@
+{
+ "id": "C2",
+ "owner": "claude",
+ "description": "win prob from M9b_B4, size shares from C1 (A9 severity + alpha 64)",
+ "params": {
+  "pw": "M9b_B4",
+  "shares": "C1"
+ },
+ "scope": "dev",
+ "points": 52.08461598392375,
+ "ci95": [
+  51.14983098542627,
+  52.95752829332886
+ ],
+ "condition_ratios": {
+  "stable": 0.08962370441319846,
+  "short_history": 0.19149105249406853,
+  "drift": 0.18449821805195762,
+  "shared_change": 0.1422735471201081
+ },
+ "R": 0.15197163051983317,
+ "class_error_shares": {
+  "p_0": 0.5428373892115009,
+  "p_1": 0.23496552809084179,
+  "p_2": 0.1647355259575914,
+  "p_5": 0.05317571868060546,
+  "p_20": 0.004285838059460475
+ },
+ "runtime_seconds": 0.006607542003621347,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": 0.0,
+ "python": "3.13.3",
+ "n_episodes": 72
+}

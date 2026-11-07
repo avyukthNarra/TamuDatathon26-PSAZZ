@@ -1,0 +1,34 @@
+{
+ "id": "TM_E67",
+ "owner": "teammates",
+ "description": "Avyukth final entry: 50/50 blend of E6 and E7",
+ "params": {
+  "source_branch": "origin/avyukth/entry-final"
+ },
+ "scope": "dev",
+ "points": 50.0241842966003,
+ "ci95": [
+  48.868508167722545,
+  51.10248826023197
+ ],
+ "condition_ratios": {
+  "stable": 0.17299320341557303,
+  "short_history": 0.22247785334453118,
+  "drift": 0.21519270273503557,
+  "shared_change": 0.18701567045831635
+ },
+ "R": 0.19941985748836402,
+ "class_error_shares": {
+  "p_0": 0.5046862343277867,
+  "p_1": 0.25061006412620973,
+  "p_2": 0.17869011368324514,
+  "p_5": 0.059960094641530376,
+  "p_20": 0.006053493221227974
+ },
+ "runtime_seconds": 0.0,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72
+}
