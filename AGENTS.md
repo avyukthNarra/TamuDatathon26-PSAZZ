@@ -202,8 +202,9 @@ Merge only when **all** are true: approved, CI green (if any), and no conflicts
 (`gh pr view --json mergeable,reviewDecision`; `mergeable` must be `MERGEABLE`).
 - **Who:** the human merges. An agent merges only when the human says "merge" in chat for that PR, and
   only after checking the conditions above. That chat OK covers that PR only.
-- **Conflicts:** don't merge. Rebase or merge `main` into the branch, resolve per §3, re-run tests,
-  push, and get approval again if the resolution changed more than `CHANGELOG.md`.
+- **Conflicts:** never merge a PR that has them, and never "just resolve" them. Understand both
+  sides first (§3), then rebase or merge `main` into the branch, re-run tests, push, and get approval
+  again if the resolution changed more than `CHANGELOG.md`.
 - **Squash merge** (default) so `main` gets one Conventional Commit per PR.
 - Delete the branch after merge (needs the human's OK for an agent, §4).
 - Everyone else: `git pull` on `main` and rebase their branches when convenient.
@@ -213,6 +214,18 @@ Merge only when **all** are true: approved, CI green (if any), and no conflicts
 ---
 
 ## 3. Keeping in sync & resolving conflicts
+**Understand a conflict before you touch it.** Never blanket-accept "ours" or "theirs", never delete
+conflict markers to make it go away, and never resolve by guessing.
+1. See what happened on each side: `git log --oneline main..HEAD` for yours and
+   `git log --oneline HEAD..origin/main` for theirs, and `git show <sha>` / `gh pr view <n>` for the
+   intent behind the other change.
+2. Work out what each side was trying to do and whether both can hold. The resolution should keep both
+   intents unless they truly contradict.
+3. If they contradict, or you can't tell what the other side intended, **stop and ask** the human or the
+   other change's author. Don't pick a winner.
+4. After resolving, re-run lint and tests, read the final diff once, and say in the PR what the
+   conflict was and how you resolved it.
+
 - Rebase/merge `main` into your branch at least every couple of hours during a hackathon.
 - **`CHANGELOG.md` conflicts are expected**: resolve by **keeping both sides' lines** in the right subsection. Never drop someone else's entry.
 - Lockfile conflicts: take `main`'s version, then re-run the install command to regenerate.
