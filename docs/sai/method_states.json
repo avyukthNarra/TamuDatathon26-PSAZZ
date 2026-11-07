@@ -461,5 +461,17 @@
   "claude",
   "neutral",
   "BEST (TM_COMBINED3 54.77) is saturated: best composition 54.72, best blend 0.85 BEST + 0.15 C2 = 54.85 (+0.08 [-0.03,+0.17]); nested check over 478 combos: held-out gain +0.007, so the +0.08 is selection optimism; only C2 gets weight (stable 0.15)"
+ ],
+ "Q1": [
+  "GBM/log-odds local-level filter per machine (grid filter, random walk on log-odds)",
+  "claude",
+  "hurts",
+  "standalone 31.51 dev, ~23 below BEST: win flags carry almost no slow level-drift signal; win probability follows lag-pair parity, which a local-level filter cannot represent; train log-lik nearly flat across sigma"
+ ],
+ "Q3": [
+  "Q1 as a win-probability member of BEST (logit blend)",
+  "claude",
+  "neutral",
+  "54.95, +0.18 [-0.00,+0.35] vs BEST; fitted coefficient is NEGATIVE (-0.146): BEST slightly over-shrinks toward the slow level; noise-level; vol-gated shrink never opens (as V3); 9 cells"
  ]
 }

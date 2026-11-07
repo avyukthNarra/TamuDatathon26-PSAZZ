@@ -212,3 +212,8 @@ Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5
 - 324 pw x shares compositions: none beats BEST (best 54.72). 154 convex blends of 2-4 members: best 0.85 BEST + 0.15 C2 = 54.85, +0.08 [-0.03,+0.17] over BEST.
 - Nested selection check (10 half-splits, 478 combos): held-out gain +0.007 => the +0.08 is selection optimism. Only C2 gets any weight (0.15, stable across folds); TM_E7, L7, TM_RULE, TM_E6 get ~0.
 - Verdict: BEST is saturated under blending of the available members.
+
+### Q1/Q3 geometric-Brownian-motion (random walk on log-odds) filter, worker report reviewed, lead re-scored
+- Q1 (per-machine grid filter, sigma per machine / pooled / BMA): 31.5 / 31.1 / 31.3 dev, ~23 points below BEST: no skill alone. Win flags carry little slow level-drift signal; the real structure is lag-pair parity.
+- Q3 (Q1 as a logit-blend member of BEST): 54.95, +0.18 [-0.00,+0.35]; fitted coefficient negative (BEST slightly over-shrinks toward the slow level). Noise-level. Vol-gated shrink never opens (same as V3).
+- Q2 (volatility-linked sigma, pair-cell filters) is running as a separate Haiku worker.

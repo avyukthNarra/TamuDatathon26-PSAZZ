@@ -195,6 +195,8 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | P5 | stack all helps members (episode-OOF) | claude | helps | -; FINAL: audit 54.09 [53.08,54.90], +1.83 [+1.18,+2.60] vs B4, +0.32 [-0.05,+0.67] vs C2; weights M9b_B4 .52 L7 .23 M2_B4 .12 L5 .08 S1 .04 / C1 .77 A9 .20; dev OOF 52.32 |
 | P6 | shrink ensemble toward the type prior | claude | alive | - |
 | P7 | clip bounds | claude | alive | - |
+| Q1 | GBM/log-odds local-level filter per machine (grid filter, random walk on log-odds) | claude | hurts | results/Q1.json; standalone 31.51 dev, ~23 below BEST: win flags carry almost no slow level-drift signal; win probability follows lag-pair parity, which a local-level filter cannot represent; train log-lik nearly flat across sigma |
+| Q3 | Q1 as a win-probability member of BEST (logit blend) | claude | neutral | results/Q3.json; 54.95, +0.18 [-0.00,+0.35] vs BEST; fitted coefficient is NEGATIVE (-0.146): BEST slightly over-shrinks toward the slow level; noise-level; vol-gated shrink never opens (as V3); 9 cells |
 | S1 | GB / HistGB second stage on B3 output + features | codex | alive | results/S1.json; 46.59 (+0.77 vs B3) but blend over B4 +0.06 [-0.07,+0.19]; rebase pending (S1_B4); built on old B3; lead re-scored via harness |
 | S2 | CatBoost / LightGBM | codex | alive | results/S2.json; CatBoost/LightGBM residual on B3: 46.77 (+0.94 vs B3, best learner) but blend over B4 +0.01 [-0.07,+0.09]; stable fixed (.115); rebase pending; built on old B3; lead re-scored via harness |
 | S3 | latent condition classifier + gating of specialists | codex | hurts | results/S3.json; 41.91 (-3.91 vs B3), blend over B4 +0.03; built on old B3; lead re-scored via harness |
@@ -215,4 +217,4 @@ Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under
 | V2 | softmax-linear vol/history gate | claude | neutral | results/V2.json; dev 54.27-54.30, +0.13..+0.16 [-0.05,+0.34]; same conclusion, 20-36 params |
 | V3 | vol-scaled shrinkage of p_win toward longer memory | claude | neutral | results/V3.json; dev 54.13, 0.00 [-0.10,+0.06]; optimiser never shrinks: TM_COMBINED p_win is already calibrated w.r.t. volatility |
 
-Counts: alive 10, baseline 5, helps 20, hurts 7, neutral 37
+Counts: alive 10, baseline 5, helps 20, hurts 8, neutral 38
