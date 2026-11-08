@@ -14,7 +14,9 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.special import expit, logsumexp
 
-PAIRS = np.array([(1, 3), (2, 5), (4, 7)], dtype=int)
+# All 28 candidate lag pairs (lags 1..8). The round's pair set is learned from the kit's
+# histories by census_pair_prior(), which sets the pair prior; nothing is hard-coded here.
+PAIRS = np.array(list(combinations(range(1, 9), 2)), dtype=int)
 TYPES = ('steady', 'balanced', 'jackpot')
 POSITIVE = (1, 2, 5, 20)
 
@@ -57,6 +59,39 @@ def load_machines(public, split, labels=False):
     if path.exists():
         conditions = {r['query_id']: r['condition'] for r in read_rows(path, ('query_id', 'condition'))}
     return machines, conditions, qs, hist, ys
+
+
+def census_pair_prior(public, floor=.002, margin=3., splits=('train', 'validation', 'test')):
+    """Pair prior from the kit's own histories (same logic as orch/priors/pairs_all_histories.py).
+
+    Ticks 8..95 of long histories (all of 8..95 observed). Per machine, each of the 28 candidate pairs
+    gets a two-rate parity log-likelihood; machines whose best pair beats the runner-up by >= margin
+    nats vote for that pair. Pairs are then weighted by vote share, floored at `floor`, renormalized.
+    """
+    def ll2(w, n):
+        p = np.clip(w / np.maximum(n, 1e-9), 1e-6, 1 - 1e-6)
+        return (w * np.log(p) + (n - w) * np.log(1 - p)).sum()
+    votes = np.zeros(len(PAIRS))
+    for split in splits:
+        machines, *_ = load_machines(public, split)
+        for m in machines:
+            if m.seq.shape[0] < 96 or np.any(m.seq[8:96] < 0):
+                continue
+            won = (m.seq > 0).astype(int)
+            t = np.arange(8, 96)
+            scores = []
+            for a, b in PAIRS:
+                k = (won[t - a] == won[t - b]).astype(int)
+                w = np.array([won[t][k == c].sum() for c in (0, 1)], dtype=float)
+                n = np.array([(k == c).sum() for c in (0, 1)], dtype=float)
+                scores.append(ll2(w, n))
+            order = np.argsort(scores)[::-1]
+            if scores[order[0]] - scores[order[1]] >= margin:
+                votes[order[0]] += 1
+    if votes.sum() == 0:
+        raise ValueError('census found no confident machines; cannot learn the pair set')
+    prior = np.maximum(votes / votes.sum(), floor)
+    return prior / prior.sum()
 
 
 def pair_alpha(machine, include_label=False):
@@ -141,8 +176,10 @@ def count_likelihood(counts, p):
     return np.stack([forward, reverse], axis=1)
 
 
-def fit_levels(machines, conditions, iterations=12, size=25):
-    pars, pair_prior = initial_levels(machines, conditions)
+def fit_levels(machines, conditions, iterations=12, size=25, pair_prior=None):
+    pars, init_prior = initial_levels(machines, conditions)
+    if pair_prior is None:
+        pair_prior = init_prior
     selected = [m for m in machines if conditions[m.query_id] == 'stable']
     counts = [cell_counts(m, True) for m in selected]
     for iteration in range(iterations):
@@ -431,7 +468,8 @@ class ExactModel:
 
 def fit(public, iterations=12, size=25):
     machines, conditions, *_ = load_machines(public, 'train', labels=True)
-    levels, pair_prior = fit_levels(machines, conditions, iterations, size)
+    levels, pair_prior = fit_levels(machines, conditions, iterations, size,
+                                    pair_prior=census_pair_prior(public))
     schedule = fit_schedule(machines, conditions)
     atoms, size_prior, size_history = fit_size(machines)
     return {'levels': levels, 'pair_prior': pair_prior.tolist(), 'schedule': schedule,
