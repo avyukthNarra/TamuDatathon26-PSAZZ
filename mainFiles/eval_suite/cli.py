@@ -22,6 +22,7 @@ import sys
 import tempfile
 import time
 import traceback
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -114,8 +115,10 @@ def _last_line(text: str) -> str:
 
 
 class Suite:
-    def __init__(self, *, entry, compare, level, mode, kit, out, work, seed, k, repeats, log):
+    def __init__(self, *, entry, compare, level, mode, kit, out, work, seed, k, repeats, log, jobs=1):
         self.entry = Path(entry).resolve()
+        self.jobs = jobs
+        self._prefetched = {}
         self.compare = Path(compare).resolve() if compare else None
         self.level, self.mode = level, mode
         self.kit, self.out, self.work = Path(kit), Path(out), Path(work)
@@ -192,11 +195,40 @@ class Suite:
         self.not_run_reasons.update(RULE_LEVEL_REASONS)
         self.not_run_reasons.update(local_reasons if self.mode == "local" else docker_reasons)
 
+    def prefetch(self, specs):
+        """Run independent entry executions concurrently (--jobs N); results are recorded later, in order.
+
+        specs is a list of (label, data_root, entry_or_None). Each RunResult (or the EntryError it
+        raised) is stored under its label and handed out by run_entry, so recording order is unchanged.
+        """
+        if self.jobs <= 1 or len(specs) < 2:
+            return
+        self.log(f"  prefetch {len(specs)} runs with {self.jobs} jobs")
+
+        def execute(spec):
+            label, data_root, entry = spec
+            entry = Path(entry) if entry is not None else self.entry
+            try:
+                return run_entry(entry, data_root, mode=self.mode, timeout_s=RUNTIME_LIMIT_S,
+                                 cpus=CPUS, memory_gb=MEMORY_GB)
+            except Exception as exc:  # re-raised by run_entry at the point the sequential loop would have
+                return exc
+
+        with ThreadPoolExecutor(max_workers=self.jobs) as pool:
+            results = list(pool.map(execute, specs))
+        for (label, _, _), result in zip(specs, results):
+            self._prefetched[label] = result
+
     def run_entry(self, label, data_root, queries_csv, *, entry=None, tag="A", record=True):
         """Run the entry on data_root; record runtime, output and CSV checks unless record=False."""
         entry = Path(entry) if entry is not None else self.entry
-        result = run_entry(entry, data_root, mode=self.mode, timeout_s=RUNTIME_LIMIT_S,
-                           cpus=CPUS, memory_gb=MEMORY_GB)
+        if label in self._prefetched:
+            result = self._prefetched.pop(label)
+            if isinstance(result, BaseException):
+                raise result
+        else:
+            result = run_entry(entry, data_root, mode=self.mode, timeout_s=RUNTIME_LIMIT_S,
+                               cpus=CPUS, memory_gb=MEMORY_GB)
         self.runs.append({"label": label, "tag": tag, "entry": str(entry), "mode": self.mode,
                           "wall_s": round(result.wall_s, 3), "exit_code": result.exit_code,
                           "peak_mem_mb": result.peak_mem_mb, "csv": result.csv_path is not None,
@@ -284,6 +316,7 @@ class Suite:
 
     def _kfold(self, tag, entry, folds):
         parts, csvs = [], {}
+        self.prefetch([(f"{tag}:fold{f.index}", f.mount, entry) for f in folds])
         for fold in folds:
             label = f"{tag}:fold{fold.index}"
             csv, _ = self.run_entry(label, fold.mount, fold.mount / "test" / "queries.csv",
@@ -349,6 +382,7 @@ class Suite:
         base = self.fold_csv["A"][0]
         variants = P.make_variants(fold.mount, self.work / "variants", split="test", seed=self.seed)
         wanted = variants if self.level == "full" else [v for v in variants if v.name in QUICK_CAUSAL]
+        self.prefetch([(f"A:{v.name}", v.data_root, None) for v in wanted])
         # identical_subset (CAU-CROSS-EPISODE) and identical variants go through perturb.compare.
         missing = zero = None
         for variant in wanted:
@@ -404,6 +438,7 @@ class Suite:
             self.not_run(GEN_IDS, "eval_suite/generator.py is not present yet", "generator")
             return
         episodes = int(self.kit_meta["counts_per_condition"]["validation"])
+        ok = []  # pass 1: generate every preset and its mount
         for preset in X.PRESETS:
             key = f"preset:{preset}"
             try:
@@ -414,6 +449,12 @@ class Suite:
                 continue
             mount = X.strip_truth_copy(dest, self.work / "preset-mounts" / preset)
             self.dataset_roots.append(mount)
+            ok.append((preset, key, dest, mount))
+        specs = [(f"A:preset:{p}", m, None) for p, _, _, m in ok]
+        if self.compare:
+            specs += [(f"B:preset:{p}", m, self.compare) for p, _, _, m in ok]
+        self.prefetch(specs)
+        for preset, key, dest, mount in ok:  # pass 2: score in the original order
             try:
                 self._score_preset(preset, key, dest, mount)
             except Exception as exc:
@@ -565,6 +606,8 @@ def build_parser():
     run.add_argument("--bootstrap-repeats", type=int, default=DEFAULT_REPEATS,
                      help="bootstrap resamples per CI (default 1000)")
     run.add_argument("--keep-work", action="store_true", help="keep copies of mounted datasets for debugging")
+    run.add_argument("--jobs", type=int, default=1,
+                     help="parallel entry runs (default 1; keep <=4 for docker on an 8 GB Docker VM)")
     return parser
 
 
@@ -574,6 +617,8 @@ def _log(message):
 
 def run_suite(args) -> int:
     kit = _kit_root(args.kit)
+    if args.jobs < 1:
+        raise SystemExit(f"--jobs must be at least 1, not {args.jobs}")
     entry = Path(args.entry).expanduser().resolve()
     if not entry.is_dir():
         raise SystemExit(f"--entry is not a directory: {entry}")
@@ -599,7 +644,7 @@ def run_suite(args) -> int:
     work = Path(tempfile.mkdtemp(prefix="eval-suite-work-"))
     suite = Suite(entry=entry, compare=args.compare and Path(args.compare).expanduser().resolve(),
                   level=args.suite, mode=mode, kit=kit, out=out, work=work, seed=args.seed,
-                  k=args.k, repeats=args.bootstrap_repeats, log=_log)
+                  k=args.k, repeats=args.bootstrap_repeats, log=_log, jobs=args.jobs)
     try:
         _log(f"eval_suite {args.suite} on {entry} ({mode} mode), output {out}")
         suite.execute()
