@@ -19,6 +19,7 @@ How to add an entry (every PR):
 ## [Unreleased]
 
 ### Added
+- Sai's AI-usage report (`docs/devpost/SAI_AI_REPORT.md`) with its stats script (`docs/devpost/tools/ai_stats.py`)
 - `submissions/` with the exact files submitted in both rounds (round one 57.97/60, round two 38.59/40) and their hashes; Devpost materials and every round-two research report under `docs/devpost/`; team commit log of all branches (`docs/devpost/research/COMMIT_LOG.md`) (#31)
 - Round-two adapted blend: every member learns its lag pairs from the round's train data (`adapted_entry/`, `adapted_entry_v17g/`, main 57.97) (#22)
 - Exact filter also learns 3-lag XOR and 2-lag AND/OR rules from each round's train census (`adapted_entry_v17g_rules/`; main unchanged, simulated mixed-rule kit +3.3) (#24)
