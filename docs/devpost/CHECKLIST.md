@@ -26,7 +26,8 @@ Nothing here is uploaded automatically. Each step is done by hand on Devpost.
 ## Round two (adaptation): add before noon
 
 1. [x] Round-two entry built and verified: `/Users/avynarra/Documents/Datathon/R2_final/ADAPTATION_submission.csv` (sha256 a7ec520d…) and `ADAPTATION_entry.zip` (sha256 feb33968…); Docker rerun matches.
-2. [ ] Choose the file to upload from `RANKING.md` (the default `blend` unless a challenger clears the bar).
+2. [x] Choose the file to upload from `RANKING.md` (the default `blend` unless a challenger clears the bar). Decided 11:28: the default `blend`; no challenger cleared the bar.
+   - Sai's laptop built the same model independently: `submission.csv` sha256 108434136029fcf2… + `entry.zip` 1b467e5db237f345… (both checkers: VALID, 1536 queries, adaptation, test). Either pair is fine, but upload one person's CSV and ZIP together, never one from each.
 3. [ ] Check the test CSV with `mainFiles/check_submission.py --split test`.
 4. [ ] Rename the files as they are added to Devpost, using these exact labels:
    - `ADAPTATION_submission.csv` (the test-set predictions)
