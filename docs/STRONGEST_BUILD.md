@@ -83,3 +83,7 @@ without validation targets. Test SHA-256 2c4a968b1580fcdceaa16f8c5041a537705d46e
   Detecting it from each machine's last K wins vs its own inverted rule (`research/size_flip.py`)
   misfires (mostly on short histories) and lowers both checks (validation down to 57.01-57.50).
 v15 (57.55) stays the best verified build.
+- Per-type blend weights (`research/v15_type_weights.py`): best (steady 0.2) +0.03 validation,
+  train mixed (window -0.0005, cutoff +0.0006) after 6 tries: noise. Not adopted.
+- Are shared_change size flips detectable from recent wins at all? (`research/size_flip_auc.py`):
+  AUC 0.54-0.64 for "the inverted rule fits the last K wins better" (K = 4-15). Not usable.
