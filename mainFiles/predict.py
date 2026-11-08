@@ -19,6 +19,7 @@ from slot_forecasting.pair_mixer import (ALL_PAIRS, WIN_PRIOR_ETA, PairMixer, ad
 
 from rule_model import RuleForecaster
 from hmm_model import HiddenRuleHMM, levels_from_targets
+from size_hmm import SizeRuleHMM, core_from_train, default_rules, modes_from_targets
 from slot_forecasting.pair_mixer import choose_pairs
 
 HERE = Path(__file__).resolve().parent
@@ -112,9 +113,45 @@ def hmm_levels(data):
     return {}
 
 
+def size_rule_modes(data):
+    """The two exact size mixes per type for the size-rule HMM, from validation answers, else priors.json."""
+    targets_path = Path(data) / "validation" / "targets.csv"
+    if targets_path.exists():
+        return modes_from_targets(read_targets(targets_path), load_inputs(Path(data) / "validation")[0])
+    saved = HERE / "priors.json"
+    if saved.exists():
+        return {k: tuple(tuple(m) for m in v)
+                for k, v in json.loads(saved.read_text(encoding="utf-8")).get("size_rule_modes", {}).items()}
+    return {}
+
+
 def saved_priors(data):
     """Everything priors.json stores, so the entry also runs without validation answers."""
-    return {**mixer_priors(data), "hmm_levels": hmm_levels(data)}
+    return {**mixer_priors(data), "hmm_levels": hmm_levels(data), "size_rule_modes": size_rule_modes(data)}
+
+
+# Size-rule HMM (size_hmm.py): replaces the payout-size split given a win. No switching (the size
+# rule does not drift on main). Validation 56.59 -> 57.32 (halves 57.44 / 57.20), every condition better.
+SIZE_HMM = dict(core_weight=0.97, none_weight=0.02, switch=0.0)
+
+
+class WithSizeHMM:
+    """Keeps the base win chance; payout size given a win comes from the size-rule HMM
+    (machine types without known size mixes keep the base split)."""
+
+    def __init__(self, base, size_hmm):
+        self.base, self.size_hmm = base, size_hmm
+
+    def predict(self, queries, history):
+        base = self.base.predict(queries, history)
+        splits = self.size_hmm.splits(queries, history)
+        out = {}
+        for k, p in base.items():
+            if k in splits:
+                out[k] = tuple([p[0]] + [(1 - p[0]) * x for x in splits[k]])
+            else:
+                out[k] = p
+        return out
 
 
 class WithHMM:
@@ -152,7 +189,14 @@ def build(data, weights=None, log=lambda *_: None):
     base = Weighted([(w, fitted[name]) for name, w in weights.items() if w > 0 and name != "hmm"])
     if weights.get("hmm", 0) > 0:
         hmm = HiddenRuleHMM(choose_pairs(queries, history), levels=hmm_levels(data))
-        return WithHMM(base, hmm, weights["hmm"])
+        base = WithHMM(base, hmm, weights["hmm"])
+    modes = size_rule_modes(data)
+    if modes:
+        # common size rules rediscovered on this round's train (main: payout >= 2x at lag 1, 2 or 4)
+        core = core_from_train(queries, history, modes)
+        log("size-rule core:", core)
+        rules = default_rules(SIZE_HMM["core_weight"], SIZE_HMM["none_weight"], core)
+        base = WithSizeHMM(base, SizeRuleHMM(modes, rules, SIZE_HMM["switch"]))
     return base
 
 

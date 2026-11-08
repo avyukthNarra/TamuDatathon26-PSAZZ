@@ -376,6 +376,8 @@ Run `git ls-files` for the current layout. Agent files are explained in `docs/AG
 - 2026-11-07 (@pkhanna29): validation gains of a few hundredths flipped to losses out of fold on train twice (data-driven prior weights, a train-history prior); score train out of fold with episode folds plus the last 10 history ticks before each cutoff (~4x tighter intervals) and validation cross-fitted (priors from the other half), and keep only what passes both. Win-chance levels differ by machine type (jackpot almost never live): per-type priors took 55.34 -> 56.12.
 - 2026-11-07 (@Codex): generated `counts_per_condition` metadata maps split names to integer counts; keep synthetic test truth under `_truth` and remove it before mounting data for an entry.
 
+- 2026-11-08 (@zmaknojia20): after v6, most short-history error was payout SIZE, not win/lose. The size mix is set by whether the payout 1, 2 or 4 spins back was >= 2x (either direction, one rule per machine, no drift); an explicit filter over those 6 rules (`size_hmm.py`, rules re-learned on each round's train) took validation 56.59 -> 57.32, both halves and all conditions better.
+
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->
 - YYYY-MM-DD (@handle): _example: squash-merge only, so `main` history maps 1:1 to changelog lines._

@@ -85,6 +85,7 @@ def main():
     shutil.copyfile(HERE / "predict.py", entry / "predict.py")
     shutil.copyfile(HERE / "rule_model.py", entry / "rule_model.py")
     shutil.copyfile(HERE / "hmm_model.py", entry / "hmm_model.py")
+    shutil.copyfile(HERE / "size_hmm.py", entry / "size_hmm.py")
     sys.path.insert(0, str(HERE))
     import predict as _predict  # save the mixer priors so the entry still runs without validation/
     (entry / "priors.json").write_text(json.dumps(_predict.saved_priors(data)) + "\n")
