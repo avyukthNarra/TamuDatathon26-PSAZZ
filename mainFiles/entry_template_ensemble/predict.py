@@ -44,7 +44,9 @@ if targets_path.exists():
 elif saved.exists():
     priors = json.loads(saved.read_text(encoding="utf-8"))
     size_modes, win_prior = priors["size_modes"], priors["win_prior"]
-model = build_ensemble(train_queries, train_history, labels, size_modes, win_prior)
+variant_path = Path(__file__).resolve().parent / "variant.json"
+variant = json.loads(variant_path.read_text(encoding="utf-8"))["variant"] if variant_path.exists() else "peers"
+model = build_ensemble(train_queries, train_history, labels, size_modes, win_prior, variant=variant)
 queries, history = load_inputs(data / args.split)
 write_submission(args.out, model.predict(queries, history))
 print(f"wrote {args.out}")

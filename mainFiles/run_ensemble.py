@@ -32,6 +32,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--data", default=str(HERE / "public"))
 parser.add_argument("--out", default="runs/ensemble")
 parser.add_argument("--cv-val", action="store_true", help="also score validation halves with opposite-half priors")
+parser.add_argument("--variant", default="peers", choices=("peers", "logodds", "three-way"),
+                    help="ensemble variant (slot_forecasting/ensemble.py); saved into the entry")
 args = parser.parse_args()
 
 started = perf_counter()
@@ -44,7 +46,7 @@ val_queries, val_history = load_inputs(public / "validation")
 train_labels = read_labels(public / "train/labels.csv", train_queries)
 size_modes = size_modes_from_targets(val_targets, val_queries)
 win_prior = win_prior_by_type_from_targets(val_targets, val_queries)
-model = build_ensemble(train_queries, train_history, train_labels, size_modes, win_prior)
+model = build_ensemble(train_queries, train_history, train_labels, size_modes, win_prior, variant=args.variant)
 files = {"validation": out / "validation_predictions.csv", "test": out / "submission.csv"}
 for split, path in files.items():
     queries, history = load_inputs(public / split)
@@ -86,7 +88,8 @@ if args.cv_val:
         prior_targets = tuple(t for t in val_targets if t.episode_id in prior_episode_ids)
         fold_model = build_ensemble(train_queries, train_history, train_labels,
                                     size_modes_from_targets(prior_targets, val_queries),
-                                    win_prior_by_type_from_targets(prior_targets, val_queries), log=lambda *_: None)
+                                    win_prior_by_type_from_targets(prior_targets, val_queries), log=lambda *_: None,
+                                    variant=args.variant)
         fold_queries = tuple(q for q in val_queries if q.episode_id in scored)
         fold_keys = {(q.episode_id, q.machine_id) for q in fold_queries}
         fold_history = tuple(p for p in val_history if (p.episode_id, p.machine_id) in fold_keys)
@@ -109,6 +112,7 @@ for name in MODULES:
     shutil.copyfile(HERE / "slot_forecasting" / name, entry / "slot_forecasting" / name)
 for name in ("predict.py", "reproduce.json"):
     shutil.copyfile(HERE / "entry_template_ensemble" / name, entry / name)
+(entry / "variant.json").write_text(json.dumps({"variant": args.variant}), encoding="utf-8")
 (entry / "priors.json").write_text(json.dumps({"size_modes": size_modes, "win_prior": win_prior}),
                                   encoding="utf-8")  # fallback if /data lacks validation targets
 metadata = json.loads((public / "metadata.json").read_text(encoding="utf-8"))
