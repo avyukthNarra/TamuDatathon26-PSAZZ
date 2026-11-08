@@ -1,0 +1,17 @@
+members: ['exact', 'sysid', 'v13_short']
+default (equal, T=1, size=v13_short): all 38.5879  A 38.6093  B 38.5931
+fit on half A: best ((np.float64(0.0), np.float64(0.5), np.float64(0.5)), 1.0, 'v13_short') -> held-out B: 38.6579 vs default 38.5931
+fit on half B: best ((np.float64(0.0), np.float64(0.9), np.float64(0.1)), 1.0, 'v13_short') -> held-out A: 38.4363 vs default 38.6093
+T=0.85: A 38.4117 B 38.4558
+T=0.9: A 38.5263 B 38.5496
+T=0.95: A 38.5888 B 38.5919
+T=1.0: A 38.6093 B 38.5931
+T=1.05: A 38.5964 B 38.5618
+T=1.1: A 38.5573 B 38.5051
+T=1.2: A 38.4229 B 38.3383
+size=exact: A 30.0923 B 29.8325
+size=sysid: A 30.0923 B 29.8325
+size=v13_short: A 38.6093 B 38.5931
+drop exact: A 38.6523 B 38.6579
+drop sysid: A 38.4901 B 38.3959
+drop v13_short: A 38.5355 B 38.6211

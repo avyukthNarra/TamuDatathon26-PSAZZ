@@ -9,3 +9,11 @@ metadata says `max_points: 40` (rescales scores only). The entry itself runs fin
   Cross-fitted validation **38.59 / 40** (= ~19.29 / 20 on the real kit scale).
 - `adapted_entry_v17g_rules/gate.json` is the adaptation gate. `bundled/validation/` = the kit's `validation/` (not committed).
 - Ranking (RANKING.md) and final CSV/ZIP SHA-256 will be added when done.
+
+## Blend tweak check (40-point scale, cross-fitted members, fit on one half / score on the other)
+Default equal-weight blend 38.588 (A 38.609 / B 38.593). Fitted weights do not transfer (fit B -> A 38.436),
+temperature 1.0 is best, size split must stay v13_short (others ~30), dropping exact is +0.04/+0.06 (< 0.1 margin).
+Verdict: no change. Script `tweak.py`, output `tweak_out.txt`.
+
+## Code ZIP
+`ADAPTATION_entry.zip` sha256 feb33968c7070000891f84547e8a896a3c1e5e0c4538498be840f995d76729d2 (clean git archive + gate.json + kit validation/ as bundled/).
