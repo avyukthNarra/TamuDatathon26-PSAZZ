@@ -1,0 +1,11 @@
+test_end_to_end_recovers_known_walsh_logistic_rule (test_logistic.LogisticTests.test_end_to_end_recovers_known_walsh_logistic_rule) ... ok
+test_missing_is_zero_while_observed_loss_is_minus_one (test_logistic.LogisticTests.test_missing_is_zero_while_observed_loss_is_minus_one) ... ok
+test_moderation_moves_uncertain_prediction_toward_half (test_logistic.LogisticTests.test_moderation_moves_uncertain_prediction_toward_half) ... ok
+test_newton_matches_independent_optimizer (test_logistic.LogisticTests.test_newton_matches_independent_optimizer) ... ok
+test_post_cutoff_and_truth_never_affect_features_or_fit (test_logistic.LogisticTests.test_post_cutoff_and_truth_never_affect_features_or_fit) ... ok
+test_zero_mean_prior_allows_sign_flips (test_logistic.LogisticTests.test_zero_mean_prior_allows_sign_flips) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.032s
+
+OK

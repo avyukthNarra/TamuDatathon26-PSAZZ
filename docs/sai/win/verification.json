@@ -1,0 +1,44 @@
+{
+  "KNOWN": {
+    "train_prior_refit_byte_identical": true,
+    "two_predictions_byte_identical": true,
+    "raw_saved_win_probabilities_byte_identical": true,
+    "csv_max_abs_difference": 2.220446049250313e-16
+  },
+  "FULL": {
+    "train_prior_refit_byte_identical": true,
+    "two_predictions_byte_identical": true,
+    "raw_saved_win_probabilities_byte_identical": true,
+    "csv_max_abs_difference": 2.220446049250313e-16
+  },
+  "files": [
+    {
+      "file": "WIN_FULL_BLEND_OOF_validation.csv",
+      "rows": 768,
+      "sha256": "7ac11736a7333a86497fc15bb16743a62d2738f16a2d838dd77c9ab46e30ba74"
+    },
+    {
+      "file": "WIN_FULL_validation.csv",
+      "rows": 768,
+      "sha256": "bb3d7e4d438120d4c4b155c893194184957f260aa1a486afd7623e7f68f93c26"
+    },
+    {
+      "file": "WIN_KNOWN_BLEND_OOF_validation.csv",
+      "rows": 768,
+      "sha256": "7ac11736a7333a86497fc15bb16743a62d2738f16a2d838dd77c9ab46e30ba74"
+    },
+    {
+      "file": "WIN_KNOWN_validation.csv",
+      "rows": 768,
+      "sha256": "ef2e05d5b1501a9b298ebe77a645012036e0369bc2b76791abedd95bc07eef03"
+    },
+    {
+      "file": "WIN_SELECTED_OPPOSITE_OOF_validation.csv",
+      "rows": 768,
+      "sha256": "5a1b49f6c8855d1740119a90f15eb1f661dca82c6af5d5b0d195b3199940b0bf"
+    }
+  ],
+  "unit_tests_passed": 6,
+  "audit_log_unchanged_during_run": true,
+  "audit_or_all_evaluations": 0
+}
