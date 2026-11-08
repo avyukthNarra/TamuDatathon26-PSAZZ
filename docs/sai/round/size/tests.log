@@ -1,0 +1,8 @@
+test_direct_discounted_likelihood_with_missing_ticks_and_different_cutoffs (test_exact_size.ExactTests.test_direct_discounted_likelihood_with_missing_ticks_and_different_cutoffs) ... ok
+test_no_outcome_probabilities_or_condition_needed (test_exact_size.ExactTests.test_no_outcome_probabilities_or_condition_needed) ... ok
+test_recover_known_lag_one_polarity (test_exact_size.ExactTests.test_recover_known_lag_one_polarity) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.054s
+
+OK

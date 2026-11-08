@@ -1,0 +1,8 @@
+lag pairs found on train: ((1, 3), (2, 5), (4, 7))
+payout-size keys discovered: ((), (1,), (2,), (4,))
+payout-size modes: target-derived mixture
+win-cell prior: {'balanced': [(0.45, 0.0394, 10.0), (0.45, 0.8396, 10.0), (0.1, 0.5, 2.0)], 'jackpot': [(0.45, 0.0126, 10.0), (0.45, 0.6691, 10.0), (0.1, 0.5, 2.0)], 'steady': [(0.45, 0.1486, 10.0), (0.45, 0.9555, 10.0), (0.1, 0.5, 2.0)]}
+cell_mode=parity: train cutoff Brier 0.35292
+cell_mode=full: train cutoff Brier 0.36031
+FIT_DONE 19.28111696243286
+BASELINE {'scope': 'dev', 'points': 55.98900221771928, 'R': 0.07163902951303766, 'n_episodes': 72, 'condition_ratios': {'stable': 0.052859095640519146, 'short_history': 0.11217947243777121, 'drift': 0.05297779623364985, 'shared_change': 0.06853975374021043}, 'mean_error': 0.013388492816532822, 'ci95': [55.31796632402963, 56.630805573923574], 'class_error_shares': {'p_0': 0.47510249783054187, 'p_1': 0.2575754651964744, 'p_2': 0.19585464940493502, 'p_5': 0.06551508476284137, 'p_20': 0.005952302805207476}} SECONDS 42.22151303291321
