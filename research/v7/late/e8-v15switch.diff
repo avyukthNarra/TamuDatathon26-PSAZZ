@@ -1,0 +1,162 @@
+diff -ruN -x runs -x __pycache__ -x *.csv -x public h12-v15/wt/mainFiles/entry_template_strongest/predict.py e8-v15switch/wt/mainFiles/entry_template_strongest/predict.py
+--- h12-v15/wt/mainFiles/entry_template_strongest/predict.py	2026-11-08 01:38:52
++++ e8-v15switch/wt/mainFiles/entry_template_strongest/predict.py	2026-11-08 01:56:07
+@@ -16,7 +16,7 @@
+ 
+ sys.path.insert(0, str(Path(__file__).resolve().parent))
+ from slot_forecasting.io import load_inputs, read_labels, read_targets, write_submission  # noqa: E402
+-from slot_forecasting.combo import V7C, combine  # noqa: E402
++from slot_forecasting.combo import V7C, combine, flip_episodes  # noqa: E402
+ from slot_forecasting.ensemble import build_ensemble  # noqa: E402
+ from slot_forecasting.pair_mixer import size_modes_from_targets, win_prior_by_type_from_targets  # noqa: E402
+ 
+@@ -51,7 +51,9 @@
+           saved_priors=json.loads((here / "v7c_priors.json").read_text(encoding="utf-8")))
+ queries, history = load_inputs(data / args.split)
+ cfg = json.loads((here / "combo.json").read_text(encoding="utf-8"))
++flip_weight = cfg.get("flip_weight", None)
++fired = flip_episodes(v7c, data, args.split) if flip_weight is not None else None
+ write_submission(args.out, combine(model.predict(queries, history), v7c.predict_ids(data, args.split, None),
+                                    cfg["win_weight"], cfg["extra_peer"], queries, history, cfg["center"],
+-                                   cfg.get("signal_coef", 0.0)))
++                                   cfg.get("signal_coef", 0.0), flip_weight=flip_weight, flip_episodes=fired))
+ print(f"wrote {args.out}")
+diff -ruN -x runs -x __pycache__ -x *.csv -x public h12-v15/wt/mainFiles/run_strongest.py e8-v15switch/wt/mainFiles/run_strongest.py
+--- h12-v15/wt/mainFiles/run_strongest.py	2026-11-08 01:38:52
++++ e8-v15switch/wt/mainFiles/run_strongest.py	2026-11-08 02:07:47
+@@ -19,7 +19,7 @@
+ 
+ from slot_forecasting.contest import score_contest_files
+ from slot_forecasting.io import load_inputs, read_labels, read_submission, read_targets, write_json, write_submission
+-from slot_forecasting.combo import V7C, combine
++from slot_forecasting.combo import V7C, combine, flip_episodes
+ from slot_forecasting.ensemble import build_ensemble
+ from slot_forecasting.pair_mixer import size_modes_from_targets, win_prior_by_type_from_targets
+ from slot_forecasting.rounds import VERSION, round_metadata
+@@ -36,6 +36,8 @@
+ parser.add_argument("--win-weight", type=float, default=0.4, help="share of v7c's win chance (v13: 0.5)")
+ parser.add_argument("--extra-peer", type=float, default=0.5, help="extra peer term on the blend (v13: 0)")
+ parser.add_argument("--signal-coef", type=float, default=0.05, help="log-odds per signal step (v14: 0)")
++parser.add_argument("--flip-weight", type=float, default=1.0,
++                    help="v7c win weight where its train flip gate fires (train OOF picked 1; set equal to --win-weight for the flat v15 blend)")
+ parser.add_argument("--variant", default="strongest", choices=("strongest",),
+                     help="ensemble variant (slot_forecasting/ensemble.py); saved into the entry")
+ args = parser.parse_args()
+@@ -54,12 +56,17 @@
+ v7c = V7C(public, targets_available=True)
+ from slot_forecasting.peers import train_center
+ center = train_center(train_queries, train_history)
+-print(f"blend: win weight on v7c {args.win_weight}, extra peer {args.extra_peer} (centre {center:.4f})")
++print(f"blend: win weight on v7c {args.win_weight}, extra peer {args.extra_peer} (centre {center:.4f})"
++      + (f"; flip-gate episodes use {args.flip_weight}" if args.flip_weight is not None else ""))
+ files = {"validation": out / "validation_predictions.csv", "test": out / "submission.csv"}
+ for split, path in files.items():
+     queries, history = load_inputs(public / split)
++    fired = flip_episodes(v7c, public, split) if args.flip_weight is not None else None
++    if fired is not None:
++        print(f"{split}: flip gate fired on {len(fired)} episodes")
+     write_submission(path, combine(model.predict(queries, history), v7c.predict_ids(public, split, None),
+-                                   args.win_weight, args.extra_peer, queries, history, center, args.signal_coef))
++                                   args.win_weight, args.extra_peer, queries, history, center, args.signal_coef,
++                                   flip_weight=args.flip_weight, flip_episodes=fired))
+ 
+ # --- validation: official contest score + win-chance vs payout-size error split ---
+ event = {"max_points": round_metadata(public)["max_points"], "version": VERSION}
+@@ -103,9 +110,12 @@
+         fold_keys = {(q.episode_id, q.machine_id) for q in fold_queries}
+         fold_history = tuple(p for p in val_history if (p.episode_id, p.machine_id) in fold_keys)
+         fold_v7c = V7C(public, targets_available=True, prior_episodes=prior_episode_ids, log=lambda *_: None)
++        fold_ids = {q.query_id for q in fold_queries}
++        fired = flip_episodes(fold_v7c, public, "validation", fold_ids) if args.flip_weight is not None else None
+         crossfit.update(combine(fold_model.predict(fold_queries, fold_history),
+-                                fold_v7c.predict_ids(public, "validation", {q.query_id for q in fold_queries}),
+-                                args.win_weight, args.extra_peer, fold_queries, fold_history, center, args.signal_coef))
++                                fold_v7c.predict_ids(public, "validation", fold_ids),
++                                args.win_weight, args.extra_peer, fold_queries, fold_history, center, args.signal_coef,
++                                flip_weight=args.flip_weight, flip_episodes=fired))
+     write_submission(out / "crossfit_validation_predictions.csv", crossfit)
+     halves = [subset_score(crossfit, val_targets, val_groups,
+                            read_submission(val / "reference.csv"), episodes,
+@@ -126,7 +136,8 @@
+     shutil.copyfile(HERE / "entry_template_strongest" / name, entry / name)
+ shutil.copytree(HERE / "v7c_forecasting", entry / "v7c_forecasting", ignore=shutil.ignore_patterns("__pycache__"))
+ (entry / "combo.json").write_text(json.dumps({"win_weight": args.win_weight, "extra_peer": args.extra_peer,
+-                                           "center": center, "signal_coef": args.signal_coef}), encoding="utf-8")
++                                           "center": center, "signal_coef": args.signal_coef,
++                                           "flip_weight": args.flip_weight}), encoding="utf-8")
+ (entry / "v7c_priors.json").write_text(json.dumps({"size_modes": v7c.size_modes, "win_prior": v7c.win_prior}),
+                                       encoding="utf-8")  # v7c's fallback if /data lacks validation targets
+ (entry / "variant.json").write_text(json.dumps({"variant": args.variant}), encoding="utf-8")
+@@ -169,6 +180,8 @@
+   (vendored in `v7c_forecasting/`): its own lag-pair mixer with an episode flip swap and a
+   train-learned payout-size rule. Final win chance = log-odds blend of the two (settings in combo.json) plus an extra peer term; payout
+   sizes given a win = v7c's. Only ticks before each cutoff are read.
++  {("On episodes where v7c's train-learned flip gate fires, the v7c win weight is "
++    + format(args.flip_weight) + " instead of " + format(args.win_weight) + ".") if args.flip_weight is not None else ""}
+ - Model files: `priors.json` and `v7c_priors.json` (fallback copies of the validation-derived priors).
+ - Seeds/settings: deterministic, no randomness; settings are the defaults in
+   `slot_forecasting/pair_mixer.py`, `rule_hmm.py`, `changepoint.py` and `ensemble.py`.
+diff -ruN -x runs -x __pycache__ -x *.csv -x public h12-v15/wt/mainFiles/slot_forecasting/combo.py e8-v15switch/wt/mainFiles/slot_forecasting/combo.py
+--- h12-v15/wt/mainFiles/slot_forecasting/combo.py	2026-11-08 01:38:52
++++ e8-v15switch/wt/mainFiles/slot_forecasting/combo.py	2026-11-08 01:56:09
+@@ -59,11 +59,32 @@
+         return self._predict_split(self.model, queries, history, self.size_rule, self.gate)
+ 
+ 
++def flip_episodes(v7c, data_dir, split, keep=None):
++    """Episode ids where v7c's train-learned flip gate fires on this split.
++
++    Reuses FlipGate.swaps: the threshold is the midpoint of the widest gap in
++    the training episodes' log Bayes factors, and an episode fires when its
++    logBF is above that gate and the posterior has a mode tick.
++    """
++    gate = getattr(v7c, "gate", None)
++    if gate is None:
++        return set()
++    from pathlib import Path
++    queries, history = v7c._load(Path(data_dir) / split)
++    if keep is not None:
++        queries = tuple(q for q in queries if q.query_id in keep)
++        keys = {(q.episode_id, q.machine_id) for q in queries}
++        history = tuple(p for p in history if (p.episode_id, p.machine_id) in keys)
++    swaps, _detect = gate.swaps(queries, history, v7c.model.pairs)
++    return set(swaps)
++
++
+ WIN_WEIGHT = 0.4    # v14: share of v7c's win chance in the log-odds blend (v13 used 0.5)
+ EXTRA_PEER = 0.5    # v14: extra peer term (v7c ignores other machines, so the blend halved it)
+ 
+ 
+-def combine(ours, theirs, win_weight=0.5, extra_peer=0.0, queries=None, history=None, center=0.5, signal_coef=0.0):
++def combine(ours, theirs, win_weight=0.5, extra_peer=0.0, queries=None, history=None, center=0.5, signal_coef=0.0,
++            flip_weight=None, flip_episodes=None):
+     """Blend ours and v7c. With extra_peer > 0 (and queries / history), add
+     extra_peer x (peers' lag 1-5 win share - center) to the blended log-odds (peers.py).
+     v14 research (research/v13_variants.py, v13_eval.py): win 0.4 + extra peer 0.5 vs v13 -
+@@ -71,8 +92,15 @@
+     -0.0019 [-0.0031, -0.0007], cutoff -0.0020 [-0.0049, +0.0007] (v7c refit per fold).
+     signal_coef (v15: 0.05): the residual of v14's win chance rises with the signal column on both
+     validation (z +3.4) and train (z +3.1); 0.05 (half the validation optimum) lifts both
+-    validation halves (57.56 / 57.44 -> 57.58 / 57.47), train dR -0.0004 window, -0.0008 cutoff."""
++    validation halves (57.56 / 57.44 -> 57.58 / 57.47), train dR -0.0004 window, -0.0008 cutoff.
++    flip_weight: on episodes in flip_episodes (v7c's gate fired), use this share of v7c's win
++    chance instead of win_weight. Elsewhere the v15 weights are unchanged. None keeps win_weight
++    on every episode."""
+     signals = {q.query_id: q.signal for q in queries} if queries is not None else {}
++    fired = set()
++    if flip_weight is not None and flip_episodes and queries is not None:
++        fired_eps = set(flip_episodes)
++        fired = {q.query_id for q in queries if q.episode_id in fired_eps}
+     shares = {}
+     if extra_peer and queries is not None:
+         from .peers import _by_machine, peer_share
+@@ -85,7 +113,8 @@
+         share = shares.get(qid)
+         bump = 0.0 if share is None else extra_peer * (share - center)
+         bump += signal_coef * signals.get(qid, 0)
+-        win = 1.0 / (1.0 + math.exp(-((1 - win_weight) * _logit(wa) + win_weight * _logit(wb) + bump)))
++        ww = flip_weight if qid in fired else win_weight
++        win = 1.0 / (1.0 + math.exp(-((1 - ww) * _logit(wa) + ww * _logit(wb) + bump)))
+         sizes = [x / wb for x in b[1:]]
+         raw = [max(p, MIN_PROBABILITY) for p in [1.0 - win] + [win * s for s in sizes]]
+         total = math.fsum(raw)

@@ -33,3 +33,14 @@ Baseline v7c: 57.37 (57.31 / 57.39); sims 37.72 / 36.45 / 37.63.
   - all_lags −3.7
   - fast_drift −2.9
 - The remaining error is ~all win probability: a perfect win would remove 77.5% of v15's error. The biggest slices are short history and jackpot (h13).
+
+## Update 02:15 — adaptability
+- **Flip-switched v15 blend (e8, patch: `e8-v15switch.diff` against Pranav's v15 checkout).** In episodes where v7c's flip gate fires, the win blend uses v7c's win chance with weight w; elsewhere it keeps v15's weights.
+  | w | main | halves | sim disjoint | sim four | sim sharedlag |
+  |---|---:|---|---:|---:|---:|
+  | v15 | 57.55 | 57.58 / 57.47 | 37.44 | 35.62 | 36.64 |
+  | 0.8 | 57.55 | 57.55 / 57.50 | 37.62 | 35.82 | 37.31 |
+  | 1.0 | 57.53 | 57.51 / 57.50 | 37.65 | 35.88 | 37.46 |
+
+  Main is unchanged, and the shifted rounds gain +0.2 / +0.2 / +0.7. It should transfer to v16, whose blend weight is not episode-aware.
+- **The cause of v7c's eval-preset losses is v7c's own round-two patch (`USE_ROUND2`: windowed pair voting, 2-means levels, cell-mode guard), not the size rule or the flip (m5).** With `USE_ROUND2` off, v7c matches v6 on round2_shift (23.92 vs 23.90) and all_lags (35.52 vs 35.51). It is being narrowed down to the responsible part.
