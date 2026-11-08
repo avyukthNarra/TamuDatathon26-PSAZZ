@@ -71,3 +71,7 @@ blend .00385. Jackpot win remains the largest gap for every member.
 - Pranav's v16 (`origin/pranav/v15-evalsuite`, 57.59, halves 57.62/57.52) as the blend's first member, with our short and
   jackpot patches: 57.98, paired +0.011 [-0.002, +0.025] vs the 57.97 blend; four members (v13 and v16) 58.00,
   +0.029 [-0.008, +0.065]. Noise-level, so the 57.97 blend is kept; v16 is an equal-strength drop-in for the v13 member.
+- zhill's `v17-round2-guards` (Pranav's v17 with our jackpot sub-cell idea + Avyukth's round-two guard fix; 57.72,
+  cross-fit 57.69) as the first member, with our short and jackpot patches: blend 57.984 (halves 58.02 / 57.94),
+  paired +0.011 [-0.002, +0.025] vs the v13-based 57.97. A tie on main, so **v14 is packaged with v17-guards** as the
+  first member: same score here, and it carries the round-two guard fix that v13's older vendored v7c lacks.
