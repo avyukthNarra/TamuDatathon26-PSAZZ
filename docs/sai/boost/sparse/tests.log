@@ -1,0 +1,11 @@
+test_beta_posterior_matches_pinned_v4 (test_sparse.SparseTests.test_beta_posterior_matches_pinned_v4) ... ok
+test_forward_predictions_never_read_future (test_sparse.SparseTests.test_forward_predictions_never_read_future) ... ok
+test_fractional_updates_recover_lag_incomplete_exposures (test_sparse.SparseTests.test_fractional_updates_recover_lag_incomplete_exposures) ... ok
+test_missing_outcomes_are_never_training_targets (test_sparse.SparseTests.test_missing_outcomes_are_never_training_targets) ... ok
+test_sparse_gate_and_probability_validity (test_sparse.SparseTests.test_sparse_gate_and_probability_validity) ... ok
+test_unmodified_head_matches_original (test_sparse.SparseTests.test_unmodified_head_matches_original) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.097s
+
+OK
