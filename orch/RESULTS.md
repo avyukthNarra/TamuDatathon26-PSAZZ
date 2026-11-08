@@ -23,6 +23,16 @@ sysid on stable/drift (explicit unchanged / machine-reversal / episode-reversal 
 histories (exact sum over missing ticks), v13 on balanced machines. Win MSE: v13 .00473, exact .00438, sysid .00440,
 blend .00385. Jackpot win remains the largest gap for every member.
 
+## Paired significance (orch/paired.py, episodes resampled within condition with both forecasts together)
+| Comparison | Points | Paired 95% CI | P(gain > 0) |
+|---|---:|---|---:|
+| final 57.97 blend vs v13 | +0.473 | [+0.206, +0.767] | 1.000 |
+| 3-model blend vs v13 | +0.359 | [+0.148, +0.602] | 1.000 |
+| + short patch (inside blend) | +0.051 | [-0.022, +0.137] | 0.904 |
+| + jackpot patch (inside blend) | +0.064 | [+0.012, +0.117] | 0.993 |
+| exact filter alone vs v13 | -0.012 | [-0.345, +0.336] | 0.467 |
+| sysid alone vs v13 | -0.054 | [-0.608, +0.417] | 0.436 |
+
 ## Members (each on its own branch, local commits pushed)
 - `sai/fresh-exact`: exact posterior predictive under the full generative model (pair x direction enumerated,
   logit-normal levels on a 25x25 grid, joint episode inference over condition and one shared change tick, exact sum over
