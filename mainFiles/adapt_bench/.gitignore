@@ -1,0 +1,5 @@
+kits/
+runs/
+*.csv
+# Tiny committed fixtures stay tracked.
+!fixtures/**/*.csv
