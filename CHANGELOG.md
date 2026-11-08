@@ -18,6 +18,9 @@ How to add an entry (every PR):
 
 ## [Unreleased]
 
+### Changed
+- Round-two script defaults to the rules-learning adapted blend (`adapted_entry_v17g_rules/`, #24); the previous default stays as challenger `blend_v17g` (main kit unchanged, 57.97)
+
 ### Added
 - Shared experiment harness, master test plan, and results leaderboard under docs/sai (reproduces pooled 30.00 and pair prototype 46.07)
 - Independent system-identification forecaster with train-only fitting, cross-fitted validation, and reproducible simulator diagnostics
