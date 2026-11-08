@@ -66,6 +66,14 @@ python3 mainFiles/check_submission.py $OUT/blend/submission.csv
 - `bundled/validation/` makes the rerun identical with or without `/data/validation/targets.csv`, or with no `/data/validation/` at all
   (checked on main: all three byte-identical).
 - If the gate drops a member, the blend CSV from run_round2.py already uses it (same `gate.json`).
-- After uploading, commit `gate.json` and `bundled/` so the repo reproduces the uploaded CSV.
+- After uploading, commit `gate.json` and record the files' SHA-256 (below). `bundled/validation/` is a copy of the kit's
+  `validation/`, so it is not committed; rebuild it with `cp -R $KIT/validation adapted_entry_v17g_rules/bundled/`.
 - Main-kit check of this path (Docker eval suite, quick): PASS WITH WARNINGS, 0 FAIL, k-fold 57.86; the 2 WARNs are the
   known future-dated-rows refusal.
+
+## Round-one (main) upload, 2026-11-08
+Submitted through the main-round Google Form from `sai/master-test` @ 65e55a2 (entry `adapted_entry_v17g_rules/`, gate keeps
+all three members, main validation 57.97).
+- `submission.csv` SHA-256 `076014ef241d8b61b6b608a513e350293a309294c538f0125a35d9e80aaba364` (check_submission: VALID FORMAT, 1536 queries, main, test)
+- `entry.zip` SHA-256 `f3dae4e5fdb0a6c83d981f4222bff152a1cf89f6ba091f43a9cdee035250743d` (742 KB; clean `git archive` of the entry + `gate.json` + `bundled/validation/` =
+  `mainFiles/public/validation/`)
