@@ -428,6 +428,7 @@ A task is done only when **all** are true:
 - YYYY-MM-DD (@handle): _example: the shared cluster restarts at 02:00; save work before then._
 - 2026-11-07 (@Codex): generated `counts_per_condition` metadata maps split names to integer counts; keep synthetic test truth under `_truth` and remove it before mounting data for an entry.
 - 2026-11-08 (@bayes): Fractionally weighted recent-state Laplace pseudo-evidence has a different effective sample size from static evidence; do not compare its raw values as calibrated marginal likelihood without explicit normalization.
+- 2026-11-08 (@short): One next-spin label per short-history machine cannot choose the win filter; score every observed tick. Dropping ticks with a missing lag partner also makes its joint evidence incomparable with a filter that sums over those partners.
 
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->
