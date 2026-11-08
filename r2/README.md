@@ -72,7 +72,7 @@ python3 mainFiles/check_submission.py $OUT/blend/submission.csv
   known future-dated-rows refusal.
 
 ## Round-one (main) upload, 2026-11-08
-Submitted through the main-round Google Form from `sai/master-test` @ 65e55a2 (entry `adapted_entry_v17g_rules/`, gate keeps
+Submitted through the main-round Google Form from `sai/master` (then named `sai/master-test`) @ 65e55a2 (entry `adapted_entry_v17g_rules/`, gate keeps
 all three members, main validation 57.97).
 - `submission.csv` SHA-256 `076014ef241d8b61b6b608a513e350293a309294c538f0125a35d9e80aaba364` (check_submission: VALID FORMAT, 1536 queries, main, test)
 - `entry.zip` SHA-256 `f3dae4e5fdb0a6c83d981f4222bff152a1cf89f6ba091f43a9cdee035250743d` (742 KB; clean `git archive` of the entry + `gate.json` + `bundled/validation/` =
