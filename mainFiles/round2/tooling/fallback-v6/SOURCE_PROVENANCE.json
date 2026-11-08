@@ -1,0 +1,23 @@
+{
+  "source": "/Users/avynarra/Documents/Datathon/worktrees/pranav-5629/mainFiles",
+  "copied_on": "2026-11-07",
+  "description": "Allowlisted plain-v6 runtime snapshot; excludes public data, priors, runs, bytecode, and git metadata.",
+  "sha256": {
+    "check_submission.py": "5c403aedff0ff9955900c2ee3567b627b8fa345ac2be595730cb8557adb22628",
+    "entry_template/predict.py": "a96b06dfc39809937cba1b5fc1e7de1d9569f4f5e9a65ffdc60c2d8dfbe51aaf",
+    "entry_template/reproduce.json": "cb91250a431dc92a45ceda7bf66df8006a4ecbce2b8e393f52f7284fd22246a1",
+    "run_pair_mixer.py": "4029da42b0030d6491b85cb8ff34cf9b48009dc84482e5b58d3c70216115459e",
+    "slot_forecasting/__init__.py": "49490dd5af60e50f1dd37048845f7b056b6f2b83a30b53031b4f12bb4c1e22e2",
+    "slot_forecasting/baseline.py": "c7e73421a47800812c54c2b58cb324446d173ebdedaaf06fc15512046f9f87c9",
+    "slot_forecasting/contest.py": "411c7586b26cbc579ac32489b5306a4e87942aac58738cdec0e7e8ce7d3cc442",
+    "slot_forecasting/experiments.py": "a0c06144922f8b7f49d9c058c963ffc2b49cd555bb474a92a335d330044ce036",
+    "slot_forecasting/io.py": "3ef8706676971936080da79be2c073e2a12472ab3a892757a9c2aff8712ab76f",
+    "slot_forecasting/pair_mixer.py": "8bd7245353aaf7866b48e3fd14f0a49544d0647eabcb95ecf4602982edee2b6f",
+    "slot_forecasting/rounds.py": "e048ef615df8c291305c7a0c642b85bad9df80103c6c7c2e1756cd6ff7508955",
+    "slot_forecasting/schema.py": "2a8ab28d29865faf0ee533c17af6b425e12b96be381825f3b23f241479645b22",
+    "slot_forecasting/scoring.py": "477c66c6c5449ca65f77ec4867a9b80934a52c892b045abe32e6471d2c8d4edd",
+    "slot_forecasting/starter.py": "33f50997aa73969d3e0fc09df6c88ad00032026b62d680ab8f76d055bd0f1069",
+    "slot_forecasting/submission_contract.py": "d88207f8279d6800b06bbad79dc24187df6816ae89defad0b8ff0c80c0ae499c",
+    "slot_forecasting/transition.py": "eb37e6b87c76f4c2f9643cbfdfe69d19980760efbaa019ee5a1984c839f2576f"
+  }
+}

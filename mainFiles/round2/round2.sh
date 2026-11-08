@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-DEFAULT_SOURCE="$ROOT/v7c-mainFiles"
+DEFAULT_SOURCE="$(cd -- "$ROOT/.." && pwd -P)"
 FALLBACK_SOURCE="$ROOT/tooling/fallback-v6"
 PYTHON="${PYTHON:-python3}"
 BUILD_SECONDS="${ROUND2_BUILD_SECONDS:-360}"

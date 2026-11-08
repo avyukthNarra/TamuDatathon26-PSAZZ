@@ -2,7 +2,7 @@
 
 This procedure refits the candidate on the newly released round's own public
 data, checks the test forecast, and leaves the two upload files in
-`c3-codex/SUBMIT_R2/`. It never uploads or submits anything. The main-round
+`mainFiles/round2/SUBMIT_R2/`. It never uploads or submits anything. The main-round
 `public/` bundled with a source checkout is deliberately excluded; every build
 receives the explicit new kit path.
 
@@ -21,12 +21,12 @@ receives the explicit new kit path.
 From any working directory, run:
 
 ```sh
-/Users/avynarra/Documents/Datathon/research_pf/c3-codex/round2.sh \
+mainFiles/round2/round2.sh \
   /absolute/path/to/new-kit/public
 ```
 
 The script copies only the runtime model code and entry templates into a fresh
-isolated workspace, uses the candidate source from `c3-codex/v7c-mainFiles`, passes
+isolated workspace, uses the candidate source from `mainFiles/` (this checkout), passes
 the new public folder explicitly, and requests cross-fitted validation output.
 The runner uses its fixed train-only, two-fold episode cross-fit gate to choose
 between the candidate size rule and the round-two v6 size head. It prints the
@@ -61,7 +61,7 @@ simulator checks, not performance claims for the real kit.
 To force a plain-v6 build manually, use the frozen fallback source explicitly:
 
 ```sh
-ROOT=/Users/avynarra/Documents/Datathon/research_pf/c3-codex
+ROOT=mainFiles/round2
 "$ROOT/round2.sh" /absolute/path/to/new-kit/public \
   --source "$ROOT/tooling/fallback-v6"
 ```
@@ -85,7 +85,7 @@ Confirm the final line says `READY` and identify whether it says `candidate` or
 `fallback-v6`. Check that both files exist and are nonempty:
 
 ```sh
-ls -lh /Users/avynarra/Documents/Datathon/research_pf/c3-codex/SUBMIT_R2
+ls -lh mainFiles/round2/SUBMIT_R2
 ```
 
 Read the printed values against the round's known data story. Treat any pair or
@@ -110,8 +110,8 @@ If time allows, repeat the checker directly with the same kit as a final
 independent confirmation:
 
 ```sh
-python3 -B /Users/avynarra/Documents/Datathon/research_pf/c3-codex/v7c-mainFiles/check_submission.py \
-  /Users/avynarra/Documents/Datathon/research_pf/c3-codex/SUBMIT_R2/submission.csv \
+python3 -B mainFiles/check_submission.py \
+  mainFiles/round2/SUBMIT_R2/submission.csv \
   --data /absolute/path/to/new-kit/public --split test
 ```
 

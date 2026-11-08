@@ -18,3 +18,7 @@ mainFiles/*-entry.zip
 /runs/
 /outputs/
 /experiments/
+
+# round-two wrapper scratch and outputs
+mainFiles/round2/.round2-work/
+mainFiles/round2/SUBMIT_R2/
