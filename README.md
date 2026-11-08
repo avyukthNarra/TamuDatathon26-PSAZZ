@@ -18,8 +18,9 @@ scored against the organizers' reference (`mainFiles/RULES.md`).
   validation, and recommends what to upload (a challenger must beat the default by > 0.1 on the mean and both halves).
 - **Round-one upload:** recorded in `r2/README.md` (SHA-256 of the CSV and code ZIP).
 - **Round-two kit:** adaptation validation 38.59 / 40 cross-fitted (halves 38.53 / 38.63; loss ratios stable 0.031,
-  short_history 0.049, drift 0.036, shared_change 0.031). The lag structure moved: per-machine pairs (3,8), (1,4), (2,6) and
-  about 30% of machines on 3-lag rules ((4,6,8), (2,4,5), (1,3,7), (1,5,8)); the default learns these from train.
+  short_history 0.049, drift 0.036, shared_change 0.031). The lag structure moved: every machine is on one of the parity pairs (3,8), (1,4), (2,6)
+  (census 733/675/655; no 3-lag or AND/OR rules; Walsh-screen triples are artefacts); the default learns these from train.
+  Headroom (Avyukth, `origin/avyukth/r2-adaptation`): true P(win) would give 39.63, true sizes 38.93, so P(win) is the gap.
 
 ## Round two in four commands
 See `r2/README.md` ("Kit-day steps") for the full version.
