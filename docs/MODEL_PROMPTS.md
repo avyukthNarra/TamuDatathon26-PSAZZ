@@ -4,7 +4,7 @@ A running log of the requests (to Claude Code or any coding agent) that led to
 real score gains, and the ones that didn't. Use it to steer the next agent fast,
 especially in round two. Validation points are out of 60; the pooled baseline is 30.
 
-## Paste-ready prompt (rebuilds the 56.12 model from the starter kit)
+## Paste-ready prompt (rebuilds the 56.19 model from the starter kit)
 
 Copy everything inside the box into a fresh coding agent opened in the repo root.
 It describes the finished model exactly, so the agent doesn't have to rediscover it.
@@ -17,7 +17,7 @@ submission_contract.py), and the organizers' baseline in run_starter.py (it alwa
 scores ~30/60 because "pooled" IS the reference model; points = 60/(1+R)).
 Read AGENTS.md first and follow it: work on a feature branch, never commit to main.
 
-GOAL: build a forecaster that scores ~56.12/60 on validation (also ~56.12 cross-fitted,
+GOAL: build a forecaster that scores ~56.19/60 on validation (~56.18 cross-fitted,
 see VERIFY), plus a verified entry ZIP.
 
 HARD CONSTRAINTS
@@ -48,7 +48,7 @@ WHAT THE DATA ACTUALLY DOES (already established; don't re-research)
 BUILD mainFiles/slot_forecasting/pair_mixer.py with:
 1. class PairMixer, one online "walk" per (episode, machine) over own[t] = payout class
    index (0 = loss) or None. At each t: EMIT the forecast, THEN absorb tick t.
-   - Win experts: one per (pair, half_life) for half_life in (12, 40). Each keeps
+   - Win experts: one per (pair, half_life) for half_life in (12, 40, 100). Each keeps
      exponentially decayed [wins, n] per cell. Default cell_mode "parity" = 2 cells
      (lags agree / disagree); also support "full" = 4 cells (won/lost at a x at b).
      Expert prediction for a cell with decayed (w wins, n spins) = posterior mean under a
@@ -72,7 +72,7 @@ BUILD mainFiles/slot_forecasting/pair_mixer.py with:
      posterior = softmax, cell forecast = sum_m post[m] * mode_m. For M = 2 this equals
      P(big) = sigmoid(llr), forecast (1-P)*small + P*big (a unit test checks it). An empty
      cell uses the machine-level counts the same way. Mix size experts with
-     log_w -= size_eta * squared error (size_eta = 8), only on winning ticks.
+     log_w -= size_eta * squared error (size_eta = 4), only on winning ticks.
      Fallback when no modes are available: keys (), (1,), (1,2), (2,), (2,3) with free
      frequencies, smoothed toward the machine mix (k_size 16) and a type prior (k_machine 32).
    - Decay all tables every tick, including missing ticks (decay_missing = True).
@@ -128,19 +128,59 @@ ALSO CREATE
 
 VERIFY (and report the actual output)
   cd mainFiles && python -m unittest discover -s tests
-  python run_pair_mixer.py --out runs/combined-v4 --cv-val
-  python check_submission.py runs/combined-v4/submission.csv
-  python check_submission.py runs/combined-v4/validation_predictions.csv --split validation
-Expect validation ~56.12/60 (R ~0.069: stable ~0.057, short_history ~0.112,
-drift ~0.050, shared_change ~0.058) and cross-fitted halves (each half's priors read
-from the OTHER half's targets) ~55.90 / 56.37. The reference build's test submission
-SHA-256 is 92ba46bd17fcf6d6814c7b8481a40e04af3acc72ccb99865b558776c39f6c2d3. A rebuild
+  python run_pair_mixer.py --out runs/combined-v5 --cv-val
+  python check_submission.py runs/combined-v5/submission.csv
+  python check_submission.py runs/combined-v5/validation_predictions.csv --split validation
+Expect validation ~56.19/60 (R ~0.068: stable ~0.055, short_history ~0.107,
+drift ~0.050, shared_change ~0.059) and cross-fitted halves (each half's priors read
+from the OTHER half's targets) ~56.00 / 56.40. The reference build's test submission
+SHA-256 is ae3159d123b6b10d398291de98e35452110042e8cbfcbeecb5a5c31dc88ff6e3. A rebuild
 will only match it byte for byte if the arithmetic order is identical, so treat the
-score as the check. Upload runs/combined-v4/submission.csv and runs/combined-v4/entry.zip.
+score as the check. Upload runs/combined-v5/submission.csv and runs/combined-v5/entry.zip.
 ````
 
 The shortcut, if the branch `COMBINED_SOLUTIONS` is available, is to check it out and
-run the VERIFY commands (current reference: 56.12). The prompt above is for rebuilding without it.
+run the VERIFY commands (current reference: 56.19). The prompt above is for rebuilding without it.
+
+## What changed on `COMBINED_SOLUTIONS`, round 5 (56.12 -> 56.19, short_history)
+
+Goal: short_history had the worst loss ratio (0.112, about twice the others), so diagnose it
+and test four targeted fixes, keeping only what passes out-of-fold train AND both cross-fitted
+validation halves.
+
+**Diagnosis (validation, cross-fit predictions):** short_history's extra error is mostly
+payout SIZE (size error 0.0126 vs 0.0044-0.0067 elsewhere; win error 0.0072 vs 0.0051-0.0058).
+Sparse active win cells are rare: only 2.1% of short_history queries land in a parity cell with
+< 5 spins in the last 40. Size error grows with recent wins (0.003 with < 12 wins in the last 40,
+0.030 with 24+), because more of the probability mass is size mass.
+
+**Results (base = the 56.12 model; cross-fit validation (halves); short_history ratio)**
+
+| Fix | Change | Cross-fit validation | short ratio | OOF train cutoff / window dR | Kept? |
+|---|---|---|---|---|---|
+| 1 | Leave-one-out re-scoring of win experts at the cutoff (weight 0.5 / 1) | 56.04 / 56.03 | 0.115 | n/a | no (worse on validation) |
+| 2 | Coarse lost / 1-2x / 5-20x size cells alongside exact ones | 56.09 | 0.109 | n/a | no |
+| 2 | Coarse size cells instead of exact ones | 54.74 | 0.115 | n/a | no |
+| 2 | Pool machine-level size counts into each cell (0.1 / 0.3) | 56.04 / 55.73 | 0.111 | n/a | no |
+| 2 | size half-life 40 / 160 | 55.93 / 56.11 | | n/a | no |
+| 2 | **size_eta 8 -> 4** | 56.16 (55.97 / 56.39) | 0.108 | +0.0005 [-0.004, +0.005] / **-0.0011 [-0.002, -0.000]** | with the next |
+| 3 | Fractional decay on missing ticks (0.15 / 0.3 / 0.5) | 56.11 | 0.112 | n/a | no |
+| 3 | **Third win memory, half-life 100** | 56.14 (55.93 / 56.39) | 0.110 | -0.0008 [-0.003, +0.001] / -0.0001 | with the previous |
+| 2+3 | **Both** | **56.18 (56.00 / 56.40)** | **0.107** | -0.0003 [-0.005, +0.005] / **-0.0012 [-0.0024, -0.0001]** | **YES** |
+| 4 | Stronger match/differ coupling for sparse cells | not built: only 2% of queries have a sparse active cell | | | no |
+
+Small but consistent: both halves up, the late-window train interval clears zero, and nothing
+is hard-coded to the main round (both are plain settings; everything data-derived is still
+re-read from each round's train and validation files).
+
+### Prompts used this round (paste these to repeat it)
+
+1. "short_history has twice the loss ratio of the other conditions. Before changing anything,
+   split its error into win vs size, by how many spins the active parity cell has, and by how
+   many wins the machine had in the last 40 spins."
+2. "Test each targeted fix ALONE on cross-fitted validation (print the short_history ratio);
+   run the out-of-fold train check (cutoff and last-10-tick window) only on the ones that raise
+   both halves; keep only what passes both. Remove the code for the rejected ones."
 
 ## What changed on `COMBINED_SOLUTIONS`, round 4 (55.34 -> 56.12, honest evaluation)
 
@@ -494,6 +534,7 @@ run the tests and check_submission.py, and commit and push.
 | 12 | **"Compare with a second team's experiment log; test their processes on our model; find where the error is; check if the truth takes few distinct values"** | Payout size is exactly one of two mixes per type, switched by whether the spin 1, 2 or 4 back was a big win. Size cells now estimate P(big mode) by Bayes' rule with the two mixes read from validation targets. Train cutoff dR -0.0233 [-0.042,-0.001]; both validation halves up | **54.90** |
 | 13 | **"Read RULES.md; compute oracle bounds (perfect size vs perfect win); test the neighbour hint per machine pair; histogram the true win chances"** | Win chance had more headroom; neighbour links were small-sample noise; true win chances are U-shaped, so each win cell now uses a dead/live Beta-mixture prior read from validation targets (eta 16 -> 8). Both validation halves up | **55.34** |
 | 14 | **"Make the evaluation honest (cross-fit validation, out-of-fold train, a late-window train score), replace hard-coded assumptions with learned ones, keep only what passes both"** | Size lags now discovered from train (1, 2, 4; lag 3 was noise); data-driven prior weights and a train-history prior REJECTED (worse on train); the win prior is per machine type (jackpot is almost never live). OOF window dR -0.0113 [-0.015, -0.008]; cross-fit halves 55.90 / 56.37 | **56.12** |
+| 15 | **"Diagnose short_history (win vs size, sparse cells, wins in the window), test four targeted fixes one at a time, keep only what passes OOF train and both cross-fit halves"** | Its extra error is payout size, not sparse win cells. A third win memory (half-life 100) plus slower size-expert re-weighting (size_eta 4) passed; leave-one-out scoring, gap decay, coarse/pooled size cells did not. OOF window dR -0.0012 [-0.0024, -0.0001]; cross-fit halves 56.00 / 56.40 | **56.19** |
 
 ## Prompt patterns that work
 

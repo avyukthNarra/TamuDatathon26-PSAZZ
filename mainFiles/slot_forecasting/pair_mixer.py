@@ -74,11 +74,13 @@ def size_mode_mixture(counts, modes, priors, temperature=1.0, floor=1e-3):
 
 
 class PairMixer:
-    # Defaults: kept only if better on BOTH train cutoff labels (tune_pair_mixer.py) and
-    # validation truth. half_life (12, 40) = a fast and a slow expert per pair.
-    def __init__(self, pairs=DEFAULT_PAIRS, pair_prior=None, half_life=(12.0, 40.0), k_win=0.25, eta=16.0,
+    # Defaults: kept only if better on BOTH out-of-fold train (tune_pair_mixer.py) and
+    # cross-fitted validation. half_life (12, 40, 100) = a fast, a medium and a slow expert per
+    # pair; size_eta 4 = size experts re-weight more slowly. Together: OOF window dR -0.0012
+    # [-0.0024, -0.0001], cross-fit validation 56.12 -> 56.18 (halves 56.00 / 56.40).
+    def __init__(self, pairs=DEFAULT_PAIRS, pair_prior=None, half_life=(12.0, 40.0, 100.0), k_win=0.25, eta=16.0,
                  size_keys=None, size_half_life=80.0, k_size=16.0, k_machine=32.0,
-                 size_eta=8.0, type_size_priors=None, rate_prior=(1.0, 2.0), cell_mode="parity",
+                 size_eta=4.0, type_size_priors=None, rate_prior=(1.0, 2.0), cell_mode="parity",
                  decay_missing=True, alpha=0.0, size_cell="class", size_modes=None, mode_temp=1.0, win_prior=None):
         # win_prior: [(weight, mean, strength), ...] - a mixture of Beta priors for each win cell's
         #   rate (e.g. a "dead" level near 0.03 and a "live" level near 0.93). A cell's estimate is
