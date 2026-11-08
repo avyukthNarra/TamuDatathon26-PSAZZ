@@ -20,6 +20,7 @@ How to add an entry (every PR):
 
 ### Added
 - Lag-pair mixer forecaster with a verified, reproducible entry ZIP (`mainFiles/run_pair_mixer.py`); validation 53.75 / 60
+- Method-agnostic evaluation suite (`python -m eval_suite run --entry DIR`) that checks any entry against all 88 documented requirements and scores it with the official metric (#19)
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 - House Edge rule model (v4): per-machine lag-pair win rules plus payout-size rules, 52.89 / 60 on validation vs 30.83 for the best starter, with a one-command entry builder for main and round two
 - Combined entry: 20% rule model + 80% pair mixer, 54.45 / 60 on validation (built by `mainFiles/make_entry.py`)
@@ -47,5 +48,6 @@ How to add an entry (every PR):
 ### Removed
 
 ### Fixed
+- Local-mode answer-isolation checks are reported as NOT RUN, and omitted mode selects Docker when available (#19)
 
 ### Security
