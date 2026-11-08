@@ -46,7 +46,9 @@ def main():
         p=read_pred_csv(path,v)
         assert np.isfinite(p).all() and (p>=0).all() and (p<=1).all()
         assert np.max(abs(p.sum(1)-1))<1e-6
-        records.append({'file':path.name,'rows':len(rows),'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
+        share_error=float(np.max(abs(p[:,1:]/p[:,1:].sum(1,keepdims=True)-shares)))
+        assert share_error<2e-15
+        records.append({'file':path.name,'rows':len(rows),'max_size_share_difference':share_error,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
     checks['files']=records
     checks['unit_tests_passed']=6
     checks['audit_log_unchanged_during_run']=report['audit_log_unchanged']
