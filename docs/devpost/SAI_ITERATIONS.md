@@ -53,14 +53,17 @@ Ran four independent "fresh" research tracks with agents, each forbidden to copy
 
 ## 5. Make it adapt for round two (Sun 02:15-05:20)
 - Risk: the blend hard-coded the main-round pairs; on simulated shifted rounds it scored about 18/40.
-- Made every member LEARN its lag-pair support from the round's own train data (all 28 pairs, census + floor), and the exact filter also learn
-  3-lag XOR and AND/OR rule families with prior mass from the train census. Built a 10-kit simulated adaptability benchmark (K1-K10).
-  Adapted blend: about 38/40 on shifted kits, main unchanged (57.97). The rules version lifted the hardest kit K10 from 32.1 to 35.4.
-- Swapped member 1 from v13 to Zhill's v17-round2-guards (v17 + Avyukth's v7c guards): main 57.97, adapt-bench +0.017.
-- Built `r2/run_round2.py`: one command screens the new kit's structure, builds every candidate, scores cross-fitted validation, runs paired
-  bootstraps, checks the CSVs, writes RANKING.md with a recommendation. Pick rule (team decision): a challenger replaces the default only if
-  it wins by > 0.1 overall AND on both halves.
-- Member gate (`r2/gate_members.py`) and bundled validation so the entry runs identically with or without validation mounted.
+- Sai: made the exact filter learn its pair set from the kit's histories (all 28 pairs, census + floor; main 57.478 vs 57.49
+  hard-coded) and wrote the round-two structure screen (`orch/r2screen/`: single lags, pairs, triples).
+- Avyukth (team effort, credit his): adapted the whole blend so every member learns its lag pairs per round (`2730597`), swapped member 1
+  to Zhill's v17-round2-guards on Sai's suggestion (`3083c87`), made the exact filter learn 3-lag XOR and AND/OR rule families from
+  the train census (`979d2d9`), and built the 10-kit simulated adaptability benchmark (K1-K10). Adapted blend: about 38/40 on shifted kits
+  vs about 18 locked; main unchanged (57.97); the rules version lifted the hardest kit K10 from 32.1 to 35.4.
+- Sai: built `r2/run_round2.py`: one command screens the new kit's structure, builds every candidate, scores cross-fitted validation,
+  runs paired bootstraps, checks the CSVs, writes RANKING.md with a recommendation. Pick rule (team decision): a challenger replaces the
+  default only if it wins by > 0.1 overall AND on both halves.
+- Zhill: the round-adaptive member gate (`r2/gate_members.py`) and bundled validation so the entry runs identically with or without
+  validation mounted.
 - Docker eval suite: PASS WITH WARNINGS, 0 FAIL, honest 4-fold 57.86.
 
 ## 6. Round two day (Sun 10:35-11:40): 38.59 / 40
