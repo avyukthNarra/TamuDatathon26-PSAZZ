@@ -17,3 +17,10 @@ Verdict: no change. Script `tweak.py`, output `tweak_out.txt`.
 
 ## Code ZIP
 `ADAPTATION_entry.zip` sha256 feb33968c7070000891f84547e8a896a3c1e5e0c4538498be840f995d76729d2 (clean git archive + gate.json + kit validation/ as bundled/).
+
+## More checks (40-point scale), all no change
+- Per-type blend weights (sysid heavier on jackpot/balanced): fit A -> B +0.11, fit B -> A -0.08. Inconsistent, rejected (`pertype.py`).
+- Headroom (`headroom.py`): true win + our size 39.63; our win + true size 38.93; blend 38.59. Win prob is most of the gap.
+- Train + validation half as extra training episodes, predicting the other half as test (`trainval_*.py`):
+  held-out B 38.502 -> 38.495 (-0.007), held-out A 38.404 -> 38.401 (-0.003). Members are data-saturated.
+- Size lags moved to {1,2,3} (smaller member of each new win pair); the size rule searches range(1,9) on train and picks them up.
