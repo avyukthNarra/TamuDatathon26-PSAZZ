@@ -28,6 +28,12 @@ How to add an entry (every PR):
 - Hidden-rule HMM (`mainFiles/hmm_model.py`) blended 50/50 into the entry: 56.28 / 60 on all 96 validation episodes
 
 ### Changed
+- Win chance blends in 30% of a hidden-rule HMM (adapted from the zhill-56.28-hmm branch) that tracks rule switches; validation 56.32 -> 56.51 / 60 (cross-fitted 56.48)
+- Pair mixer's win prior levels also depend on the machine's signal column; validation 56.29 -> 56.32 / 60 (cross-fitted 56.31)
+- Pair mixer's win prior gets a middle level per machine type, read from that type's in-between win chances; validation 56.19 -> 56.29 / 60 (cross-fitted 56.28)
+- Pair mixer adds a slow 100-spin win memory and re-weights its payout-size experts more slowly; validation 56.12 -> 56.19 / 60 (cross-fitted 56.18), short_history error ratio 0.112 -> 0.107
+- Pair mixer reads typical win levels per machine type, finds which earlier spins drive payout size from train history (main round: 1, 2 and 4 back), and supports any number of size modes per type; validation 55.34 -> 56.12 / 60 (cross-fitted 56.12)
+- Model tuning scores train out of fold (8 episode folds, plus a late-window score) and validation cross-fitted (each half's priors from the other half); `run_pair_mixer.py --cv-val` reports the cross-fitted score
 - Pair mixer pulls each noisy win estimate toward the nearer typical level (dead ~0.04 / live ~0.90, read from validation targets); validation 54.90 -> 55.34 / 60
 - Pair mixer predicts payout size as a switch between two exact size mixes per machine type (read from validation targets), keyed on the last four spins; validation 54.21 -> 54.90 / 60
 - Pair mixer's payout-size experts now read the exact earlier payouts (lags 1, 2, (1,2), (2,3)); validation 53.75 -> 54.21 / 60

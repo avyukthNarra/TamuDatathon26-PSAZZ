@@ -19,17 +19,18 @@ from time import perf_counter
 
 from slot_forecasting.contest import score_contest_files
 from slot_forecasting.io import load_inputs, read_labels, read_submission, read_targets, write_json, write_submission
-from slot_forecasting.pair_mixer import adapt, size_modes_from_targets, win_prior_from_targets
+from slot_forecasting.pair_mixer import adapt, size_modes_from_targets, win_prior_by_type_from_targets
 from slot_forecasting.rounds import VERSION, round_metadata
 from slot_forecasting.starter import public_directory
 from slot_forecasting.submission_contract import package_code
 
 HERE = Path(__file__).resolve().parent
-MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py")
+MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py", "rule_hmm.py")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", default=str(HERE / "public"))
 parser.add_argument("--out", default="runs/pair-mixer")
+parser.add_argument("--cv-val", action="store_true", help="also score validation halves with opposite-half priors")
 args = parser.parse_args()
 
 started = perf_counter()
@@ -38,10 +39,11 @@ out = Path(args.out).expanduser().resolve()
 out.mkdir(parents=True, exist_ok=True)
 train_queries, train_history = load_inputs(public / "train")
 val_targets = read_targets(public / "validation/targets.csv")
-size_modes = size_modes_from_targets(val_targets, load_inputs(public / "validation")[0])
-win_prior = win_prior_from_targets(val_targets)
-model = adapt(train_queries, train_history, read_labels(public / "train/labels.csv", train_queries),
-              size_modes=size_modes, win_prior=win_prior)
+val_queries, val_history = load_inputs(public / "validation")
+train_labels = read_labels(public / "train/labels.csv", train_queries)
+size_modes = size_modes_from_targets(val_targets, val_queries)
+win_prior = win_prior_by_type_from_targets(val_targets, val_queries)
+model = adapt(train_queries, train_history, train_labels, size_modes=size_modes, win_prior=win_prior)
 files = {"validation": out / "validation_predictions.csv", "test": out / "submission.csv"}
 for split, path in files.items():
     queries, history = load_inputs(public / split)
@@ -73,6 +75,29 @@ for name, row in report["by_condition"].items():
     print(f"{name:<15}{row['error']:>8.4f}{row['reference_error']:>10.4f}{row['loss_ratio']:>8.3f}"
           f"{win / n:>10.4f}{size / n:>11.4f}")
 print(f"R = {report['mean_loss_ratio']:.4f}  ->  {report['technical_points']:.2f} / {report['max_points']:g} points")
+if args.cv_val:
+    from slot_forecasting.experiments import episode_folds, subset_score
+    from slot_forecasting.io import read_rows
+    val_groups = {r["query_id"]: r["condition"] for r in read_rows(val / "conditions.csv", ("query_id", "condition"))}
+    tuning, audit = episode_folds(val_targets, val_groups)
+    crossfit = {}
+    for scored, prior_episode_ids in ((tuning, audit), (audit, tuning)):
+        prior_targets = tuple(t for t in val_targets if t.episode_id in prior_episode_ids)
+        fold_model = adapt(train_queries, train_history, train_labels,
+                           size_modes=size_modes_from_targets(prior_targets, val_queries),
+                           win_prior=win_prior_by_type_from_targets(prior_targets, val_queries), log=lambda *_: None)
+        fold_queries = tuple(q for q in val_queries if q.episode_id in scored)
+        fold_keys = {(q.episode_id, q.machine_id) for q in fold_queries}
+        fold_history = tuple(p for p in val_history if (p.episode_id, p.machine_id) in fold_keys)
+        crossfit.update(fold_model.predict(fold_queries, fold_history))
+    write_submission(out / "crossfit_validation_predictions.csv", crossfit)
+    halves = [subset_score(crossfit, val_targets, val_groups,
+                           read_submission(val / "reference.csv"), episodes,
+                           event["max_points"]) for episodes in (tuning, audit)]
+    crossfit_report = {"tuning_using_audit_priors": halves[0], "audit_using_tuning_priors": halves[1]}
+    write_json(out / "crossfit_validation_score.json", crossfit_report)
+    print(f"Cross-fitted validation: tuning {halves[0]['technical_points']:.2f} / {event['max_points']:g}; "
+          f"audit {halves[1]['technical_points']:.2f} / {event['max_points']:g}")
 
 # --- entry folder + ZIP ---
 entry = out / "entry"
@@ -89,13 +114,14 @@ metadata = json.loads((public / "metadata.json").read_text(encoding="utf-8"))
 sha = hashlib.sha256(files["test"].read_bytes()).hexdigest()
 commit = subprocess.run(["git", "-C", str(HERE), "rev-parse", "--short", "HEAD"],
                         capture_output=True, text=True).stdout.strip() or "unknown"
-(entry / "README.md").write_text(f"""# House Edge entry: lag-pair mixer
+(entry / "README.md").write_text(f"""# House Edge entry: lag-pair mixer + hidden-rule HMM
 
 - Round: {metadata.get('round', 'main')}
 - Season ID: {metadata.get('season_id', 'see public/metadata.json')}
 - Forecast SHA-256: {sha}
 - Code version: git {commit} (built by mainFiles/run_pair_mixer.py)
-- Environment: `python` image, Python standard library only (tested on Python {platform.python_version()})
+- Environment: `python` image, Python standard library only, no extra dependencies
+  (tested on Python {platform.python_version()}; needs 3.11+)
 - Validation: {report['technical_points']:.2f} / {report['max_points']:g} points (R = {report['mean_loss_ratio']:.4f})
 
 ## Recreate the forecast
@@ -106,17 +132,21 @@ Run from the archive root:
 python predict.py --data /data --out /output/submission.csv
 ```
 
-- What it does: on `/data/train` it rediscovers which lag pairs drive wins, picks
-  match/differ (2-cell) vs 4-cell experts by Brier on `train/labels.csv` at the
-  cutoff, fits payout-size priors per machine type, and reads two priors from
-  `/data/validation/targets.csv`: the two exact payout-size mixes per type and the
-  dead/live win-chance levels (copy in `priors.json`); then it predicts every
-  `/data/test` query with a per-machine online mixture of lag-pair experts. Each expert tracks, with exponential forgetting, how often the machine
-  won when its results at two earlier lags matched vs differed; experts are
-  weighted by their recent squared error. Only ticks before each cutoff are read.
-- Model files: none (the command refits in about a second).
-- Seeds/settings: deterministic, no randomness; settings are the `PairMixer`
-  defaults in `slot_forecasting/pair_mixer.py`.
+- Data used: `/data/train` (history, queries, labels), `/data/validation` (queries and
+  `targets.csv`), `/data/test` (history, queries). If `validation/targets.csv` is missing,
+  the same priors are read from `priors.json` in this archive. Writes only `--out`.
+- Training details (all refit at run time, about 2 minutes):
+  1. On train history: find the lag pairs whose match/differ drives wins, and the lags
+     whose exact payout drives payout size.
+  2. From validation targets: the payout-size modes per machine type, and a win-chance
+     prior with dead / live / middle levels per machine type and signal.
+  3. Pick 2-cell (match/differ) vs 4-cell win experts by Brier on `train/labels.csv`.
+- Prediction: per machine, an online mixture of lag-pair experts (three memory lengths)
+  gives the win chance and payout sizes; 30% of the win chance comes from a hidden-rule
+  HMM that tracks rule switches. Only ticks before each cutoff are read.
+- Model files: `priors.json` (fallback copy of the validation-derived priors).
+- Seeds/settings: deterministic, no randomness; settings are the defaults in
+  `slot_forecasting/pair_mixer.py` and `slot_forecasting/rule_hmm.py`.
 - Runtime: about {perf_counter() - started:.0f} s for train + validation + test on one CPU core.
 """, encoding="utf-8")
 zip_path = out / "entry.zip"
