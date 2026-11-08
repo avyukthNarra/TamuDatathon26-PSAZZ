@@ -8,6 +8,7 @@ What it does:
        rule       our rule model (all 37 lag rules, rules + payout-size rules)
        mixer      team pair mixer v3 (pairs rediscovered on train; size modes + win prior from validation)
        mixer_all  pair mixer over all 28 lag pairs (safer if round two spreads rules out)
+       hmm        our hidden-rule HMM (hmm_model.py), payout sizes from the mixer
   2. Predicts <data>/validation with each, and scores every blend on a 0.1 grid.
   3. Picks the blend with the best score on the TUNE half of validation episodes, then checks it on
      the AUDIT half. It only replaces the current blend if it gains at least --min-gain (0.15)
@@ -38,6 +39,7 @@ import predict
 HERE = Path(__file__).resolve().parent
 CONFIG = HERE / "blend_config.json"
 DATA = None  # set in main()
+TRAIN = None  # (train queries, train history), set in main()
 
 
 def candidates(queries, history, labels, log):
@@ -50,6 +52,12 @@ def candidates(queries, history, labels, log):
     mixer_all = PairMixer(pairs=ALL_PAIRS, cell_mode=mixer.cell_mode, size_modes=priors["size_modes"],
                           **extra).fit(queries, history)
     return {"rule": rules, "mixer": mixer, "mixer_all": mixer_all}
+
+
+def hmm_predictions(queries, history, size_from, data):
+    """Our hidden-rule HMM's forecast, with payout sizes borrowed from size_from (as in predict.py)."""
+    model = predict.HiddenRuleHMM(predict.choose_pairs(*TRAIN), levels=predict.hmm_levels(data))
+    return model.predict(queries, history, size_from=size_from)
 
 
 def grid(names, step=0.1):
@@ -86,6 +94,8 @@ def main():
     start = time.time()
     tq, th = load_inputs(data / "train")
     labels = read_labels(data / "train" / "labels.csv", tq)
+    global TRAIN
+    TRAIN = (tq, th)
     models = candidates(tq, th, labels, log)
     vq, vh = load_inputs(data / "validation")
     preds = {}
@@ -93,6 +103,8 @@ def main():
         t0 = time.time()
         preds[name] = model.predict(vq, vh)
         log(f"  predicted validation with {name} ({time.time() - t0:.0f}s)")
+    preds["hmm"] = hmm_predictions(vq, vh, preds["mixer"], data)
+    log("  predicted validation with hmm")
 
     v = data / "validation"
     targets = read_targets(v / "targets.csv")
@@ -117,7 +129,7 @@ def main():
                      **{c: full["by_condition"][c]["loss_ratio"] for c in CONDITIONS}})
     rows.sort(key=lambda r: -r["tune"])
 
-    current = json.loads(CONFIG.read_text()) if CONFIG.exists() else {"weights": {"rule": 0.2, "mixer": 0.8}}
+    current = json.loads(CONFIG.read_text()) if CONFIG.exists() else {"weights": dict(predict.DEFAULT_WEIGHTS)}
     cur = next((r for r in rows if r["weights"] == current["weights"]), None)
     if cur is None:  # current config not on the grid (or uses an unknown model): score it directly
         w = {n: x for n, x in current["weights"].items() if n in preds}

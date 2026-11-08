@@ -18,7 +18,7 @@ import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-KIT_MODULES = ("__init__.py", "baseline.py", "schema.py", "io.py", "pair_mixer.py")
+KIT_MODULES = ("__init__.py", "baseline.py", "schema.py", "io.py", "pair_mixer.py", "rule_hmm.py")
 
 README = """# House Edge entry: rule model + pair mixer blend
 

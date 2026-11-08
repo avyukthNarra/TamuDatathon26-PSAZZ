@@ -15,7 +15,7 @@ from pathlib import Path
 
 from slot_forecasting.io import load_inputs, read_labels, read_targets, write_submission
 from slot_forecasting.pair_mixer import (ALL_PAIRS, WIN_PRIOR_ETA, PairMixer, adapt, size_modes_from_targets,
-                                         win_prior_from_targets)
+                                         win_prior_by_type_from_targets)
 
 from rule_model import RuleForecaster
 from hmm_model import HiddenRuleHMM, levels_from_targets
@@ -29,7 +29,9 @@ HERE = Path(__file__).resolve().parent
 # v5 (Nov 7, 8 PM): + hidden-rule HMM (hmm_model.py) at 50%: validation 56.28 on all 96 episodes
 # (tune 56.27, audit 56.31) vs 55.58 for 0.2 rule + 0.8 mixer. The HMM takes its payout-size split
 # from the rule+mixer part, so "hmm" here only replaces the win chance.
-DEFAULT_WEIGHTS = {"rule": 0.1, "mixer": 0.4, "hmm": 0.5}
+# v6 (Nov 7, 10 PM, after merging COMBINED_SOLUTIONS mixer6 = per-type win prior + Pranav's rule_hmm):
+# mixer6 alone 56.51; 0.1 rule + 0.1 our HMM + 0.8 mixer6 = 56.59 (tune 56.55, audit 56.65) on all 96.
+DEFAULT_WEIGHTS = {"rule": 0.1, "mixer": 0.8, "hmm": 0.1}
 
 # Rule model v4 (52.89 / 60 alone): average of two variants that make different mistakes.
 #  - "full":     rules are graded on predicting the exact payout
@@ -88,8 +90,10 @@ def mixer_priors(data):
     targets_path = Path(data) / "validation" / "targets.csv"
     if targets_path.exists():
         targets = read_targets(targets_path)
-        return {"size_modes": size_modes_from_targets(targets, load_inputs(Path(data) / "validation")[0]),
-                "win_prior": win_prior_from_targets(targets)}
+        vq = load_inputs(Path(data) / "validation")[0]
+        # per-type win prior (mixer6): adapt() then also blends in Pranav's rule_hmm at 0.3
+        return {"size_modes": size_modes_from_targets(targets, vq),
+                "win_prior": win_prior_by_type_from_targets(targets, vq)}
     saved = HERE / "priors.json"
     if saved.exists():
         priors = json.loads(saved.read_text(encoding="utf-8"))

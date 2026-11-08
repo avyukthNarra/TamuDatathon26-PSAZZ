@@ -508,3 +508,18 @@ switching). Forward filtering gives the rule posterior; payout size given a win 
 
 Blend weights 0.4–0.6 all give 56.2–56.3. Entry: `python3 make_entry.py --out runs/hmm-v1`; runs in ~100 s;
 `priors.json` now also stores `hmm_levels` (tested: identical CSV with no validation folder).
+
+## 16. v6: merged all branches (Nov 7, 10 PM) — **56.59 on all 96**
+
+Merged `COMBINED_SOLUTIONS` (Pranav's mixer6: per-type win priors + his own `rule_hmm.py` blended at 0.3),
+`main` (Avyukth's eval suite) and `avyukth/master-research` (docs). `sai/master-test` was read, not merged: it
+carries ~300 prediction CSVs and its own copies of our model files.
+
+| Model (validation) | all 96 | tune / audit | Sai 24 |
+|---|---|---|---|
+| our v5 (0.5 HMM + 0.5 rule/mixer4) | 56.28 | 56.27 / 56.31 | 56.66 |
+| Pranav mixer6 alone | 56.51 | 56.48 / 56.57 | |
+| **0.1 rule + 0.1 our HMM + 0.8 mixer6 (entry v6)** | **56.59** | **56.55 / 56.65** | **56.93** |
+
+The +0.08 over mixer6 alone is below the 0.15 noise bar, so treat it as a tie; `auto_tune.py` (now with an `hmm`
+candidate) keeps it. Entry: `python3 make_entry.py --out runs/v6` (ships `rule_hmm.py` too).
