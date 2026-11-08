@@ -1,5 +1,16 @@
 # FINAL: best score found (main round, public validation)
 
+> **UPDATE 5 (2026-11-07 evening, latest): best model = 20% zhill rule + 80% Pranav mixer v4 (`39e5757`): dev 55.34, +0.57 [+0.21,+1.02] over the
+> 55.90-audit v3 combo; audit ~56.2 for the tied top-10 variants. Details: `COMBOS_TOP10.md`.**
+> - The 55.90 v3 combo reproduces from source (`mainFiles/combo/predict.py`, max diff 2e-16).
+> - v3/v4 read size modes / win levels from public validation targets (allowed by RULES.md). Cross-fitting them on half the episodes gives 55.35 vs 55.34: no inflation (`combos/crossfit_priors.py`).
+> - Nothing adds to v4 beyond noise: 660-structure team blend search, our C1/C2/M9b/S5, Avyukth E67, gated blends, recalibration (`improve/`),
+>   train priors / shrinkage / peer pooling (`improve/model/`), gapped-history handling, signal prior, peer-triggered forgetting (`boost/`).
+> - "short_history" machines span ~200 ticks with 64 observed and ~21 gaps; ~45% of observed spins lack a pair lag. Gap handling did not help.
+> - Where the rest of the error is (dev, one part made perfect): true win probability -> 58.36 (+3.0); true size given win -> 56.76 (+1.4).
+>   True win probabilities are continuous (deciles .01 .02 .06 .13 .32 .66 .82 .91 .96), not two levels, so the next lever is a better win function
+>   (e.g. per-machine logistic on Walsh lag terms with sign-flip hierarchical priors), not more blending.
+
 > **UPDATE (after pulling teammates' branches, see `TEAM_COMPARISON.md`): the best model is the teammates' combined model on `zhill-branch`
 > (20% zhill rule model + 80% Pranav pair mixer): 55.37 [54.5,56.1] on our 24 audit episodes (dev 54.14), above our stack's 54.09.**
 > It is stdlib-only, deterministic and already packaged. Our stack adds only +0.15 (CI -0.05,+0.34) to it on dev. The sections below describe OUR models.

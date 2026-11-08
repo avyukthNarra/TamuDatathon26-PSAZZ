@@ -428,6 +428,7 @@ A task is done only when **all** are true:
 - YYYY-MM-DD (@handle): _example: the shared cluster restarts at 02:00; save work before then._
 - 2026-11-07 (@Saibot913): House Edge win model: lag 7 + pairs (1,3),(2,5),(4,7) at ridge lambda 0.05 beats the starter-style lambda 20 by ~5 points (B3 over-shrank), payout size depends on lags 1,2,4 instead; harness and all verdicts live in docs/sai (RESULTS.md, FINAL.md). Round two: rerun the lag and severity screens first.
 - 2026-11-07 (@Saibot913): Mixer v4 (`39e5757`) fits both payout-size modes and a Beta-mixture win prior from all validation targets; nested blend CV cannot remove that inherited leakage. Frozen combination search, noise-band ties and audit guard are documented in `docs/sai/COMBOS_TOP10.md`.
+- 2026-11-07 (@Saibot913): Mixer v4 is saturated: ~70 add-ons (blends, priors, gap handling, signal, peer forgetting) all within noise; in docs/sai/FINAL.md (UPDATE 5). Perfect win probability would be worth +3.0 dev vs +1.4 for perfect sizes, and true win chances are continuous, so work on the win function, not blending.
 
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->
