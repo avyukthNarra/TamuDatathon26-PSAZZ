@@ -1,0 +1,59 @@
+## ADAPTATION (round two)  (adaptation-participants/public)
+
+train: queries=768 episodes=96 machines=768 steady=255 balanced=253 jackpot=260
+validation: queries=768 episodes=96 machines=768 steady=207 balanced=295 jackpot=266
+test: queries=1536 episodes=192 machines=1536 steady=501 balanced=483 jackpot=552
+
+history length (rows with tick < cutoff) by condition, train:
+  drift: n=192 mean=215.3 min=193 max=248
+  shared_change: n=192 mean=225.5 min=192 max=256
+  short_history: n=192 mean=64.0 min=64 max=64
+  stable: n=192 mean=227.0 min=193 max=255
+
+history length (rows with tick < cutoff) by condition, validation:
+  drift: n=192 mean=222.7 min=193 max=256
+  shared_change: n=192 mean=221.4 min=192 max=254
+  short_history: n=192 mean=64.0 min=64 max=64
+  stable: n=192 mean=221.6 min=192 max=255
+
+train history payout frequencies (n=140504):
+  0x=83724 (0.5959)  1x=25165 (0.1791)  2x=20380 (0.1450)  5x=9299 (0.0662)  20x=1936 (0.0138)
+train win rate (payout>0) by machine type:
+  steady: 0.5800 (n_spins=45842)
+  balanced: 0.4158 (n_spins=46836)
+  jackpot: 0.2241 (n_spins=47826)
+
+validation targets.csv mean p_0,p_1,p_2,p_5,p_20 by machine type:
+  steady (n=207): 0.3918 0.3759 0.1859 0.0455 0.0009  sum=1.0000
+  balanced (n=295): 0.5680 0.1604 0.1889 0.0709 0.0118  sum=1.0000
+  jackpot (n=266): 0.7692 0.0489 0.0670 0.0862 0.0287  sum=1.0000
+
+## MAIN  (R2/mainFiles/public)
+
+train: queries=768 episodes=96 machines=768 steady=266 balanced=278 jackpot=224
+validation: queries=768 episodes=96 machines=768 steady=269 balanced=234 jackpot=265
+test: queries=1536 episodes=192 machines=1536 steady=498 balanced=549 jackpot=489
+
+history length (rows with tick < cutoff) by condition, train:
+  drift: n=192 mean=222.9 min=192 max=256
+  shared_change: n=192 mean=221.3 min=192 max=256
+  short_history: n=192 mean=64.0 min=64 max=64
+  stable: n=192 mean=220.6 min=194 max=254
+
+history length (rows with tick < cutoff) by condition, validation:
+  drift: n=192 mean=226.2 min=196 max=250
+  shared_change: n=192 mean=224.8 min=198 max=256
+  short_history: n=192 mean=64.0 min=64 max=64
+  stable: n=192 mean=221.4 min=192 max=249
+
+train history payout frequencies (n=139944):
+  0x=81642 (0.5834)  1x=26980 (0.1928)  2x=20524 (0.1467)  5x=9007 (0.0644)  20x=1791 (0.0128)
+train win rate (payout>0) by machine type:
+  steady: 0.5780 (n_spins=50423)
+  balanced: 0.4074 (n_spins=49567)
+  jackpot: 0.2244 (n_spins=39954)
+
+validation targets.csv mean p_0,p_1,p_2,p_5,p_20 by machine type:
+  steady (n=269): 0.4032 0.3621 0.1877 0.0460 0.0009  sum=1.0000
+  balanced (n=234): 0.5260 0.1770 0.2066 0.0775 0.0129  sum=1.0000
+  jackpot (n=265): 0.7538 0.0520 0.0715 0.0920 0.0307  sum=1.0000
