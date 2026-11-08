@@ -83,6 +83,7 @@ class CausalFeaturesTest(unittest.TestCase):
             data = load_dataset(root, output, 20)
             self.assertEqual(data['qx'].shape[0], 3)
             self.assertTrue(np.isfinite(data['x']).all())
+            np.testing.assert_array_equal(data['y'], data['row_ticks'] % 5)
 
 
 if __name__ == '__main__':

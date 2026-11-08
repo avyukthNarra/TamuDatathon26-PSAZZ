@@ -36,7 +36,7 @@ def load_dataset(data, output, max_examples):
     cache = output / 'features.npz'
     input_files = [data / split / name for split in ('train', 'validation', 'test')
                    for name in ('queries.csv', 'history.csv')] + [data / 'train/labels.csv']
-    signature = json.dumps({'max_examples': max_examples, 'sampler_version': 1,
+    signature = json.dumps({'max_examples': max_examples, 'sampler_version': 2,
                             'feature_source': hashlib.sha256(Path(__file__).with_name('features.py').read_bytes()).hexdigest(),
                             'inputs': {str(p.relative_to(data)): hashlib.sha256(p.read_bytes()).hexdigest() for p in input_files}}, sort_keys=True)
     if cache.exists():
@@ -45,6 +45,7 @@ def load_dataset(data, output, max_examples):
             return cached
     rng = np.random.default_rng(914)
     all_x, all_y, roles, query_x, query_ids, query_splits = [], [], [], [], [], []
+    row_query_indices, row_ticks = [], []
     metadata = {}
     names = groups = None
     # 24 train episodes (stratified by their existing sorted order) excluded
@@ -86,21 +87,26 @@ def load_dataset(data, output, max_examples):
                 all_x.append(x[eligible])
                 all_y.append(y[eligible])
                 roles.append(np.full(eligible.sum(), role, dtype=np.int8))
+                row_query_indices.append(np.full(eligible.sum(), len(query_ids) - 1, dtype=np.int32))
+                row_ticks.append(np.flatnonzero(eligible).astype(np.int16))
                 split_rows += int(eligible.sum())
         metadata[split] = {'episodes': len(episodes), 'queries': len(queries),
                            'history_rows': len(history), 'retained_examples': split_rows}
         print('features', split, metadata[split], flush=True)
     x, y, role = np.concatenate(all_x), np.concatenate(all_y), np.concatenate(roles)
+    row_query_indices, row_ticks = np.concatenate(row_query_indices), np.concatenate(row_ticks)
     if (role == 0).sum() > max_examples:
         keep = np.ones(len(y), dtype=bool)
         fit_indices = np.flatnonzero(role == 0)
         keep[fit_indices] = False
         keep[rng.choice(fit_indices, max_examples, replace=False)] = True
         x, y, role = x[keep], y[keep], role[keep]
+        row_query_indices, row_ticks = row_query_indices[keep], row_ticks[keep]
     result = dict(x=x, y=y, role=role, qx=np.stack(query_x), ids=np.array(query_ids),
                   splits=np.array(query_splits), names=np.array(names), groups=np.array(groups),
                   metadata=np.array(json.dumps(metadata)),
                   signature=np.array(signature),
+                  row_query_indices=row_query_indices, row_ticks=row_ticks,
                   calibration_episodes=np.array(sorted(calibration)), selection_episodes=np.array(sorted(selection)))
     np.savez_compressed(cache, **result)
     return result
