@@ -1,0 +1,132 @@
+{
+  "tests_passed": 5,
+  "two_run_train_prior_prediction_byte_identical": true,
+  "saved_train_prior_forecast_byte_identical": true,
+  "files": [
+    {
+      "file": "J1_BASE_validation.csv",
+      "rows": 768,
+      "other_type_rows_byte_identical": 503,
+      "sha256": "2b31cd3a4558d178bcf514619d5e21b1dd0910a057c7a8c7b59a464818d31272"
+    },
+    {
+      "file": "J1_LIVE2_validation.csv",
+      "rows": 768,
+      "other_type_rows_byte_identical": 503,
+      "sha256": "f0ab91bbc471e931ee595786ec38363fe610955826a531235ad0a9034a8f65eb"
+    },
+    {
+      "file": "J1_LIVE6_validation.csv",
+      "rows": 768,
+      "other_type_rows_byte_identical": 503,
+      "sha256": "98ab0c668ac840985bd4982fc7ca6ff545e945a0ab0416e9b5ad064e42a49ec1"
+    },
+    {
+      "file": "J1_OOF_validation.csv",
+      "rows": 768,
+      "other_type_rows_byte_identical": 503,
+      "sha256": "dfe6b6ec1cd2c18ad7f941ef0518e72419eab33fe1fe27cc323435ef74fb8e11"
+    },
+    {
+      "file": "J1_TRAIN_validation.csv",
+      "rows": 768,
+      "other_type_rows_byte_identical": 503,
+      "sha256": "f09e929faef4a604333c9a86b6fd960392df35154ae35ceba9da1ac58790eb3e"
+    }
+  ],
+  "dev_level_error_comparison": {
+    "baseline": {
+      "0-0.1": {
+        "n": 122,
+        "true_mean": 0.01369663730499098,
+        "predicted_mean": 0.02062018571356491,
+        "bias": 0.006923548408573933,
+        "mse": 0.0006565737266756274,
+        "wrong_half_fraction": 0.0,
+        "wrong_half_error_share": 0.0,
+        "wrong_half_mse": null,
+        "same_half_mse": 0.0006565737266756274
+      },
+      "0.2-0.5": {
+        "n": 30,
+        "true_mean": 0.3854476862150155,
+        "predicted_mean": 0.5257659468044408,
+        "bias": 0.14031826058942531,
+        "mse": 0.032116139996045324,
+        "wrong_half_fraction": 0.5333333333333333,
+        "wrong_half_error_share": 0.8673375499249131,
+        "wrong_half_mse": 0.05222912658227899,
+        "same_half_mse": 0.009129869611778293
+      },
+      "0.5-0.8": {
+        "n": 47,
+        "true_mean": 0.6364491381511154,
+        "predicted_mean": 0.6217824576104808,
+        "bias": -0.014666680540634632,
+        "mse": 0.010671856909090517,
+        "wrong_half_fraction": 0.06382978723404255,
+        "wrong_half_error_share": 0.22895290726324558,
+        "wrong_half_mse": 0.03827919175532684,
+        "same_half_mse": 0.00878953862411986
+      },
+      "0.8-1.0001": {
+        "n": 8,
+        "true_mean": 0.8372769505017157,
+        "predicted_mean": 0.65332051294736,
+        "bias": -0.18395643755435565,
+        "mse": 0.0404470800895462,
+        "wrong_half_fraction": 0.0,
+        "wrong_half_error_share": 0.0,
+        "wrong_half_mse": null,
+        "same_half_mse": 0.0404470800895462
+      }
+    },
+    "train_prior": {
+      "0-0.1": {
+        "n": 122,
+        "true_mean": 0.01369663730499098,
+        "predicted_mean": 0.021098524844887376,
+        "bias": 0.007401887539896395,
+        "mse": 0.0007102073536104611,
+        "wrong_half_fraction": 0.0,
+        "wrong_half_error_share": 0.0,
+        "wrong_half_mse": null,
+        "same_half_mse": 0.0007102073536104611
+      },
+      "0.2-0.5": {
+        "n": 30,
+        "true_mean": 0.3854476862150155,
+        "predicted_mean": 0.5155391209165889,
+        "bias": 0.13009143470157342,
+        "mse": 0.024603817909584748,
+        "wrong_half_fraction": 0.6,
+        "wrong_half_error_share": 0.8403848363881985,
+        "wrong_half_mse": 0.034461125814119004,
+        "same_half_mse": 0.009817856052783359
+      },
+      "0.5-0.8": {
+        "n": 47,
+        "true_mean": 0.6364491381511154,
+        "predicted_mean": 0.5889796294712888,
+        "bias": -0.047469508679826744,
+        "mse": 0.011888754552214395,
+        "wrong_half_fraction": 0.06382978723404255,
+        "wrong_half_error_share": 0.19572779446112068,
+        "wrong_half_mse": 0.036455702082514335,
+        "same_half_mse": 0.010213735402421221
+      },
+      "0.8-1.0001": {
+        "n": 8,
+        "true_mean": 0.8372769505017157,
+        "predicted_mean": 0.6195013497091955,
+        "bias": -0.21777560079252026,
+        "mse": 0.05101687237389406,
+        "wrong_half_fraction": 0.0,
+        "wrong_half_error_share": 0.0,
+        "wrong_half_mse": null,
+        "same_half_mse": 0.05101687237389406
+      }
+    }
+  },
+  "audit_or_all_evaluations": 0
+}
