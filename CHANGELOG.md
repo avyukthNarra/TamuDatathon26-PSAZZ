@@ -20,6 +20,7 @@ How to add an entry (every PR):
 
 ### Added
 - Win-probability form study: cutoff chances are per-machine logit-normal levels on a parity cell that has already finished flipping
+- Validation forecast that pairs the train-history win posterior with the v13 size split (`validation_crossfit.csv`, 57.68 points)
 - Method-agnostic evaluation suite (`python -m eval_suite run --entry DIR`) that checks any entry against all 88 documented requirements and scores it with the official metric (#19)
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 

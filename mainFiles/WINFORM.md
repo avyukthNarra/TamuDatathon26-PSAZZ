@@ -105,12 +105,20 @@ Encode this at the cutoff. Regime inference can stay as it is; the correction is
 5. **Do not add** a cutoff coefficient, a peer/episode shift, or a neighbour term. Signal stays: dropping it costs 0.040 points.
 6. **Where the points still are.** With true sizes, this posterior scores 58.19 cross-fit and 58.23 train-only. The other 1.81 points are ε that short histories and jackpots do not identify. Perfect knowledge of P(win) with these true sizes scores 60.
 
+## Forecast file for blending
+
+`mainFiles/runs/winform/validation_crossfit.csv` is a validation forecast, not a ceiling. P(win) is the train-history logit-normal posterior (the 58.226 row above). No validation target enters that probability. The size split is v13's cross-fit vector, renormalized on the four positive payouts: `[1-p, p * v13[1:] / sum(v13[1:])]`. Regime still comes from `conditions.csv`. Shared-flip ticks are fit on that episode's pre-cutoff history.
+
+Scored with `orch/common.py` `points` (same official ratio as the contest): **57.682**. Condition ratios: stable 0.0319, short history 0.0630, drift 0.0326, shared change 0.0333. v13's own cross-fit forecast scores 57.500, so swapping in this P(win) and keeping v13's sizes is worth about 0.18 points. The same P(win) with true sizes scores 58.226; v13's size split accounts for the rest.
+
 ## Reproduce
 
 ```sh
 cd /Users/saisreed/Desktop/Coding/TamuDatathon26-PSAZZ/worktrees/fresh-winform
 python3 -m unittest discover -s mainFiles -p test_winform.py -v
 OPENBLAS_NUM_THREADS=2 VECLIB_MAXIMUM_THREADS=2 python3 mainFiles/winform_study.py --out mainFiles/runs/winform
+# forecast only, after winform.json already exists:
+OPENBLAS_NUM_THREADS=2 VECLIB_MAXIMUM_THREADS=2 python3 mainFiles/winform_study.py --forecast-only --out mainFiles/runs/winform
 ```
 
 Python 3.13.3. The study run that produced these numbers took about 8 seconds. Unit tests: 7 passed. Outputs stay in `mainFiles/runs/winform/` (git-ignored).

@@ -7,6 +7,7 @@ import numpy as np
 from winform_study import (
     CELLS,
     _cell_counts,
+    blend_with_size_split,
     cutoff_cell,
     dist_from_p,
     level_stats,
@@ -47,6 +48,14 @@ class ScheduleAndPackingTest(unittest.TestCase):
         self.assertEqual(u_at_cutoff(96, 62), 1.0)
         self.assertAlmostEqual(u_at_cutoff(31, 62), 0.5)
         self.assertEqual(u_at_cutoff(0, 62), 0.0)
+
+    def test_v13_size_split_scales_with_our_win_probability(self):
+        v13 = np.array([0.5, 0.2, 0.2, 0.05, 0.05])
+        blended = blend_with_size_split(0.2, v13)
+        self.assertTrue(np.allclose(blended, [0.8, 0.08, 0.08, 0.02, 0.02]))
+        self.assertAlmostEqual(float(blended.sum()), 1.0)
+        # The conditional size split is v13's, not a flat or true-size vector.
+        self.assertAlmostEqual(blended[1] / 0.2, 0.4)
 
     def test_true_sizes_rebuild_the_target(self):
         target = np.array([0.2, 0.5, 0.2, 0.08, 0.02])

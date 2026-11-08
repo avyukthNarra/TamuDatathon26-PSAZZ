@@ -1195,12 +1195,99 @@ def _json(value):
     raise TypeError(type(value))
 
 
+def blend_with_size_split(p_win, size_row):
+    """P(payout) from a win probability and another model's conditional size split.
+
+    `size_row` is a length-5 probability vector. The size distribution is
+    size_row[1:] renormalized, then scaled by p_win. The zero outcome is 1 - p_win.
+    """
+    sizes = np.asarray(size_row, dtype=np.float64)[1:]
+    total = float(sizes.sum())
+    if total <= 0:
+        sizes = np.full(4, 0.25)
+    else:
+        sizes = sizes / total
+    p = float(p_win)
+    if not math.isfinite(p):
+        p = 0.5
+    p = min(max(p, 0.0), 1.0)
+    out = np.empty(5, dtype=np.float64)
+    out[0] = 1.0 - p
+    out[1:] = p * sizes
+    error = float(out.sum() - 1.0)
+    if error != 0.0:
+        out[0] -= error
+    return out
+
+
+def export_forecast(public, v13_path, out_csv):
+    """Train-prior posterior P(win) from pre-cutoff history, with v13's size split.
+
+    Validation targets are not loaded. The prior is the debiased train-history
+    logit-normal. Shared-flip ticks are fit on that episode's history.
+    """
+    from slot_forecasting.io import read_submission, write_submission
+
+    val, _ = prepare(public, "validation", False)
+    train, _ = prepare(public, "train", False)
+    prior, _ = train_level_prior(train)
+    by_episode = defaultdict(list)
+    for machine in val:
+        by_episode[machine["episode"]].append(machine)
+    flips = {
+        episode: shared_flip(group)
+        for episode, group in by_episode.items()
+        if group[0]["condition"] == "shared_change"
+    }
+    p_win, _ = predict_fold(val, prior, "shrink", flips=flips)
+    v13 = read_submission(v13_path, set(p_win))
+    blended = {qid: blend_with_size_split(p, v13[qid]) for qid, p in p_win.items()}
+    out_csv.parent.mkdir(parents=True, exist_ok=True)
+    write_submission(out_csv, blended)
+    return p_win, blended
+
+
+def score_forecast(public, blended):
+    """Official points via orch/common.py. Targets are used only here, after the file is written."""
+    import importlib.util
+
+    path = Path("/Users/saisreed/Desktop/Coding/TamuDatathon26-PSAZZ/worktrees/fresh-orch/orch/common.py")
+    spec = importlib.util.spec_from_file_location("orch_common", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    data = module.load("validation", pub=public)
+    pred = {qid: np.asarray(row, dtype=float) for qid, row in blended.items()}
+    score, ratios = module.points(pred, data)
+    return {"points": float(score), "ratios": {k: float(v) for k, v in ratios.items()}}
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=Path, default=ROOT / "public")
     parser.add_argument("--out", type=Path, default=ROOT / "runs" / "winform")
+    parser.add_argument("--forecast-only", action="store_true")
+    parser.add_argument(
+        "--v13",
+        type=Path,
+        default=Path("/Users/saisreed/Desktop/Coding/TamuDatathon26-PSAZZ/worktrees/_tm/v13/mainFiles/runs/v13/crossfit_validation_predictions.csv"),
+    )
     args = parser.parse_args()
-    run(args.data, args.out)
+    if not args.forecast_only:
+        run(args.data, args.out)
+    if args.v13.exists():
+        _, blended = export_forecast(args.data, args.v13, args.out / "validation_crossfit.csv")
+        scored = score_forecast(args.data, blended)
+        summary_path = args.out / "winform.json"
+        summary = json.loads(summary_path.read_text()) if summary_path.exists() else {}
+        summary["v13_size_blend"] = {
+            "file": "validation_crossfit.csv",
+            "p_win": "train-history logit-normal posterior, pre-cutoff ticks only",
+            "sizes": "v13 cross-fit conditional size split",
+            "targets_used_in_forecast": False,
+            **scored,
+        }
+        summary_path.write_text(json.dumps(summary, indent=2) + "\n")
+        print("forecast", round(scored["points"], 4), {k: round(v, 4) for k, v in scored["ratios"].items()}, flush=True)
 
 
 if __name__ == "__main__":
