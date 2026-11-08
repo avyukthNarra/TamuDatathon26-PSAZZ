@@ -1,0 +1,38 @@
+start v13_short
+start exact
+start sysid
+pair support [(1, 4), (2, 6), (3, 8)] top [((3, 8), 185), ((1, 4), 180), ((2, 6), 164), ((6, 8), 5), ((3, 5), 4), ((4, 8), 4)] of 768
+pair support [(1, 4), (2, 6), (3, 8)] top votes [((3, 8), 185), ((1, 4), 180), ((2, 6), 164), ((6, 8), 5), ((3, 5), 4), ((4, 8), 4)] of 768
+v17 blend centre 0.4148
+sysid fit no_common -13025.727783643975
+rule families {'parity': 1.0, 'xor3': 0.0, 'and': 0.0, 'or': 0.0} extras 0
+exact: train levels and schedule fit
+sysid fit basic -12999.426385485256
+sysid fit peers_only -12934.450768581479
+sysid fit all_peers -12930.41438840965
+sysid fit strongest_peer -12960.93683234428
+sysid regime dyn0 -43124.396930253286
+sysid regime dyn01 -42422.10371308603
+sysid regime dyn02 -42911.1999596706
+sysid regime dyn01shared0 -42450.385366922754
+sysid selected strongest_peer/dyn01
+sysid wrote 768 rows
+exact crossfit half done, 384 queries
+v17 crossfit half done, 384 queries
+exact crossfit half done, 768 queries
+exact wrote 768 rows
+v17 crossfit half done, 768 queries
+jackpot pair support ((1, 4), (2, 6), (3, 8))
+jackpot strength atom4 {'map': 0.08583, 'atom4': 0.0834, 'atom8': 0.08405, 'atom16': 0.08464}
+jackpot patched 200 queries with atom4
+short crossfit half done, 96 queries
+short crossfit half done, 192 queries
+v17_short wrote 768 rows
+done v13_short exit 0 in 160.1s
+done exact exit 0 in 160.1s
+done sysid exit 0 in 160.1s
+wrote /private/var/folders/y6/yf_5569s6bjgf1zczt2m2wt40000gn/T/gate-un95ni87/_blend.csv (768 rows) in 160.2s
+all members ['v13_short', 'exact', 'sysid']: 38.588 (halves 38.31 / 38.81)
+  without exact: 38.649 (halves 38.36 / 38.89)
+  without sysid: 38.426 (halves 38.06 / 38.72)
+gate: keep ['v13_short', 'exact', 'sysid'] (38.588 vs all 38.588); wrote /Users/avynarra/Documents/Datathon/R2/adapted_entry_v17g_rules/gate.json
