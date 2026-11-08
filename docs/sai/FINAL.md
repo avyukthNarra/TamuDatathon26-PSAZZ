@@ -1,5 +1,10 @@
 # FINAL: best score found (main round, public validation)
 
+> **UPDATE 6 (2026-11-07 ~8 PM, latest): new best = 20% zhill rule + 80% Pranav mixer5 (`27d776d`, `pkhanna/honest-tuning`: per-type
+> dead/live win prior + learned size lags): dev 55.99 in-sample, 55.96 cross-fitted, +0.62 [+0.34,+0.96] over the v4 combo (+1.2 over the 55.90 run).
+> Script: `round/score_mixer5.py`. Gemini research (`gemini-code-1794099642432.md`) tested on top: Exp 3 exact 8-hypothesis size switch loses
+> 0.29-1.12 (`round/size/`); Exp 1 screened Walsh-logistic BMA has 7.4x v4's win MSE and blend weight 0 (`round/walsh/`); Exp 2 skipped (T3 showed no headroom).
+
 > **UPDATE 5 (2026-11-07 evening, latest): best model = 20% zhill rule + 80% Pranav mixer v4 (`39e5757`): dev 55.34, +0.57 [+0.21,+1.02] over the
 > 55.90-audit v3 combo; audit ~56.2 for the tied top-10 variants. Details: `COMBOS_TOP10.md`.**
 > - The 55.90 v3 combo reproduces from source (`mainFiles/combo/predict.py`, max diff 2e-16).
