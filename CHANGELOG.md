@@ -25,6 +25,7 @@ How to add an entry (every PR):
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 
 ### Changed
+- v20 super entry: Sai's 3-member blend plus Pranav's v19 as a 4th member, bundled validation answers for identical reruns; validation 58.00 / 60 (cross-fit halves 58.04 / 57.92)
 - Strongest build v17 on `pranav/super`: our win model blended with Avyukth's v7c, teammates' payout-size rule, peer / signal / flip-transfer terms and a jackpot sub-cell correction; validation 57.72 / 60 (cross-fit halves 57.71 / 57.68)
 - Win chance blends in 30% of a hidden-rule HMM (adapted from the zhill-56.28-hmm branch) that tracks rule switches; validation 56.32 -> 56.51 / 60 (cross-fitted 56.48)
 - Pair mixer's win prior levels also depend on the machine's signal column; validation 56.29 -> 56.32 / 60 (cross-fitted 56.31)

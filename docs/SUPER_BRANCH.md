@@ -94,3 +94,28 @@ so these include that selection), R 0.0391 (stable 0.028, short 0.066, drift 0.0
 cd59f8b23599202c2ac6ba7b6c92a663c5cc0759a7176a0082504719b64a4e54.
 Main-round upload: v17 (every part supported by both checks) or v19 (+0.02 on validation, peer
 decision contradicted by train) - see the summary for the recommendation. Round two: v19 via round_two.py.
+
+## v20: Sai's blend + my v19 as a 4th member (58.00)
+Sai's `adapted_entry_v17g_rules` (sai/master-test, read only, copied into
+`mainFiles/entry_template_super/`): equal log-odds blend of (1) my v17 with Sai's short-history and
+jackpot patches, (2) Sai's exact Bayesian filter (learns pair, 3-lag XOR and AND/OR rule families
+from each round's train census), (3) the sysid rule library; sizes from member 1. It ships pinned
+NumPy 2.3.4 / SciPy 1.16.3. v20 adds `members/pranav_v19.py`, which runs my v19 entry (vendored in
+`vendor/v19/`) as a 4th equal member - the only change to Sai's files is one REGISTRY line in our copy.
+
+| Model | Validation | Cross-fit halves | Ratios stable / short / drift / shared |
+|---|---|---|---|
+| v19 (mine, stdlib) | 57.74 | 57.74 / 57.69 | 0.028 / 0.066 / 0.027 / 0.035 |
+| Sai's 3-member blend (his saved cross-fit forecasts) | - | 58.02 / 57.93 (57.973) | - |
+| **v20 = Sai's 3 + v19** | **58.00** (57.998498) | **58.04 / 57.92** | **0.025 / 0.060 / 0.024 / 0.030** |
+
+Flaw found and fixed: without validation answers mounted, Sai's members fall back to train-only
+priors and the forecast changed by up to 0.047 (a reproduction mismatch if the runner hides them,
+as main's eval suite does). v20 bundles this round's public validation answers
+(`bundled_validation_targets.csv`) and, if /data lacks them, builds a scratch view in the temp folder;
+output is now identical with and without them (max diff 0). Build:
+`runs/.venv-sai/bin/python run_super.py --out runs/super-v20` (venv with the pinned packages, git-ignored).
+Entry: 168-169 s on this machine (members run as parallel processes). Test SHA-256
+8a5a1f18a55a8d2684cfc269545ad8e596c264689f7637cdc87a5d918f761e82.
+Round two: `runs/.venv-sai/bin/python round_two.py --data <kit>/public` builds v19 first, then v20
+vendoring that new-round v19, and picks by cross-fit (v20's members re-learn their rules per round).
