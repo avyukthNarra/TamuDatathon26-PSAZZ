@@ -35,20 +35,25 @@ ENTRY = Path(__file__).resolve().parent
 
 def with_bundled_targets(data):
     """Same forecast with or without validation answers mounted: the members use
-    validation/targets.csv as priors, so when /data lacks it, read the copy bundled at build time
-    (bundled/validation_targets.csv, public kit data) through a /tmp view of /data (symlinks)."""
-    bundled = ENTRY / "bundled" / "validation_targets.csv"
-    if (data / "validation" / "targets.csv").exists() or not bundled.exists():
+    validation/targets.csv as priors, so when /data lacks it (or lacks validation/ entirely, as in an
+    organizer-style mount of train/ and test/ only), read the validation folder bundled at build time
+    (bundled/validation/, public kit data) through a /tmp view of /data (symlinks). Mounted
+    validation files are preferred; bundled ones only fill the gaps."""
+    bundled = ENTRY / "bundled" / "validation"
+    if (data / "validation" / "targets.csv").exists() or not bundled.is_dir():
         return data
     view = Path(tempfile.mkdtemp(prefix="data-view-"))
     for item in data.iterdir():
         if item.name != "validation":
             (view / item.name).symlink_to(item)
     (view / "validation").mkdir()
-    for item in (data / "validation").iterdir():
-        (view / "validation" / item.name).symlink_to(item)
-    (view / "validation" / "targets.csv").symlink_to(bundled)
-    print("validation answers not mounted: using bundled/validation_targets.csv", flush=True)
+    names = {item.name for item in bundled.iterdir()}
+    if (data / "validation").is_dir():
+        names |= {item.name for item in (data / "validation").iterdir()}
+    for name in sorted(names):
+        mounted = data / "validation" / name
+        (view / "validation" / name).symlink_to(mounted if mounted.exists() else bundled / name)
+    print("validation answers not mounted: using bundled/validation/", flush=True)
     return view
 
 

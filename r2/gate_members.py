@@ -9,9 +9,10 @@ blend without it is better on BOTH validation halves (the kit's episode_folds) a
 least --margin points overall; otherwise every member stays. The size member (hooks.SIZE_MEMBER)
 is never dropped, and at least two members are always kept.
 
-Also copies the kit's validation/targets.csv to <entry>/bundled/validation_targets.csv, which
-predict.py (adapted_entry_v17g_rules) reads when /data has no validation answers, so the forecast
-is byte-identical with or without them (checked offline, --network none, read-only, 2 CPUs).
+Also copies the kit's whole validation/ folder to <entry>/bundled/validation/, which
+predict.py (adapted_entry_v17g_rules) reads when /data has no validation answers or no validation/
+folder at all (the eval suite's organizer-style kit-test mounts only train/ and test/), so the
+forecast is byte-identical either way (checked offline, --network none, read-only, 2 CPUs).
 
 Writes <entry>/gate.json ({"win_members": [...], ...}); predict.py reads it, so the decision is
 made once at build time and the graded rerun (with or without validation targets) uses it.
@@ -122,10 +123,13 @@ def main():
             "all_members_points": round(base[0], 6), "chosen_points": round(best[0], 6),
             "kit_round": round_metadata(kit)["round"]}
     (entry / "gate.json").write_text(json.dumps(gate, indent=2) + "\n")
-    # bundle this round's validation answers (public kit data) so predict.py gives the same
-    # forecast when the rerun mounts /data without them (members use them as priors)
-    (entry / "bundled").mkdir(exist_ok=True)
-    shutil.copyfile(kit / "validation" / "targets.csv", entry / "bundled" / "validation_targets.csv")
+    # bundle this round's validation folder (public kit data) so predict.py gives the same
+    # forecast when the rerun mounts /data without its answers or without validation/ at all
+    # (members use the validation answers as priors)
+    bundled = entry / "bundled"
+    shutil.rmtree(bundled, ignore_errors=True)
+    bundled.mkdir()
+    shutil.copytree(kit / "validation", bundled / "validation")
     print(f"gate: keep {choice} ({best[0]:.3f} vs all {base[0]:.3f}); wrote {entry / 'gate.json'}")
 
 
