@@ -1,5 +1,7 @@
 {
   "reference": "R5_BASE",
+  "reference_file": "docs/sai/round/mixer5/COMBINED_v5_insample_validation.csv",
+  "local_baseline_max_abs_diff_vs_reference": 2.220446049250313e-16,
   "variants": {
     "R5_BASE": {
       "settings": {
@@ -24,8 +26,8 @@
         "class_error_shares": {
           "p_0": 0.47510249783054187,
           "p_1": 0.2575754651964744,
-          "p_2": 0.19585464940493502,
-          "p_5": 0.06551508476284137,
+          "p_2": 0.195854649404935,
+          "p_5": 0.06551508476284139,
           "p_20": 0.005952302805207476
         }
       },
@@ -320,7 +322,7 @@
         "diff": -1.056587121153342,
         "ci95": [
           -1.3961763537354122,
-          -0.7413184432790441
+          -0.741318443279051
         ]
       },
       "short_history_conditional_size_mse": 0.02513421658541518,
@@ -570,8 +572,8 @@
       "class_error_shares": {
         "p_0": 0.47510249783054187,
         "p_1": 0.2575754651964744,
-        "p_2": 0.19585464940493502,
-        "p_5": 0.06551508476284137,
+        "p_2": 0.195854649404935,
+        "p_5": 0.06551508476284139,
         "p_20": 0.005952302805207476
       }
     },
@@ -604,7 +606,7 @@
       "static"
     ]
   },
-  "seconds": 1.750816822052002,
+  "seconds": 1.668992042541504,
   "target_dependency": "Size modes and per-type win priors fitted on all validation targets, per requested baseline; all structure/lag selection fitted on train. No audit/all scoring.",
   "size_error_definition": "Mean five-class SSE with true win rate held fixed and forecast conditional size shares; reported only on DEV short_history rows. Conditional-size MSE also recorded."
 }

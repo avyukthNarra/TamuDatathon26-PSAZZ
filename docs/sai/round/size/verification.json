@@ -1,4 +1,5 @@
 {
+  "canonical_baseline_max_abs_diff": 2.220446049250313e-16,
   "two_run_exact_sizes_max_diff": 0.0,
   "saved_sizes_max_diff": 0.0,
   "all_csv_p0_max_diff": 1.7763568394002505e-15,
@@ -71,8 +72,8 @@
     },
     "R5_OOF_validation.csv": {
       "rows": 768,
-      "p0_max_diff": 0.0,
-      "sha256": "8afeae73040efcf2efbef00acc20b2c8e13b13c25a923cec642bcfee33b3f362"
+      "p0_max_diff": 1.1102230246251565e-16,
+      "sha256": "3599ac136943929a9d0ad25b7dfaab1d1249a841dc4d3fa888243f11cbb19123"
     }
   }
 }

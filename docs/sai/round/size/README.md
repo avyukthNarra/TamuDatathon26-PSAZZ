@@ -47,3 +47,5 @@ likelihood calculation with missing ticks and different cutoffs, recovers a
 known simulated switch, and verifies prediction independence from targets.
 `verification.json` records deterministic reruns, strict probability/ID checks,
 and unchanged p0 for all CSVs. The recommendation is to keep R5_BASE.
+
+The canonical comparison file is `docs/sai/round/mixer5/COMBINED_v5_insample_validation.csv`. The independently fitted R5_BASE matches within 2.22e−16; `run.py` checks this before using that file directly for every paired comparison.

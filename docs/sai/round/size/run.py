@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 ROOT=Path(__file__).resolve().parents[4];OUT=Path(__file__).resolve().parent
 sys.path.insert(0,str(ROOT/'docs/sai'))
-from harness import load_split,evaluate,diff_ci,to_csv
+from harness import load_split,evaluate,diff_ci,to_csv,read_pred_csv
 from harness.scoring import scope_episodes
 from exact_size import ExactSizeSwitch,train_big_win_prior,HYPOTHESIS_NAMES
 
@@ -16,6 +16,11 @@ def main():
     arrays=np.load(OUT/'baseline_arrays.npz');meta=json.loads((OUT/'baseline.json').read_text())
     assert np.array_equal(arrays['qid'],v.qid)
     base,mix,rule=arrays['base'],arrays['mixer'],arrays['rule']
+    reference_path=ROOT/'docs/sai/round/mixer5/COMBINED_v5_insample_validation.csv'
+    canonical=read_pred_csv(reference_path,v)
+    baseline_error=float(abs(base-canonical).max())
+    assert baseline_error<1e-12,baseline_error
+    base=canonical  # Use orchestrator's saved forecast directly for every diff_ci.
     win=mix[:,1:].sum(1);base_size=mix[:,1:]/win[:,None]
     prior=train_big_win_prior(train)
     model=ExactSizeSwitch(meta['size_modes'],prior)
@@ -67,7 +72,8 @@ def main():
         oof[folds[f]]=predictions[chosen][folds[f]]
         choices.append({'test_fold':f,'chosen':chosen})
     to_csv(ROOT/'docs/sai/preds/R5_OOF_validation.csv',v,oof)
-    output={'reference':'R5_BASE','variants':results,'best':best,'train_big_win_prior':prior,
+    output={'reference':'R5_BASE','reference_file':str(reference_path.relative_to(ROOT)),
+            'local_baseline_max_abs_diff_vs_reference':baseline_error,'variants':results,'best':best,'train_big_win_prior':prior,
             'opposite_half':{'choices':choices,'evaluation':evaluate(oof,v,'dev'),
                              'difference_vs_R5_BASE':diff_ci(oof,base,v,'dev'),**size_error(oof)},
             'diagnostics':{'short_history_mean_posterior_entropy_by_memory':[
