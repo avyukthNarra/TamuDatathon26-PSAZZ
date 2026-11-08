@@ -23,6 +23,7 @@ How to add an entry (every PR):
 - Independent system-identification forecaster with train-only fitting, cross-fitted validation, and reproducible simulator diagnostics
 - Causal residual stacking of mixer forecasts with separate prior-fold training and checkpoint-only test prediction
 - Independent self-supervised global learning experiment with causal in-context features, train-only calibration, and episode cross-fitted evaluation
+- eval_suite: --jobs N runs independent entry executions in parallel (identical results)
 - Method-agnostic evaluation suite (`python -m eval_suite run --entry DIR`) that checks any entry against all 88 documented requirements and scores it with the official metric (#19)
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 - Empirical-Bayes latent-state experiment with reproducible cross-fitted validation and uncertainty reporting
