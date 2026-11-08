@@ -14,7 +14,7 @@ import numpy as np
 from scipy.optimize import minimize
 from scipy.special import expit, logsumexp
 
-PAIRS = np.array(list(combinations(range(1, 9), 2)), dtype=int)
+PAIRS = np.array([(1, 3), (2, 5), (4, 7)], dtype=int)
 TYPES = ('steady', 'balanced', 'jackpot')
 POSITIVE = (1, 2, 5, 20)
 
@@ -79,7 +79,7 @@ def cell_counts(machine, include_label=False, flip=None):
     if flip is not None:
         alpha = np.where(alpha < 0, -1, np.where(np.arange(alpha.shape[1]) >= flip, 1-alpha, alpha))
     y = machine.seq[:alpha.shape[1]]
-    counts = np.zeros((28, 2, 3))
+    counts = np.zeros((len(PAIRS), 2, 3))
     for outcome in (0, 1):
         mask = (y >= 0) & ((y > 0) == outcome)
         for k, value in enumerate((0., 1., .5)):
@@ -90,7 +90,7 @@ def cell_counts(machine, include_label=False, flip=None):
 def initial_levels(machines, conditions):
     """Initialize from train stable MLEs; EM removes sampling variance next."""
     rows = {k: [] for k in TYPES}
-    pair_counts = np.ones(28) * .05
+    pair_counts = np.ones(len(PAIRS)) * .05
     for m in machines:
         if conditions[m.query_id] != 'stable':
             continue
@@ -119,7 +119,8 @@ def initial_levels(machines, conditions):
 
 def level_grid(par, signal, size=25):
     """Fixed physical logit grid; normal density integrated by rectangle rule."""
-    mean = np.array(par['mean']) + par['slope'] * signal
+    slope = np.asarray(par['slope'])
+    mean = np.array(par['mean']) + (slope if slope.ndim else np.repeat(slope, 2)) * signal
     cov = np.array(par['cov'])
     sd = np.sqrt(np.diag(cov))
     axes = [mean[k] + np.linspace(-4.5, 4.5, size) * max(sd[k], .2) for k in range(2)]
@@ -146,7 +147,7 @@ def fit_levels(machines, conditions, iterations=12, size=25):
     counts = [cell_counts(m, True) for m in selected]
     for iteration in range(iterations):
         moments = {k: [] for k in TYPES}
-        pair_sum = np.full(28, .025)
+        pair_sum = np.full(len(PAIRS), .025)
         total_ll = 0.
         grids = {(kind, sig): level_grid(pars[kind], sig, size) for kind in TYPES for sig in (-1, 0, 1)}
         for m, count in zip(selected, counts):
@@ -346,7 +347,7 @@ class ExactModel:
         return float(logsumexp(lp)), np.sum(softmax(lp)*pred), lp
 
     def pred_for(self, m, p, flip=False):
-        out = np.empty((28, 2, len(p)))
+        out = np.empty((len(PAIRS), 2, len(p)))
         for j, (a, b) in enumerate(PAIRS):
             va, vb = m.seq[m.cutoff-a], m.seq[m.cutoff-b]
             alpha = .5 if va < 0 or vb < 0 else float((va > 0) == (vb > 0))
@@ -363,11 +364,11 @@ class ExactModel:
         # Prefix counts permit exact Bernoulli likelihood for every candidate c.
         masks = np.stack([(a == value) & ((y > 0) == outcome) & (y >= 0)
                           for outcome in (0, 1) for value in (0., 1., .5)], axis=2)
-        pref = np.concatenate([np.zeros((28, 1, 6)), np.cumsum(masks, axis=1)], axis=1)
-        before = pref[:, cs].transpose(1, 0, 2).reshape(len(cs), 28, 2, 3)
-        after = pref[:, -1].reshape(1, 28, 2, 3)-before
+        pref = np.concatenate([np.zeros((len(PAIRS), 1, 6)), np.cumsum(masks, axis=1)], axis=1)
+        before = pref[:, cs].transpose(1, 0, 2).reshape(len(cs), len(PAIRS), 2, 3)
+        after = pref[:, -1].reshape(1, len(PAIRS), 2, 3)-before
         counts = before + after[:, :, :, [1, 0, 2]]
-        lp = count_likelihood(counts.reshape(-1, 2, 3), p).reshape(len(cs), 28, 2, -1)
+        lp = count_likelihood(counts.reshape(-1, 2, 3), p).reshape(len(cs), len(PAIRS), 2, -1)
         lp += lw + np.log(self.pair_prior)[None, :, None, None]-np.log(2)
         evidence = logsumexp(lp, axis=(1, 2, 3))
         pred = self.pred_for(m, p, flip=True)
@@ -381,7 +382,7 @@ class ExactModel:
         u = np.clip((np.arange(m.cutoff)-(m.cutoff-schedule['anchor']))/schedule['duration'], 0, 1)
         w = np.where(a >= 0, a*(1-u)+(1-a)*u, .5)
         y = m.seq[:m.cutoff]
-        lp = np.zeros((28, 2, len(p)))
+        lp = np.zeros((len(PAIRS), 2, len(p)))
         # Group exact identical alpha values: endpoints use counts, ramp uses BLAS.
         for d in (0, 1):
             ww = w if d == 0 else 1-w

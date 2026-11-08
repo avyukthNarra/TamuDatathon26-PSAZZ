@@ -139,11 +139,28 @@ def evaluate(public, out, grid=25, refit=False):
         params = json.loads(params_path.read_text())
     ev = Evaluator(public)
     win_path = out / f'win_grid{grid}.json'
+    truth_priors = json.loads((ROOT.parent / '_coord/fresh/levels_from_truth.json').read_text())
+    win = {}
+    diagnostics = []
     if win_path.exists() and not refit:
         saved = json.loads(win_path.read_text()); win, diagnostics = saved['win'], saved['diagnostics']
     else:
-        model = ExactModel(params, size=grid)
-        win, diagnostics = model.predict_win(ev.machines)
+        for eval_fold in (0, 1):
+            fold_params = json.loads(json.dumps(params))
+            prior = truth_priors['foldB' if eval_fold == 0 else 'foldA']
+            for kind in ('steady', 'balanced', 'jackpot'):
+                row = prior[kind]
+                par = fold_params['levels'][kind]
+                par['mean'] = [row['dead']['a'], row['live']['a']]
+                par['slope'] = [row['dead']['b'], row['live']['b']]
+                corr = np.array(par['cov'])
+                rho = corr[0,1]/np.sqrt(corr[0,0]*corr[1,1])
+                sd0, sd1 = row['dead']['sd'], row['live']['sd']
+                par['cov'] = [[sd0**2, rho*sd0*sd1], [rho*sd0*sd1, sd1**2]]
+            model = ExactModel(fold_params, size=grid)
+            fold_machines = [m for m in ev.machines if ev.folds[m.episode_id] == eval_fold]
+            fold_win, fold_diag = model.predict_win(fold_machines)
+            win.update(fold_win); diagnostics.extend(fold_diag)
         win_path.write_text(json.dumps({'win': win, 'diagnostics': diagnostics}, indent=2))
     all_preds = {}
     evidence = {}
