@@ -170,6 +170,7 @@ the data, and keep only what survives the honest checks.
 | Any number of size modes per type (2 found here) | v3 | identical | identical | 55.36 | yes (robustness only) |
 | **Win prior per machine type** (strength 10, eta 6) | v3 + discovered lags | -0.0021 [-0.013, +0.009] | **-0.0113 [-0.015, -0.008]** | **56.12 (55.90 / 56.37)** | **YES** |
 | ...strength 8, eta 8 | same | -0.0005 [-0.011, +0.010] | -0.0098 [-0.013, -0.007] | 56.06 (55.83 / 56.33) | (same plateau) |
+| Blend in another team's rule model (zhill-56.2, 37 lag rules per machine) at 5 / 10 / 15 / 20% | 56.12 model | +0.0020 / +0.0044 / +0.0072 / **+0.0102 [+0.000, +0.019]** | -0.0001 / +0.0002 / +0.0010 / +0.0022 (all cross zero) | 56.16 / 56.18 / 56.18 / 56.15 | **no**: no train gain at any weight |
 
 Validation-only sweeps around the per-type prior (cross-fit): shrink toward round-wide levels
 0.5 -> 55.76, 0.25 -> 55.95, 0.1 -> 56.03, 0 -> 56.06; strength 10 -> 56.12. A flat plateau, so the
@@ -551,6 +552,11 @@ run the tests and check_submission.py, and commit and push.
 - Data-driven win-prior weights (share of targets per cluster): +0.03 on validation, but
   worse out of fold on train (dR +0.008). A strength-6 middle component cost -0.11.
 - Win prior fitted to train-history cell rates (no targets): worse than no prior (dR +0.030).
+- Blending another team's rule model (the "56.22" entry, which is our v3 + 20% rule model and
+  scores 55.58 on all 96 episodes; 56.22 was a 24-episode slice where our 56.12 model scores
+  56.59): +0.06 on cross-fit validation at 10%, but out of fold on train it never helps
+  (window dR ~0) and hurts at the cutoff (20%: +0.010 [+0.000, +0.019]). Compare entries on the
+  SAME episodes before chasing a number.
 - Single-lag per-machine logistic regression: worse than a flat rate on later ticks,
   because the real signal is a pair interaction (like XOR), which straight-line models can't see.
 
