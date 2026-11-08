@@ -82,7 +82,7 @@ all three members, main validation 57.97).
 Uploaded Avyukth's build of the default `adapted_entry_v17g_rules/` (gate keeps all three members; no challenger cleared the
 > 0.1 both-halves rule; validation 38.588/40 cross-fit on the max_points-40 copy of the kit). Files and hashes:
 `origin/avyukth/r2-adaptation` @ `a80ddc6`, `r2/adaptation_submission/`.
-- `ADAPTATION_submission.csv` SHA-256 `a7ec520dd737c40502bbb277…` (check_submission on the real kit: VALID FORMAT, 1536 queries, adaptation, test)
+- `ADAPTATION_submission.csv` SHA-256 `a7ec520dd737c40502bbb2778f1c1973efdf224e494811dd9243c3798033190f` (check_submission on the real kit: VALID FORMAT, 1536 queries, adaptation, test)
 - `ADAPTATION_entry.zip` SHA-256 `feb33968c7070000891f84547e8a896a3c1e5e0c4538498be840f995d76729d2` (Docker rerun, pinned numpy/scipy, matches to 9.7e-15)
 - Cross-check: Sai's independent build (`submission.csv` `108434136029fcf2…`, `entry.zip` `1b467e5d…`) equals it to 3.2e-14, its ZIP
   code is identical, and rerunning that ZIP on the real kit reproduced its CSV byte for byte in 159 s.
