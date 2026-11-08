@@ -400,12 +400,13 @@ class CrossEpisodeVariantTests(TempCase):
                                                {q: (0.5, 0.5, 0.0, 0.0, 0.0) for q in other})
         result = compare(base, same_for_kept, self.variant)
         self.assertTrue(result.passed, result.message)
-        self.assertEqual(result.severity, "fail")
+        self.assertEqual(result.severity, "info")
         self.assertEqual(result.details["n_queries"], 8)
 
         leaked = self.write_predictions(self.tmp / "leak.csv", {self.variant.subset[0]: (0.5, 0.5, 0.0, 0.0, 0.0)})
         result = compare(base, leaked, self.variant)
         self.assertFalse(result.passed)
+        self.assertEqual(result.severity, "fail")
         self.assertEqual(result.details["n_differing"], 1)
 
     def test_identical_subset_needs_a_subset(self):

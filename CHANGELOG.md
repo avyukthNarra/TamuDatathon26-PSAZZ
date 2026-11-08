@@ -33,5 +33,6 @@ How to add an entry (every PR):
 ### Removed
 
 ### Fixed
+- Local-mode answer-isolation checks are reported as NOT RUN, and omitted mode selects Docker when available (#19)
 
 ### Security

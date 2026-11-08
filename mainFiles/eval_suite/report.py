@@ -93,7 +93,8 @@ def verdict_line(tally, record_fail, ctx) -> str:
         head = "PASS WITH WARNINGS"
     else:
         head = "PASS"
-    authority = ("NON-AUTHORITATIVE local run (no docker isolation)" if ctx["mode"] == "local"
+    authority = ("NON-AUTHORITATIVE local run (entry runs on the host and could read answer files; "
+                 "only docker mode isolates them)" if ctx["mode"] == "local"
                  else "docker run (VM memory and quotas as reported)")
     errors = f"; {len(ctx['errors'])} suite error(s)" if ctx["errors"] else ""
     return (f"VERDICT: {head} - {tally['FAIL']} requirement(s) FAIL, {tally['WARN']} WARN, "

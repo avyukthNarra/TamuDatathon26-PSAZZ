@@ -414,7 +414,8 @@ def compare(base_csv, variant_csv, variant, tol=1e-9) -> CheckResult:
     passed is False only for a broken file, an id mismatch, or (for identical
     relations) any query whose probabilities differ by more than tol. For the
     info relation, passed is True when the files align, and severity is "info".
-    For the other relations severity is "fail", the severity of a failure.
+    A successful equality check has severity "info"; a failed equality check
+    or invalid prediction file has severity "fail".
     """
     try:
         base = _load_predictions(base_csv)
@@ -447,7 +448,7 @@ def compare(base_csv, variant_csv, variant, tol=1e-9) -> CheckResult:
             variant.name, False, "fail",
             f"{len(differing)} of {total} queries changed (max abs diff {max_abs:.3g} > tol {tol:g})",
             details)
-    return CheckResult(variant.name, True, "fail",
+    return CheckResult(variant.name, True, "info",
                        f"predictions identical within tol (max abs diff {max_abs:.3g}) over {total} queries",
                        details)
 

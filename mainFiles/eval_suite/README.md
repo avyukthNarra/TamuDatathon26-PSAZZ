@@ -13,22 +13,27 @@ From the kit root (the directory that contains `eval_suite/` and `public/`):
 
 ```bash
 # quick: contract, k-fold real-validation score, determinism, 3 causality probes (about seconds)
-python3 -m eval_suite run --entry path/to/entry --suite quick --mode local --out runs/eval/NAME
+# mode defaults to auto: Docker when its daemon is available, local otherwise
+python3 -m eval_suite run --entry path/to/entry --suite quick --out runs/eval/NAME
 
 # full: quick + every perturbation + packaging + dataset checks + generator presets
-python3 -m eval_suite run --entry path/to/entry --suite full --mode docker --out runs/eval/NAME
+python3 -m eval_suite run --entry path/to/entry --suite full --out runs/eval/NAME
+
+# opt into a faster, non-authoritative host run explicitly
+python3 -m eval_suite run --entry path/to/entry --suite quick --mode local --out runs/eval/NAME-local
 
 # paired comparison against a second entry on the same datasets
 python3 -m eval_suite run --entry path/to/A --compare path/to/B --suite full --mode docker --out runs/eval/A-vs-B
 ```
 
-Options: `--seed` (default 0), `--k` (validation folds, default 4),
+Options: `--mode docker|local` (default auto; auto selects Docker when `docker info`
+succeeds and falls back to local with a warning otherwise), `--seed` (default 0), `--k` (validation folds, default 4),
 `--bootstrap-repeats` (default 1000), `--kit` (kit `public/` directory, default `public/`),
 `--keep-work` (keep mounted dataset copies for debugging). Exit status is 0 for no FAIL,
 1 for any FAIL, 2 for a suite error with no FAIL.
 
-Tests: `python3 -m unittest discover -s eval_suite/tests -t . -v` (158 tests; the latest full
-run completed in about 126 seconds on the development host; runtime is host-dependent).
+Tests: `python3 -m unittest discover -s eval_suite/tests -t . -v` (about two minutes on the
+development host; runtime and test count may change as checks are added).
 
 ## What each level runs
 
@@ -36,20 +41,25 @@ run completed in about 126 seconds on the development host; runtime is host-depe
 |---|---|---|---|
 | Entry layout and `reproduce.json` schema, ZIP root, pins | yes | yes | CON-REPRODUCE-SCHEMA, PKG-ZIP-ROOT, PKG-REQUIREMENTS-PINNED |
 | Kit test run: `train/` and `test/` mounted, no validation answers. Forecast format, UTF-8, strict CSV, runtime, output file | yes | yes | CON-CSV-*, CON-QUERY-SET, CON-PROB-*, CON-EXIT-ZERO, ROB-RUNTIME-LIMIT |
-| k-fold real validation: each fold mounts its visible episodes plus the scored episodes' queries and history, with no answers. Predictions are stitched and scored by `scoring.official_score`. Matches the kit's `score_round` | yes | yes | SCO-FORMULA, SCO-MATCHES-KIT, GDE-07, DAT-12 |
+| k-fold real validation: Docker mode mounts visible episodes plus scored queries/history without answer files; local mode cannot prove host isolation. Predictions are stitched and scored by `scoring.official_score` | yes | yes | SCO-FORMULA, SCO-MATCHES-KIT, GDE-07, DAT-12 |
 | Determinism: fold 0 rerun, max abs difference 1e-8 after row normalisation | yes | yes | ROB-DETERMINISM, RUL-37 |
 | Causality on fold 0: future ticks, row order, answers hidden | yes | yes | CAU-FUTURE-TICKS, ROB-ROW-ORDER, CAU-ANSWERS-REMOVED |
 | All perturbations: cutoff-tick rows for other machines, condition removal, ID renaming, missing vs zero, cross-episode (`identical_subset`) | no | yes | CAU-CUTOFF-OTHERS, CAU-CONDITIONS-REMOVED, ROB-ID-RENAME, CAU-MISSING-PROBE, CAU-CROSS-EPISODE |
 | Fresh folder: the reproduce command runs from a copy with nothing else in the folder, and matches the kit test run | no | yes | ENT-FRESH-FOLDER, ENT-MATCHES-SUBMITTED |
 | Packaging: `package_entry` then `check_zip` (needs `datachecks.py`) | no | yes | PKG-* |
 | Dataset checks on the kit and on each generator preset (needs `datachecks.py`) | no | yes | DAT-*, CON-ROUND-METADATA |
-| Mount checks: no answers at the mount root or `test/`, no forecast file (needs `datachecks.py`; a suite-internal check always runs) | partial | yes | ROB-MOUNT-NO-ANSWERS, ROB-NO-FORECAST-INPUT |
+| Mount checks: no answers at the mount root or `test/`, no forecast file (needs `datachecks.py`; a suite-internal check always runs) | partial (local isolation NOT RUN) | yes | ROB-MOUNT-NO-ANSWERS, ROB-NO-FORECAST-INPUT |
 | Generator presets (`main_like`, `round2_shift`, `all_lags`, `neighbour_heavy`, `hidden_state_heavy`, `fast_drift`, `edge_cases`): generated with `episodes-per-condition` from metadata (24), scored against `_truth` | no | yes | DAT-*, CON-ROUND-METADATA; GEN-* checks remain NOT RUN (the suite scores presets but does not emit generator-specific checks) |
 | `--compare`: the second entry runs the same datasets, and `paired_compare` reports the points difference | k-fold only | k-fold and presets | paired table |
 
 Docker-only limits (`ROB-OFFLINE`, `ROB-CPU-LIMIT`, `ROB-MEM-LIMIT`, `ROB-READONLY-MOUNTS`,
 `ENT-DEPS-PREINSTALL`) are recorded in docker mode from the kit test run. In local mode
-they are NOT RUN with the reason.
+they are NOT RUN with the reason. The answer-isolation checks `ROB-MOUNT-NO-ANSWERS`,
+`CAU-ANSWERS-REMOVED` and `CAU-CONDITIONS-REMOVED` are also NOT RUN in local mode: the
+entry runs on the host and could read answer files; only docker mode isolates them. A
+detected violation still fails rather than being hidden by this limitation. Local
+equality under answer/condition removal is diagnostic only and is not presented as an
+isolation pass.
 
 Scores are never computed on the kit test split, because its answers are private.
 Every score comes from validation or from generated `_truth`. For synthetic presets, `_truth/test`
@@ -58,7 +68,8 @@ is kept outside the mounted copy; the suite reads it only after the entry produc
 ## How to read `report.md`
 
 1. **Verdict line.** FAIL if any requirement or any check failed. PASS WITH WARNINGS if
-   a check warned. Local mode is always labelled NON-AUTHORITATIVE.
+   a check warned. Local mode is always labelled NON-AUTHORITATIVE and states that the host
+   entry could read answer files.
 2. **Requirement coverage.** One row for every requirement in `requirements.py`, so none
    is silently dropped. Status is the worst status of its check IDs:
    - PASS, INFO: verified (INFO is information only, for example ENT-MAIN-DATA-MOUNT).
@@ -108,8 +119,9 @@ recomputed without rerunning the entry.
 - `entry.py` maps `"image": "python"` to `python:3.13-slim`, matching GDE-21. ENT-BASE-PY313
   remains NOT RUN because the fixed mapping is not a separate runtime verification.
 - The k-fold score is comparable across entries but is not identical to training on all of
-  validation. Each fold's entry sees the other folds' validation answers as training data. The
-  suite withholds scored-fold answer files from the mounted dataset, but cannot remove information
+  validation. Each fold's entry sees the other folds' validation answers as training data. Docker
+  mode withholds scored-fold answer files from the mounted dataset; local mode runs the entry on
+  the host, where it could read them. Neither mode can remove information
   already encoded in packaged weights or priors; it does not verify training provenance or prior
   exposure to validation.
 - The generator presets are spec-derived approximations, not the organizer's data.

@@ -168,7 +168,7 @@ def score_bundle(pred_csv, split, *, history_path, max_points, seed, repeats, n_
     """Official points, condition ratios, bootstrap CI, half-split spread and slices."""
     args = (pred_csv, split.targets, split.queries, split.conditions, split.reference, max_points)
     official = S.official_score(*args)
-    ci = S.bootstrap_ci(*args, repeats=repeats, seed=S.DEFAULT_SEED)
+    ci = S.bootstrap_ci(*args, repeats=repeats, seed=seed)
     halves = S.repeated_half_splits(*args, n_splits=n_splits, seed=seed)
     slices = S.slices(pred_csv, split.targets, split.queries, split.conditions, split.reference,
                       history=history_path)

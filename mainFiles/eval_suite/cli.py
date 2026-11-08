@@ -98,7 +98,7 @@ def _status(passed: bool, severity: str, check_id: str) -> str:
 
 
 def _normalize_identical(result: CheckResult) -> CheckResult:
-    """perturb.compare marks passed identical checks with severity 'fail'; a pass is not a failure."""
+    """Normalize successful identical checks, including results from older comparison helpers."""
     if result.passed:
         return CheckResult(result.id, True, "info", result.message, result.details)
     return result
@@ -139,6 +139,18 @@ class Suite:
 
     def add(self, result: CheckResult, source: str):
         covers = ALIASES.get(result.id, [result.id])
+        isolation_ids = {"ROB-MOUNT-NO-ANSWERS", "CAU-ANSWERS-REMOVED", "CAU-CONDITIONS-REMOVED"}
+        covered_isolation_ids = isolation_ids.intersection(covers)
+        if self.mode == "local" and covered_isolation_ids:
+            # Host execution cannot establish what the entry could read outside its working tree.
+            # Keep a detected violation, but never treat a local PASS as isolation evidence.
+            if result.passed:
+                reason = self.not_run_reasons[next(iter(covered_isolation_ids))]
+                self.records.append({"id": result.id, "covers": list(covers), "status": "NOT RUN",
+                                     "passed": None, "severity": "info",
+                                     "message": reason, "source": source,
+                                     "details": result.details})
+                return
         self.records.append({"id": result.id, "covers": list(covers),
                              "status": _status(result.passed, result.severity, result.id),
                              "passed": result.passed, "severity": result.severity,
@@ -161,6 +173,9 @@ class Suite:
 
     def _configure_mode(self):
         local_reasons = {
+            "ROB-MOUNT-NO-ANSWERS": "local mode: entry runs on the host and could read answer files; only docker mode isolates them",
+            "CAU-ANSWERS-REMOVED": "local mode: entry runs on the host and could read answer files; only docker mode isolates them",
+            "CAU-CONDITIONS-REMOVED": "local mode: entry runs on the host and could read answer files; only docker mode isolates them",
             "ROB-OFFLINE": "local mode does not disable the network (docker mode only)",
             "ROB-READONLY-MOUNTS": "local mode does not mount /data or /submission read-only (docker mode only)",
             "ROB-TMP-QUOTA": "local mode does not impose the 128 MiB /tmp quota",
@@ -474,10 +489,15 @@ class Suite:
             "runtime; it never scores anything (EXP-03: test answers are private).",
             "Fold datasets are partial by design (validation holds only visible episodes, test holds the scored "
             "ones), so check_dataset is run on the kit and on generator presets, not on fold datasets.",
-            "The scored answers live in <fold>-truth/_truth, outside the mounted dataset, so ROB-MOUNT-NO-ANSWERS "
-            "can hold for the mounts the entry sees.",
-            "CAU-ANSWERS-REMOVED and CAU-CONDITIONS-REMOVED change the scored split, which has no answer or "
-            "condition files in the kit, so those variants are equal to the base by construction.",
+            ("Local mode cannot prove answer isolation: the entry runs on the host and could read answer files; "
+             "ROB-MOUNT-NO-ANSWERS, CAU-ANSWERS-REMOVED and CAU-CONDITIONS-REMOVED are NOT RUN."
+             if self.mode == "local" else
+             "The scored answers live in <fold>-truth/_truth, outside the mounted dataset, so "
+             "ROB-MOUNT-NO-ANSWERS can hold for the mounts the entry sees."),
+            ("In docker mode, CAU-ANSWERS-REMOVED and CAU-CONDITIONS-REMOVED change the scored split, which has "
+             "no answer or condition files in the kit, so those variants are equal to the base by construction."
+             if self.mode == "docker" else
+             "Local mode cannot use equality after answer/condition removal to establish isolation."),
             "CAU-CUTOFF-OTHERS (perturb CAU-SAME-TICK-OTHERS) also adds a tick-at-cutoff row for the query's own "
             "machine. That is stricter than the rule's wording (other machines only).",
             "CAU-CROSS-EPISODE randomises payouts of the other scored episodes' history in the scored split only. "
@@ -493,8 +513,9 @@ class Suite:
         ]
         if self.mode == "local":
             items.insert(0, "NON-AUTHORITATIVE: local mode runs the host Python with no network block, no read-only "
-                            "mounts, no CPU or memory limits and no requirements install. Use --mode docker for "
-                            "organizer-equivalent runs.")
+                            "mounts, no CPU or memory limits and no requirements install. The entry runs on the host "
+                            "and could read answer files; only docker mode isolates them. Isolation checks are NOT RUN. "
+                            "Use --mode docker for organizer-equivalent runs.")
         else:
             items.insert(0, "Docker mode is the organizer emulation. Peak memory is sampled with `docker stats` "
                             "every 0.5 s, so it is an estimate, and Docker VM memory may differ from the host. "
@@ -534,8 +555,9 @@ def build_parser():
     run.add_argument("--entry", required=True, help="entry directory (code ZIP root)")
     run.add_argument("--compare", help="second entry directory for a paired comparison")
     run.add_argument("--suite", choices=("quick", "full"), default="quick")
-    run.add_argument("--mode", choices=("local", "docker"), default="local",
-                     help="local is fast and non-authoritative; docker is the organizer emulation")
+    run.add_argument("--mode", choices=("local", "docker"), default=None,
+                     help="default auto selects docker when available, otherwise non-authoritative local; "
+                          "local runs on the host and could read answer files")
     run.add_argument("--kit", default="public", help="kit public directory (default: public/)")
     run.add_argument("--out", help="output directory (default: runs/eval/<entry name>)")
     run.add_argument("--seed", type=int, default=0)
@@ -557,19 +579,29 @@ def run_suite(args) -> int:
         raise SystemExit(f"--entry is not a directory: {entry}")
     if args.compare and not Path(args.compare).expanduser().is_dir():
         raise SystemExit(f"--compare is not a directory: {args.compare}")
-    if args.mode == "docker":
+    mode = args.mode
+    if mode is None:
+        docker_ok, docker_message = docker_available()
+        mode = "docker" if docker_ok else "local"
+        if not docker_ok:
+            _log(f"WARNING: docker unavailable ({docker_message}); falling back to local mode. "
+                 "Local mode runs the entry on the host, where it could read answer files; only docker mode isolates them.")
+    elif mode == "docker":
         ok, message = docker_available()
         if not ok:
             raise SystemExit(f"--mode docker needs a running Docker daemon: {message}")
+    if mode == "local" and args.mode == "local":
+        _log("WARNING: local mode runs the entry on the host, where it could read answer files; "
+             "only docker mode isolates them.")
     out = Path(args.out) if args.out else Path("runs") / "eval" / entry.name
     out = out.expanduser().resolve()
     out.mkdir(parents=True, exist_ok=True)
     work = Path(tempfile.mkdtemp(prefix="eval-suite-work-"))
     suite = Suite(entry=entry, compare=args.compare and Path(args.compare).expanduser().resolve(),
-                  level=args.suite, mode=args.mode, kit=kit, out=out, work=work, seed=args.seed,
+                  level=args.suite, mode=mode, kit=kit, out=out, work=work, seed=args.seed,
                   k=args.k, repeats=args.bootstrap_repeats, log=_log)
     try:
-        _log(f"eval_suite {args.suite} on {entry} ({args.mode} mode), output {out}")
+        _log(f"eval_suite {args.suite} on {entry} ({mode} mode), output {out}")
         suite.execute()
     finally:
         if args.keep_work:

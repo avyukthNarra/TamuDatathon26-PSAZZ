@@ -286,6 +286,7 @@ class CompareTests(unittest.TestCase):
         copy.write_bytes(self.base_csv.read_bytes())
         result = compare(self.base_csv, copy, self.variant())
         self.assertTrue(result.passed)
+        self.assertEqual(result.severity, "info")
         self.assertEqual(result.details["n_differing"], 0)
         self.assertEqual(result.details["max_abs_diff"], 0.0)
 

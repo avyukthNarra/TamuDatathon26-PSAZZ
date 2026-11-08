@@ -16,6 +16,7 @@ import tempfile
 import unittest
 from collections import defaultdict
 from pathlib import Path
+from unittest.mock import patch
 
 from eval_suite import cli, protocol, scoring as S
 from eval_suite.requirements import REQUIREMENTS
@@ -238,6 +239,27 @@ class FullLevelTests(SuiteRuns):
         self.assertTrue(all(r["wall_s"] < r["limit_s"] for r in report["runs"]))
         self.assertEqual(self.requirement("reference-full", "RUL-20")["status"], "NOT RUN")
 
+    def test_local_mode_does_not_claim_answer_or_condition_isolation(self):
+        ids = ("ROB-MOUNT-NO-ANSWERS", "CAU-ANSWERS-REMOVED", "CAU-CONDITIONS-REMOVED")
+        reason = "host and could read answer files"
+        for name in ("reference", "reference-full"):
+            report = self.report(name)
+            self.assertEqual(report["mode"], "local")
+            self.assertIn("could read answer files", report["verdict"])
+            self.assertIn("only docker mode isolates them", report["verdict"])
+            by_requirement = {row["id"]: row for row in report["requirements"]}
+            self.assertEqual(by_requirement["RUL-16"]["status"], "NOT RUN")
+            if name == "reference-full":
+                self.assertEqual(by_requirement["RUL-21"]["status"], "NOT RUN")
+            for check_id in ids:
+                records = [r for r in report["checks"] if check_id in r["covers"]]
+                if name == "reference-full":
+                    self.assertTrue(records, check_id)
+                self.assertTrue(all(r["status"] != "PASS" for r in records), check_id)
+                self.assertTrue(any(reason in r["reason"] for r in report["requirements"]
+                                    if check_id in r["check_ids"]), check_id)
+            self.assertTrue(any(reason in caveat for caveat in report["caveats"]))
+
 
 class ProtocolTests(unittest.TestCase):
     @classmethod
@@ -304,6 +326,78 @@ class CommandTests(unittest.TestCase):
                                    capture_output=True, text=True, timeout=120)
         self.assertEqual(completed.returncode, 0, completed.stderr)
         self.assertIn("--compare", completed.stdout)
+
+    def _run_cli_with_mocked_suite(self, extra_args, *, available, daemon_message="test daemon"):
+        tmp = Path(tempfile.mkdtemp(prefix="suite-mode-test-"))
+        self.addCleanup(shutil.rmtree, tmp, True)
+        entry = tmp / "entry"
+        entry.mkdir()
+        out = tmp / "out"
+        observed = {}
+
+        class FakeSuite:
+            def __init__(self, **kwargs):
+                observed["mode"] = kwargs["mode"]
+                self.errors = []
+
+            def execute(self):
+                pass
+
+            def context(self):
+                return {"errors": []}
+
+        tally = {name: 0 for name in ("FAIL", "WARN", "NOT RUN", "PASS", "INFO", "MANUAL")}
+        argv = ["run", "--entry", str(entry), "--kit", str(PUBLIC), "--out", str(out), *extra_args]
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with patch.object(cli, "docker_available", return_value=(available, daemon_message)), \
+             patch.object(cli, "Suite", FakeSuite), \
+             patch.object(cli.R, "write_report", return_value={"tally": tally, "record_fail": 0}), \
+             patch.object(cli.R, "verdict_line", return_value="VERDICT: PASS"), \
+             contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = cli.main(argv)
+        return code, observed.get("mode"), stderr.getvalue()
+
+    def test_omitted_mode_prefers_docker_when_daemon_is_available(self):
+        code, mode, stderr = self._run_cli_with_mocked_suite([], available=True)
+        self.assertEqual(code, 0)
+        self.assertEqual(mode, "docker")
+        self.assertNotIn("WARNING", stderr)
+
+    def test_omitted_mode_falls_back_to_local_with_exposure_warning(self):
+        code, mode, stderr = self._run_cli_with_mocked_suite([], available=False,
+                                                             daemon_message="daemon stopped")
+        self.assertEqual(code, 0)
+        self.assertEqual(mode, "local")
+        self.assertIn("WARNING", stderr)
+        self.assertIn("could read answer files", stderr)
+
+    def test_explicit_local_is_respected_and_explicit_docker_fails_closed(self):
+        code, mode, stderr = self._run_cli_with_mocked_suite(["--mode", "local"], available=True)
+        self.assertEqual(code, 0)
+        self.assertEqual(mode, "local")
+        self.assertIn("WARNING", stderr)
+        self.assertIn("could read answer files", stderr)
+
+        with self.assertRaisesRegex(SystemExit, "running Docker daemon"):
+            self._run_cli_with_mocked_suite(["--mode", "docker"], available=False)
+
+    def test_local_status_downgrades_positive_isolation_checks_but_preserves_failures(self):
+        ids = ("ROB-MOUNT-NO-ANSWERS", "CAU-ANSWERS-REMOVED", "CAU-CONDITIONS-REMOVED")
+        for mode, expected in (("local", "NOT RUN"), ("docker", "PASS")):
+            suite = cli.Suite.__new__(cli.Suite)
+            suite.mode = mode
+            suite.records = []
+            suite.not_run_reasons = {check_id: "host could read answers" for check_id in ids}
+            probe_ids = ("ROB-MOUNT-NO-ANSWERS", "CAU-ANSWERS-HIDDEN", "CAU-CONDITIONS-HIDDEN")
+            for check_id in probe_ids:
+                suite.add(cli.CheckResult(check_id, True, "info", "positive scan", {}), "test")
+            self.assertEqual([r["status"] for r in suite.records], [expected] * len(ids))
+
+        suite = cli.Suite.__new__(cli.Suite)
+        suite.mode = "local"
+        suite.records = []
+        suite.add(cli.CheckResult("ROB-MOUNT-NO-ANSWERS", False, "fail", "visible answers", {}), "test")
+        self.assertEqual(suite.records[0]["status"], "FAIL")
 
 
 if __name__ == "__main__":
