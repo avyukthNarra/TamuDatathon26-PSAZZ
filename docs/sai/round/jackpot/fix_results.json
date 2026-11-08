@@ -1,0 +1,403 @@
+{
+  "reference": "mixer6 alone, 814cb60",
+  "baseline_max_abs_reproduction_error": 2.220446049250313e-16,
+  "baseline_priors": {
+    "balanced": [
+      [
+        0.45,
+        0.0394,
+        10.0
+      ],
+      [
+        0.45,
+        0.8396,
+        10.0
+      ],
+      [
+        0.1,
+        0.5,
+        2.0
+      ]
+    ],
+    "jackpot": [
+      [
+        0.45,
+        0.0126,
+        10.0
+      ],
+      [
+        0.45,
+        0.6691,
+        10.0
+      ],
+      [
+        0.1,
+        0.5,
+        2.0
+      ]
+    ],
+    "steady": [
+      [
+        0.45,
+        0.1486,
+        10.0
+      ],
+      [
+        0.45,
+        0.9555,
+        10.0
+      ],
+      [
+        0.1,
+        0.5,
+        2.0
+      ]
+    ]
+  },
+  "pairs": [
+    [
+      1,
+      3
+    ],
+    [
+      2,
+      5
+    ],
+    [
+      4,
+      7
+    ]
+  ],
+  "size_keys": [
+    [],
+    [
+      1
+    ],
+    [
+      2
+    ],
+    [
+      4
+    ]
+  ],
+  "train_active_prior": {
+    "mean": 0.5922068036053117,
+    "strength": 21.26237341677157,
+    "sample_machines": 45,
+    "machines": [
+      "main-train-e00000-m003-next",
+      "main-train-e00005-m002-next",
+      "main-train-e00005-m003-next",
+      "main-train-e00005-m005-next",
+      "main-train-e00005-m006-next",
+      "main-train-e00005-m007-next",
+      "main-train-e00007-m003-next",
+      "main-train-e00008-m003-next",
+      "main-train-e00012-m006-next",
+      "main-train-e00017-m004-next",
+      "main-train-e00024-m004-next",
+      "main-train-e00024-m005-next",
+      "main-train-e00025-m002-next",
+      "main-train-e00025-m003-next",
+      "main-train-e00042-m000-next",
+      "main-train-e00042-m004-next",
+      "main-train-e00044-m003-next",
+      "main-train-e00044-m007-next",
+      "main-train-e00048-m000-next",
+      "main-train-e00058-m000-next",
+      "main-train-e00058-m006-next",
+      "main-train-e00063-m001-next",
+      "main-train-e00063-m002-next",
+      "main-train-e00069-m002-next",
+      "main-train-e00069-m005-next",
+      "main-train-e00070-m001-next",
+      "main-train-e00070-m004-next",
+      "main-train-e00070-m006-next",
+      "main-train-e00071-m001-next",
+      "main-train-e00071-m003-next",
+      "main-train-e00081-m001-next",
+      "main-train-e00081-m005-next",
+      "main-train-e00081-m006-next",
+      "main-train-e00083-m000-next",
+      "main-train-e00085-m002-next",
+      "main-train-e00085-m007-next",
+      "main-train-e00087-m005-next",
+      "main-train-e00087-m007-next",
+      "main-train-e00090-m000-next",
+      "main-train-e00090-m001-next",
+      "main-train-e00090-m002-next",
+      "main-train-e00090-m003-next",
+      "main-train-e00090-m006-next",
+      "main-train-e00095-m003-next",
+      "main-train-e00095-m006-next"
+    ],
+    "observed_variance": 0.015367316062516822,
+    "estimated_binomial_variance": 0.004519510177320561,
+    "method": "Known-pair high cells, stable jackpot train machines only, both cells n>=10; method-of-moments Beta with binomial noise subtracted. Selection bias remains."
+  },
+  "inherited_dependency": "Baseline win/size priors fit all 96 validation targets; preserved. New fit uses train only. Scoring/selection dev only.",
+  "variants": [
+    {
+      "id": "J1_BASE",
+      "live_prior": [
+        0.45,
+        0.6691,
+        10.0
+      ],
+      "dev": {
+        "scope": "dev",
+        "points": 56.009353960419354,
+        "R": 0.07124963523772744,
+        "n_episodes": 72,
+        "condition_ratios": {
+          "stable": 0.05963551442353416,
+          "short_history": 0.10945663136180009,
+          "drift": 0.048199010909617125,
+          "shared_change": 0.0677073842559584
+        },
+        "mean_error": 0.013338883075064482,
+        "ci95": [
+          55.30778707418692,
+          56.66621442216454
+        ],
+        "class_error_shares": {
+          "p_0": 0.47335965351021625,
+          "p_1": 0.2574912070769136,
+          "p_2": 0.19423831496884897,
+          "p_5": 0.06871755921552956,
+          "p_20": 0.0061932652284916526
+        }
+      },
+      "difference": {
+        "diff": 0.0,
+        "ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "jackpot_win": {
+        "overall_jackpot_win_mse": 0.009027729999900534,
+        "condition_mse": {
+          "drift": 0.006708657089693075,
+          "shared_change": 0.008991812773081377,
+          "short_history": 0.010520221440613911,
+          "stable": 0.010023040116384009
+        }
+      },
+      "fold_points": [
+        55.8601581936909,
+        56.192180128907815
+      ]
+    },
+    {
+      "id": "J1_LIVE2",
+      "live_prior": [
+        0.45,
+        0.6691,
+        2.0
+      ],
+      "dev": {
+        "scope": "dev",
+        "points": 55.866393840606605,
+        "R": 0.07399092504855533,
+        "n_episodes": 72,
+        "condition_ratios": {
+          "stable": 0.06042487547306291,
+          "short_history": 0.10981739389591005,
+          "drift": 0.05320848780096608,
+          "shared_change": 0.07251294302428228
+        },
+        "mean_error": 0.013860946666619028,
+        "ci95": [
+          55.123766681638386,
+          56.57461870103538
+        ],
+        "class_error_shares": {
+          "p_0": 0.48519652510580463,
+          "p_1": 0.25079015452005204,
+          "p_2": 0.18868557641675818,
+          "p_5": 0.06904390533149017,
+          "p_20": 0.006283838625894863
+        }
+      },
+      "difference": {
+        "diff": -0.1429601198127486,
+        "ci95": [
+          -0.27664770596999516,
+          -0.025408862786899373
+        ]
+      },
+      "jackpot_win": {
+        "overall_jackpot_win_mse": 0.010171922241137768,
+        "condition_mse": {
+          "drift": 0.00863245451028884,
+          "shared_change": 0.011000447659126547,
+          "short_history": 0.01066957564003261,
+          "stable": 0.010381645319489584
+        }
+      },
+      "fold_points": [
+        55.69893513676475,
+        56.07051333088053
+      ]
+    },
+    {
+      "id": "J1_LIVE6",
+      "live_prior": [
+        0.45,
+        0.6691,
+        6.0
+      ],
+      "dev": {
+        "scope": "dev",
+        "points": 55.98062330616509,
+        "R": 0.07179942730991812,
+        "n_episodes": 72,
+        "condition_ratios": {
+          "stable": 0.05978218538678226,
+          "short_history": 0.10889224064765465,
+          "drift": 0.04964627203306387,
+          "shared_change": 0.06887701117217167
+        },
+        "mean_error": 0.01344506372945522,
+        "ci95": [
+          55.269542200735316,
+          56.65220812028597
+        ],
+        "class_error_shares": {
+          "p_0": 0.47588106526502943,
+          "p_1": 0.25617515757149295,
+          "p_2": 0.19302873294491646,
+          "p_5": 0.0687111076687642,
+          "p_20": 0.006203936549796872
+        }
+      },
+      "difference": {
+        "diff": -0.028730654254260912,
+        "ci95": [
+          -0.07349850179132175,
+          0.011193270960305129
+        ]
+      },
+      "jackpot_win": {
+        "overall_jackpot_win_mse": 0.009261920412432153,
+        "condition_mse": {
+          "drift": 0.00726511939033944,
+          "shared_change": 0.009484704969258186,
+          "short_history": 0.010311664585003755,
+          "stable": 0.010086721768936215
+        }
+      },
+      "fold_points": [
+        55.8220469628666,
+        56.17390353764053
+      ]
+    },
+    {
+      "id": "J1_TRAIN",
+      "live_prior": [
+        0.45,
+        0.5922068036053117,
+        21.26237341677157
+      ],
+      "dev": {
+        "scope": "dev",
+        "points": 56.057741344190596,
+        "R": 0.07032496424720752,
+        "n_episodes": 72,
+        "condition_ratios": {
+          "stable": 0.05829374582069908,
+          "short_history": 0.10612548444630268,
+          "drift": 0.048800365534026925,
+          "shared_change": 0.06808026118780143
+        },
+        "mean_error": 0.0131715695368984,
+        "ci95": [
+          55.40534078810092,
+          56.683627717478
+        ],
+        "class_error_shares": {
+          "p_0": 0.46921365871767234,
+          "p_1": 0.25813451950575755,
+          "p_2": 0.19673518625153985,
+          "p_5": 0.06963927487677414,
+          "p_20": 0.0062773606482561415
+        }
+      },
+      "difference": {
+        "diff": 0.0483873837712423,
+        "ci95": [
+          -0.07445646401601848,
+          0.21411432266459093
+        ]
+      },
+      "jackpot_win": {
+        "overall_jackpot_win_mse": 0.008655392644315207,
+        "condition_mse": {
+          "drift": 0.0069045457756350456,
+          "shared_change": 0.009133726526877817,
+          "short_history": 0.009253898523533444,
+          "stable": 0.009411168924761694
+        }
+      },
+      "fold_points": [
+        55.87113424780874,
+        56.27889832632895
+      ]
+    }
+  ],
+  "opposite_half": {
+    "dev": {
+      "scope": "dev",
+      "points": 56.057741344190596,
+      "R": 0.07032496424720752,
+      "n_episodes": 72,
+      "condition_ratios": {
+        "stable": 0.05829374582069908,
+        "short_history": 0.10612548444630268,
+        "drift": 0.048800365534026925,
+        "shared_change": 0.06808026118780143
+      },
+      "mean_error": 0.0131715695368984,
+      "ci95": [
+        55.40534078810092,
+        56.683627717478
+      ],
+      "class_error_shares": {
+        "p_0": 0.46921365871767234,
+        "p_1": 0.25813451950575755,
+        "p_2": 0.19673518625153985,
+        "p_5": 0.06963927487677414,
+        "p_20": 0.0062773606482561415
+      }
+    },
+    "difference": {
+      "diff": 0.0483873837712423,
+      "ci95": [
+        -0.07445646401601848,
+        0.21411432266459093
+      ]
+    },
+    "jackpot_win": {
+      "overall_jackpot_win_mse": 0.008655392644315207,
+      "condition_mse": {
+        "drift": 0.0069045457756350456,
+        "shared_change": 0.009133726526877817,
+        "short_history": 0.009253898523533444,
+        "stable": 0.009411168924761694
+      }
+    },
+    "choices": [
+      {
+        "test_fold": 0,
+        "selected": "J1_TRAIN"
+      },
+      {
+        "test_fold": 1,
+        "selected": "J1_TRAIN"
+      }
+    ]
+  },
+  "audit_log_unchanged": true,
+  "seconds": 12.548993917007465
+}

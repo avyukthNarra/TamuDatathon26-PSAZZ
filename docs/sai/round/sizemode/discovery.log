@@ -1,0 +1,9 @@
+SCREENED 0
+Traceback (most recent call last):
+  File "/Users/saisreed/Desktop/Coding/TamuDatathon26-PSAZZ/docs/sai/round/sizemode/discover.py", line 228, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/Users/saisreed/Desktop/Coding/TamuDatathon26-PSAZZ/docs/sai/round/sizemode/discover.py", line 145, in main
+    small=ma[i,0,cls];big=ma[i,1,cls]
+          ~~^^^^^^^^^
+IndexError: arrays used as indices must be of integer (or boolean) type

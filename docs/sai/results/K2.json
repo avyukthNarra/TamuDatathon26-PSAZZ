@@ -1,0 +1,273 @@
+{
+ "id": "K2",
+ "owner": "claude",
+ "description": "K2 small-subset stack and observable gates; best dev OOF: two-stage win=['TM_COMBINED3', 'TM_E7', 'M9b_B4'] shares=['TM_MIXER3', 'C1', 'C2'] (fit on all dev for audit rows)",
+ "params": {
+  "type": "two_stage",
+  "win": [
+   "TM_COMBINED3",
+   "TM_E7",
+   "M9b_B4"
+  ],
+  "shares": [
+   "TM_MIXER3",
+   "C1",
+   "C2"
+  ]
+ },
+ "scope": "dev",
+ "points": 54.90747415419196,
+ "ci95": [
+  53.97028537921014,
+  55.7809311378743
+ ],
+ "condition_ratios": {
+  "stable": 0.06680684864628493,
+  "short_history": 0.13508480313669038,
+  "drift": 0.07988729519768333,
+  "shared_change": 0.08921068051574603
+ },
+ "R": 0.09274740687410117,
+ "class_error_shares": {
+  "p_0": 0.5208326373053024,
+  "p_1": 0.24387171307722674,
+  "p_2": 0.17346164015852034,
+  "p_5": 0.05707345087743109,
+  "p_20": 0.004760558581519431
+ },
+ "runtime_seconds": 44.9,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "extra": {
+  "step1_combos": 1681,
+  "step2_gate_configs": 24,
+  "top3_vs_BEST_bootstrap500": [
+   {
+    "win": [
+     "TM_COMBINED3",
+     "TM_E7",
+     "M9b_B4"
+    ],
+    "shares": [
+     "TM_MIXER3",
+     "C1",
+     "C2"
+    ],
+    "points": 54.90747415419196,
+    "diff": 0.13348850072159735,
+    "ci95": [
+     -0.004087383306651654,
+     0.3016910497429724
+    ]
+   },
+   {
+    "win": [
+     "TM_COMBINED3",
+     "TM_E7",
+     "M9b_B4"
+    ],
+    "shares": [
+     "TM_MIXER3",
+     "C2"
+    ],
+    "points": 54.90747379682927,
+    "diff": 0.13348814335891035,
+    "ci95": [
+     -0.004087484079373555,
+     0.3016909211852431
+    ]
+   },
+   {
+    "win": [
+     "TM_COMBINED3",
+     "TM_E7",
+     "M9b_B4"
+    ],
+    "shares": [
+     "TM_MIXER3",
+     "C1"
+    ],
+    "points": 54.90747379451741,
+    "diff": 0.13348814104704587,
+    "ci95": [
+     -0.004087489602388844,
+     0.3016909310014271
+    ]
+   }
+  ],
+  "gated_gt_0.1_over_ungated": [],
+  "gate_table": [
+   {
+    "A": "TM_COMBINED3",
+    "B": "C2",
+    "gate": "ungated",
+    "points": 54.850043692734864,
+    "gain_vs_ungated": 0.0
+   },
+   {
+    "A": "TM_COMBINED3",
+    "B": "C2",
+    "gate": "obs",
+    "points": 54.905185071430694,
+    "gain_vs_ungated": 0.055141378695829246
+   },
+   {
+    "A": "TM_COMBINED3",
+    "B": "C2",
+    "gate": "cutoff",
+    "points": 54.85365128199751,
+    "gain_vs_ungated": 0.0036075892626428185
+   },
+   {
+    "A": "TM_COMBINED3",
+    "B": "C2",
+    "gate": "type",
+    "points": 54.734865398235534,
+    "gain_vs_ungated": -0.11517829449933004
+   },
+   {
+    "A": "TM_COMBINED3",
+    "B": "TM_E7",
+    "gate": "ungated",
+    "points": 54.8064186540025,
+    "gain_vs_ungated": 0.0
+   },
+   {
+    "A": "TM_COMBINED3",
+    "B": "TM_E7",
+    "gate": "obs",
+    "points": 54.85195117085706,
+    "gain_vs_ungated": 0.045532516854564165
+   },
+   {
+    "A": "TM_COMBINED3",
+    "B": "TM_E7",
+    "gate": "cutoff",
+    "points": 54.731482847912616,
+    "gain_vs_ungated": -0.07493580608988282
+   },
+   {
+    "A": "TM_COMBINED3",
+    "B": "TM_E7",
+    "gate": "type",
+    "points": 54.847382129821874,
+    "gain_vs_ungated": 0.04096347581937465
+   },
+   {
+    "A": "TM_COMBINED3",
+    "B": "A9",
+    "gate": "ungated",
+    "points": 54.8038908795717,
+    "gain_vs_ungated": 0.0
+   },
+   {
+    "A": "TM_COMBINED3",
+    "B": "A9",
+    "gate": "obs",
+    "points": 54.88674726163376,
+    "gain_vs_ungated": 0.08285638206205448
+   },
+   {
+    "A": "TM_COMBINED3",
+    "B": "A9",
+    "gate": "cutoff",
+    "points": 54.84462061801881,
+    "gain_vs_ungated": 0.040729738447105035
+   },
+   {
+    "A": "TM_COMBINED3",
+    "B": "A9",
+    "gate": "type",
+    "points": 54.72540666909345,
+    "gain_vs_ungated": -0.07848421047825127
+   },
+   {
+    "A": "C2",
+    "B": "TM_E7",
+    "gate": "ungated",
+    "points": 52.63458349375809,
+    "gain_vs_ungated": 0.0
+   },
+   {
+    "A": "C2",
+    "B": "TM_E7",
+    "gate": "obs",
+    "points": 52.67228244543063,
+    "gain_vs_ungated": 0.03769895167253878
+   },
+   {
+    "A": "C2",
+    "B": "TM_E7",
+    "gate": "cutoff",
+    "points": 52.61790858011202,
+    "gain_vs_ungated": -0.016674913646070877
+   },
+   {
+    "A": "C2",
+    "B": "TM_E7",
+    "gate": "type",
+    "points": 52.65597745626789,
+    "gain_vs_ungated": 0.02139396250979786
+   },
+   {
+    "A": "C2",
+    "B": "A9",
+    "gate": "ungated",
+    "points": 52.06762898687359,
+    "gain_vs_ungated": 0.0
+   },
+   {
+    "A": "C2",
+    "B": "A9",
+    "gate": "obs",
+    "points": 52.07066308929686,
+    "gain_vs_ungated": 0.0030341024232640734
+   },
+   {
+    "A": "C2",
+    "B": "A9",
+    "gate": "cutoff",
+    "points": 52.06556292565194,
+    "gain_vs_ungated": -0.002066061221654536
+   },
+   {
+    "A": "C2",
+    "B": "A9",
+    "gate": "type",
+    "points": 52.096925585722644,
+    "gain_vs_ungated": 0.02929659884905078
+   },
+   {
+    "A": "TM_E7",
+    "B": "A9",
+    "gate": "ungated",
+    "points": 52.21399001289878,
+    "gain_vs_ungated": 0.0
+   },
+   {
+    "A": "TM_E7",
+    "B": "A9",
+    "gate": "obs",
+    "points": 52.226385228251935,
+    "gain_vs_ungated": 0.012395215353151912
+   },
+   {
+    "A": "TM_E7",
+    "B": "A9",
+    "gate": "cutoff",
+    "points": 52.20401495072049,
+    "gain_vs_ungated": -0.009975062178291694
+   },
+   {
+    "A": "TM_E7",
+    "B": "A9",
+    "gate": "type",
+    "points": 52.23291859911412,
+    "gain_vs_ungated": 0.018928586215338328
+   }
+  ]
+ }
+}

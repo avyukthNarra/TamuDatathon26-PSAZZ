@@ -1,0 +1,57 @@
+{
+  "unit_tests_passed": 5,
+  "reference_numerical_parity": "14 decimal places on seeded non-tied inputs, all three allowed slab values",
+  "default_bank_repeat_byte_identical": true,
+  "screened_features_and_occam_counts_repeat_identical": true,
+  "files": [
+    {
+      "file": "R6_C1p35_H12_OOF_validation.csv",
+      "rows": 768,
+      "size_share_max_abs_difference": 1.1102230246251565e-16,
+      "sha256": "7ac11736a7333a86497fc15bb16743a62d2738f16a2d838dd77c9ab46e30ba74"
+    },
+    {
+      "file": "R6_C1p35_H12_validation.csv",
+      "rows": 768,
+      "size_share_max_abs_difference": 3.3306690738754696e-16,
+      "sha256": "39b5281dea7d4d1536bcdb18ba2c0876678cafbef352455f66964c2aadf95d05"
+    },
+    {
+      "file": "R6_C1p35_H40_OOF_validation.csv",
+      "rows": 768,
+      "size_share_max_abs_difference": 1.1102230246251565e-16,
+      "sha256": "7ac11736a7333a86497fc15bb16743a62d2738f16a2d838dd77c9ab46e30ba74"
+    },
+    {
+      "file": "R6_C1p35_H40_validation.csv",
+      "rows": 768,
+      "size_share_max_abs_difference": 2.220446049250313e-16,
+      "sha256": "669f8ceca949d6902be14fc670b772df33a203e2289ab16b13162fe7736deb3c"
+    },
+    {
+      "file": "R6_C1p35_INF_OOF_validation.csv",
+      "rows": 768,
+      "size_share_max_abs_difference": 1.1102230246251565e-16,
+      "sha256": "7ac11736a7333a86497fc15bb16743a62d2738f16a2d838dd77c9ab46e30ba74"
+    },
+    {
+      "file": "R6_C1p35_INF_validation.csv",
+      "rows": 768,
+      "size_share_max_abs_difference": 2.220446049250313e-16,
+      "sha256": "b1402fe3f403dc4942a0667b9a273482452f05016ceb5ab80976f3ae34c7805e"
+    },
+    {
+      "file": "R6_C1p35_UNIFORM_OOF_validation.csv",
+      "rows": 768,
+      "size_share_max_abs_difference": 1.1102230246251565e-16,
+      "sha256": "7ac11736a7333a86497fc15bb16743a62d2738f16a2d838dd77c9ab46e30ba74"
+    },
+    {
+      "file": "R6_C1p35_UNIFORM_validation.csv",
+      "rows": 768,
+      "size_share_max_abs_difference": 2.220446049250313e-16,
+      "sha256": "73d0d88f55e54b3e075b3fe4e0ff5471f9a5ac8e16912659462630c793519966"
+    }
+  ],
+  "audit_or_all_evaluations": 0
+}

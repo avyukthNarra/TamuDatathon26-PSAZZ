@@ -1,0 +1,10 @@
+test_bic_recovers_known_parity_and_either_polarity (test_jackpot.JackpotTests.test_bic_recovers_known_parity_and_either_polarity) ... ok
+test_constant_outcome_and_single_cell_bic_are_finite (test_jackpot.JackpotTests.test_constant_outcome_and_single_cell_bic_are_finite) ... ok
+test_copied_mixer_is_source_identical_except_import (test_jackpot.JackpotTests.test_copied_mixer_is_source_identical_except_import) ... ok
+test_jackpot_prior_change_leaves_other_type_exact (test_jackpot.JackpotTests.test_jackpot_prior_change_leaves_other_type_exact) ... ok
+test_online_walk_never_uses_current_or_future_outcomes (test_jackpot.JackpotTests.test_online_walk_never_uses_current_or_future_outcomes) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.038s
+
+OK

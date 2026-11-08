@@ -1,0 +1,8 @@
+test_batch_win_and_size_heads_match_original_v4_walk (test_models.ModelTests.test_batch_win_and_size_heads_match_original_v4_walk) ... ok
+test_peer_trigger_excludes_self_and_future_events (test_models.ModelTests.test_peer_trigger_excludes_self_and_future_events) ... ok
+test_signal_prior_changes_forecast_without_reading_targets (test_models.ModelTests.test_signal_prior_changes_forecast_without_reading_targets) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.043s
+
+OK

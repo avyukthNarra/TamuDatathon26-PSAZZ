@@ -1,0 +1,247 @@
+# RESULTS
+
+## FINAL: best score found (main round, public validation)
+
+> **UPDATE (after pulling teammates' branches, see `TEAM_COMPARISON.md`): the best model is the teammates' combined model on `zhill-branch`
+> (20% zhill rule model + 80% Pranav pair mixer): 55.37 [54.5,56.1] on our 24 audit episodes (dev 54.14), above our stack's 54.09.**
+> It is stdlib-only, deterministic and already packaged. Our stack adds only +0.15 (CI -0.05,+0.34) to it on dev. The sections below describe OUR models.
+
+> **UPDATE 4 (more blending, volatility, geometric-motion, extensive combination search):** K1 (324 compositions, 154 blends, nested check), K2 (1681 two-stage structures, gates),
+> V1-V3 (volatility), G1-G3 (gated/per-class/MLP blends), Q1-Q3 (random walk on log-odds, volatility-linked, pair-cell) all end within +0.0..+0.25 dev points of the best model
+> (20% rule + 80% mixer v3, dev 54.77, audit 55.90), and nested checks put the held-out gain of the searched combos at about +0.007. That model is saturated under blending of the available members.
+> The only combination worth considering is 15% of our C2 (+0.08, CI includes 0). Real gains now need a better win-probability component (the largest remaining error, p0 share .52).
+>
+> **UPDATE 3 (latest teammate push): Pranav's commit 6a8098c adds a two-mode payout-size model. The 20% rule + 80% mixer-v3 blend scores dev 54.77 [53.7,55.7] and
+> audit 55.90 [55.1,56.6] through our harness: the best model found. Our C2 adds +0.07 (CI includes 0) to it. Details: `TEAM_COMPARISON.md`.
+>
+> **UPDATE 2 (blending everything, volatility, gated/meta blends):** the full team stack (our members + teammates' models, simplex pw/shares weights fit on dev) scores
+> dev 54.29 (OOF) and **55.59 [54.89,56.17] on the 24 audit episodes**, vs 55.37 for the zhill combined model alone: a gain of about +0.2 that is within noise.
+> Volatility-gated blends (V1-V3), observable-evidence gates (G1), per-class/geometric pools (G2) and a tiny MLP meta-learner (G3) all land at 54.3-54.4 dev,
+> +0.1 to +0.25 over TM_COMBINED with CIs that mostly include 0. Blending is saturated near 54.3-54.4 dev; a better component (payout-size modelling) is what is needed.
+
+**Best: W5 stack = 54.09 points on the 24 reserved audit episodes (CI 53.08-54.90)**, scored once after all choices were made on the other 72.
+For reference, on the same audit set: pooled starter 30.00 by definition, original pair prototype B3 46.78, base B4 52.26 [50.95,53.35], simple composition C2 53.77 [52.71,54.66].
+
+| Model | Dev (72 ep.) | Audit (24 ep., scored once) | Audit vs B4 (CI) |
+|---|---|---|---|
+| B3 pair prototype (start of this work) | 45.82 | 46.78 | -5.5 |
+| B4 = lag 7 + pairs, ridge lambda 0.05 | 50.89 | 52.26 | |
+| C2 = M9b win memory + C1 sizes | 52.09 | 53.77 | +1.51 |
+| **W5 stack (winner)** | 52.32 (out-of-fold) | **54.09** | **+1.83 (+1.18, +2.60)** |
+
+Stack vs C2 on audit: +0.32 (CI -0.05, +0.67): the stack's edge over the simple C2 is not distinguishable from zero, C2 is the cheaper model with nearly the same score.
+Audit per-condition ratios (stack): stable .066, short_history .125, drift .124, shared_change .122 (pooled reference = 1.0).
+
+## What produced the gains (each tested, CI vs its base)
+1. **B3 -> B4, +5.1 dev / +5.5 audit.** B3's ridge (lambda 20) over-shrank the real lag effects and its extra single lags 1-5 hurt. Lag 7 plus pairs (1,3),(2,5),(4,7) at lambda 0.05 (near-OLS) is the win model. Lags/pairs are learned from train histories with null controls.
+2. **A9 severity model, +0.58 dev.** How much a win pays depends per machine on centred log1p payouts at lags 1, 2, 4 (not on lag 7).
+3. **Alpha-64 size-share prior, +0.27 dev.** One effect found by A1/A4/A6.
+4. **M9b peer-gated episode changepoints, +0.33 dev.** Pool changepoint evidence across an episode's machines only when >=2 of 7 peers show a regime start in the last 80 ticks; B3-style holdout memory as fallback.
+5. **Stacking the members, +0.23 dev over C2** (CI includes 0).
+The win model (lag 7 + pairs) and the size model (lags 1,2,4) use disjoint lag structure, which is why their gains add.
+
+## What did not work (tested, reported in RESULTS.md and reports/)
+More lag structure (all pairs, triples, one-hot, MTD, per-machine selection), pooling coefficients to the type mean, signal interactions, HMM, ADWIN, BOCPD alone, JSD gates, half-lives 4-12 and weight floors, peer/episode features (E1-E5), condition-gated specialists, MLP, future-window pseudo-targets, rolling-cutoff row multiplication, payout-level features in the win model. Gradient-boosted residual learners (S1, S2, Codex) improved the old B3 but add <= +0.09 to B4.
+
+## Caveats (read before trusting the numbers)
+- Every member's settings were chosen on dev (32-336 cells each), so dev numbers are optimistic. The audit set was not used for any choice; its access log is `results/audit_access.log` (selfcheck scored B0/B3 on all 96 earlier; final scoring is the W5_final lines).
+- 24 audit episodes is small; CIs are episode-level bootstrap.
+- Audit scored higher than dev for B3 as well (46.78 vs 45.82), so the audit set is somewhat easier; compare within a set, not across.
+- Codex W3/W4 learners (E1-E5, S1-S8) were built on the old B3; a rebase onto B4 (S1_B4, S2_B4, S5_B4) was requested but is not in these results. Expected value is small (their B3 gains were <= +0.9 and B4 adds <= +0.09 as blend members).
+- Nothing here is packaged for submission: models need numpy/scipy; W6 stdlib port was dropped by request.
+- Round two changes the structure: rerun `scripts/lag_screen.py` and the severity screen on the new train data first.
+
+
+Generated by `harness/leaderboard.py`. Scope `dev` = 72 validation episodes (audit set of 24 reserved).
+Verdicts follow MASTER_TEST_PLAN section 9. Points = 60/(1+R); differences under ~0.2 are noise.
+
+## Leaderboard
+
+| ID | owner | points | CI95 | stable | short | drift | shared | sec | det |
+|---|---|---|---|---|---|---|---|---|---|
+| Q3 | sai-worker | 54.95 | 53.93-55.84 | 0.068 | 0.144 | 0.067 | 0.088 | 4 | None |
+| K2 | claude | 54.91 | 53.97-55.78 | 0.067 | 0.135 | 0.080 | 0.089 | 45 | None |
+| TEAM_SIZE_MODES | ? | 54.87 | 53.85-55.86 | 0.059 | 0.155 | 0.072 | 0.089 | 14 | 0.0 |
+| K1 | sai-worker | 54.85 | 53.85-55.74 | 0.064 | 0.140 | 0.081 | 0.090 | 0 | None |
+| Q2 | claude | 54.77 | 53.70-55.71 | 0.066 | 0.149 | 0.076 | 0.091 | 133 | 0.0 |
+| TM_COMBINED3 | teammates | 54.77 | 53.74-55.71 | 0.066 | 0.149 | 0.076 | 0.091 | 0 | None |
+| TM_MIXER3 | teammates | 54.59 | 53.52-55.58 | 0.079 | 0.152 | 0.073 | 0.092 | 0 | None |
+| G3 | claude | 54.37 | 53.42-55.25 | 0.076 | 0.141 | 0.096 | 0.101 | 4 | None |
+| G1 | claude | 54.35 | 53.44-55.20 | 0.069 | 0.142 | 0.102 | 0.103 | 4 | None |
+| TEAM_FACTOR | codex-team | 54.34 | 53.33-55.21 | 0.079 | 0.139 | 0.096 | 0.103 | 1 | 0.0 |
+| G2 | claude | 54.31 | 53.23-55.32 | 0.078 | 0.142 | 0.098 | 0.101 | 7 | None |
+| V2 | sai-worker | 54.30 | 53.35-55.18 | 0.072 | 0.145 | 0.099 | 0.104 | 0 | None |
+| TEAM_GATE | codex-team | 54.29 | 53.37-55.15 | 0.073 | 0.144 | 0.099 | 0.104 | 1 | 0.0 |
+| V1 | sai-worker | 54.27 | 53.31-55.17 | 0.072 | 0.146 | 0.100 | 0.104 | 0 | None |
+| TEAM_DIRECT | codex-team | 54.27 | 53.30-55.16 | 0.072 | 0.147 | 0.098 | 0.105 | 0 | 0.0 |
+| TEAM_VOLATILITY | codex | 54.22 | 53.17-55.20 | 0.074 | 0.152 | 0.094 | 0.106 | 99 | 0.0 |
+| V3 | sai-worker | 54.14 | 53.07-55.12 | 0.077 | 0.156 | 0.094 | 0.106 | 0 | None |
+| TEAM_VOLATILITY_CONTROL | codex | 54.14 | 53.07-55.12 | 0.077 | 0.156 | 0.094 | 0.106 | 99 | 0.0 |
+| TM_COMBINED | teammates | 54.14 | 53.07-55.12 | 0.077 | 0.156 | 0.094 | 0.106 | 0 | None |
+| TM_MIXER | teammates | 53.87 | 52.76-54.87 | 0.091 | 0.159 | 0.096 | 0.109 | 0 | None |
+| TM_RULE | teammates | 52.89 | 51.78-53.94 | 0.057 | 0.210 | 0.133 | 0.136 | 0 | None |
+| C2 | claude | 52.08 | 51.15-52.96 | 0.090 | 0.191 | 0.184 | 0.142 | 0 | 0.0 |
+| C1 | claude-w1 | 51.72 | 50.76-52.67 | 0.090 | 0.191 | 0.200 | 0.159 | 0 | 0.0 |
+| A9 | claude-w1 | 51.47 | 50.50-52.38 | 0.090 | 0.203 | 0.203 | 0.167 | 0 | 0.0 |
+| M9b_B4 | claude-w2 | 51.22 | 50.22-52.15 | 0.105 | 0.216 | 0.197 | 0.168 | 0 | 0.0 |
+| A6_B4 | claude-w1 | 51.16 | 50.13-52.14 | 0.105 | 0.200 | 0.212 | 0.174 | 0 | 0.0 |
+| A1_B4 | claude-w1 | 51.16 | 50.13-52.13 | 0.105 | 0.200 | 0.212 | 0.174 | 0 | 0.0 |
+| A4_B4 | claude-w1 | 51.15 | 50.13-52.13 | 0.103 | 0.203 | 0.210 | 0.176 | 0 | 0.0 |
+| M2_B4 | claude-w2 | 51.11 | 50.10-52.01 | 0.089 | 0.216 | 0.208 | 0.183 | 0 | 0.0 |
+| L10 | claude | 51.10 | 49.98-52.07 | 0.107 | 0.208 | 0.202 | 0.179 | 0 | 0.0 |
+| L5 | claude-w1 | 51.09 | 50.03-52.04 | 0.109 | 0.206 | 0.201 | 0.181 | 0 | 0.0 |
+| M3_B4 | claude-w2 | 51.09 | 50.07-52.00 | 0.091 | 0.216 | 0.208 | 0.183 | 0 | 0.0 |
+| S5_B4 | codex | 51.05 | 50.02-51.99 | 0.103 | 0.210 | 0.210 | 0.179 | 3 | 0.0 |
+| S2_B4 | codex | 51.00 | 49.93-52.00 | 0.107 | 0.214 | 0.209 | 0.176 | 44 | 0.0 |
+| S1_B4 | codex | 50.99 | 49.92-51.96 | 0.108 | 0.215 | 0.210 | 0.175 | 19 | 0.0 |
+| M1_B4 | claude-w2 | 50.89 | 49.85-51.87 | 0.105 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
+| B4 | claude-w1 | 50.89 | 49.85-51.87 | 0.106 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
+| L2 | claude-w1 | 50.89 | 49.85-51.87 | 0.106 | 0.216 | 0.211 | 0.183 | 0 | 0.0 |
+| L3 | claude-w1 | 50.88 | 49.84-51.86 | 0.106 | 0.216 | 0.211 | 0.184 | 0 | 0.0 |
+| L1 | claude-w1 | 50.87 | 49.77-51.90 | 0.107 | 0.225 | 0.203 | 0.183 | 0 | 0.0 |
+| L6 | claude-w1 | 50.77 | 49.75-51.74 | 0.108 | 0.216 | 0.214 | 0.189 | 0 | 0.0 |
+| L9 | claude-w1 | 50.77 | 49.75-51.74 | 0.108 | 0.216 | 0.214 | 0.189 | 0 | 0.0 |
+| TM_E67 | teammates | 50.02 | 48.87-51.10 | 0.173 | 0.222 | 0.215 | 0.187 | 0 | None |
+| TM_E7 | teammates | 49.42 | 48.13-50.76 | 0.203 | 0.225 | 0.217 | 0.211 | 0 | None |
+| L7 | claude-w1 | 49.34 | 47.54-50.80 | 0.106 | 0.201 | 0.299 | 0.258 | 1 | 0.0 |
+| TM_E6 | teammates | 47.69 | 46.32-49.00 | 0.207 | 0.327 | 0.277 | 0.222 | 0 | None |
+| S2 | codex | 46.77 | 45.66-47.86 | 0.115 | 0.329 | 0.357 | 0.331 | 25 | 0.0 |
+| S2 | codex | 46.77 | 45.66-47.86 | 0.115 | 0.329 | 0.357 | 0.331 | 18 | 0.0 |
+| L4 | claude-w1 | 46.71 | 44.58-48.71 | 0.151 | 0.437 | 0.280 | 0.269 | 4 | 0.0 |
+| S1 | codex | 46.59 | 45.28-47.80 | 0.162 | 0.354 | 0.339 | 0.297 | 17 | 0.0 |
+| S1 | codex | 46.59 | 45.28-47.80 | 0.162 | 0.354 | 0.339 | 0.297 | 62 | 0.0 |
+| S5 | codex | 46.40 | 45.27-47.51 | 0.118 | 0.335 | 0.378 | 0.342 | 1 | 0.0 |
+| M3 | claude-w2 | 46.09 | 45.04-47.04 | 0.091 | 0.344 | 0.398 | 0.375 | 0 | 0.0 |
+| M2 | claude-w2 | 46.08 | 45.04-47.06 | 0.090 | 0.344 | 0.399 | 0.375 | 0 | 0.0 |
+| M9b | claude-w2 | 46.07 | 44.98-47.15 | 0.118 | 0.344 | 0.390 | 0.357 | 0 | 0.0 |
+| A3 | claude-w1 | 45.98 | 44.90-47.05 | 0.115 | 0.333 | 0.399 | 0.372 | 0 | 0.0 |
+| A6 | claude-w1 | 45.98 | 44.88-47.05 | 0.117 | 0.332 | 0.398 | 0.372 | 0 | 0.0 |
+| A8 | claude-w1 | 45.96 | 44.87-47.04 | 0.119 | 0.332 | 0.400 | 0.371 | 0 | 0.0 |
+| A1 | claude-w1 | 45.96 | 44.87-47.04 | 0.119 | 0.332 | 0.400 | 0.371 | 0 | 0.0 |
+| A5 | claude-w1 | 45.96 | 44.87-47.03 | 0.116 | 0.335 | 0.398 | 0.373 | 0 | 0.0 |
+| A2 | claude-w1 | 45.95 | 44.87-47.03 | 0.117 | 0.335 | 0.398 | 0.373 | 0 | 0.0 |
+| M9 | claude-w2 | 45.88 | 44.68-47.00 | 0.159 | 0.344 | 0.377 | 0.350 | 0 | 0.0 |
+| A4 | claude-w1 | 45.85 | 44.77-46.91 | 0.117 | 0.343 | 0.399 | 0.376 | 0 | 0.0 |
+| M1 | claude-w2 | 45.83 | 44.75-46.89 | 0.118 | 0.344 | 0.399 | 0.375 | 0 | 0.0 |
+| A7 | claude-w1 | 45.82 | 44.75-46.90 | 0.118 | 0.344 | 0.399 | 0.377 | 0 | 0.0 |
+| B3 | claude | 45.82 | 44.75-46.90 | 0.118 | 0.344 | 0.399 | 0.377 | 1 | 0.0 |
+| E3 | codex | 45.81 | 44.79-46.79 | 0.118 | 0.346 | 0.400 | 0.376 | 3 | 0.0 |
+| E5 | codex | 45.78 | 44.75-46.75 | 0.118 | 0.347 | 0.401 | 0.375 | 5 | 0.0 |
+| E2 | codex | 45.77 | 44.69-46.81 | 0.120 | 0.349 | 0.405 | 0.369 | 1 | 0.0 |
+| E4 | codex | 45.77 | 44.72-46.77 | 0.118 | 0.349 | 0.401 | 0.377 | 2 | 0.0 |
+| M7 | claude-w2 | 45.76 | 44.62-46.83 | 0.137 | 0.344 | 0.397 | 0.366 | 0 | 0.0 |
+| M5 | claude-w2 | 45.75 | 44.63-46.85 | 0.129 | 0.344 | 0.398 | 0.375 | 0 | 0.0 |
+| E1 | codex | 45.75 | 44.68-46.81 | 0.118 | 0.351 | 0.404 | 0.372 | 1 | 0.0 |
+| M4 | claude-w2 | 45.72 | 44.59-46.80 | 0.136 | 0.344 | 0.398 | 0.372 | 0 | 0.0 |
+| M6 | claude-w2 | 45.52 | 44.46-46.54 | 0.154 | 0.344 | 0.399 | 0.376 | 0 | 0.0 |
+| S4 | codex | 45.02 | 44.05-46.08 | 0.137 | 0.349 | 0.439 | 0.405 | 1 | 0.0 |
+| M8 | claude-w2 | 44.89 | 43.63-46.04 | 0.147 | 0.344 | 0.443 | 0.413 | 0 | 0.0 |
+| S7 | codex | 44.73 | 43.65-45.85 | 0.156 | 0.408 | 0.413 | 0.388 | 1 | 0.0 |
+| S1 | codex | 44.01 | 42.47-45.34 | 0.224 | 0.428 | 0.423 | 0.378 | 46 | 0.0 |
+| L8 | claude-w1 | 43.12 | 42.45-43.77 | 0.120 | 0.992 | 0.237 | 0.217 | 6 | 0.0 |
+| S3 | codex | 41.91 | 40.77-43.00 | 0.271 | 0.657 | 0.430 | 0.367 | 1 | 0.0 |
+| S8 | codex | 39.92 | 38.68-41.15 | 0.288 | 0.538 | 0.645 | 0.541 | 12 | 0.0 |
+| M10 | claude-w2 | 38.59 | 37.29-39.93 | 0.144 | 0.344 | 0.976 | 0.754 | 0 | 0.0 |
+| S6 | codex | 34.74 | 34.25-35.19 | 0.618 | 0.774 | 0.799 | 0.717 | 1 | 0.0 |
+| S8 | codex | 32.41 | 31.23-33.58 | 0.558 | 0.924 | 0.932 | 0.991 | 2 | 0.0 |
+| Q1 | sai-worker | 31.51 | 31.02-32.01 | 0.923 | 0.932 | 0.943 | 0.818 | 8 | None |
+| B0 | claude | 30.00 | 30.00-30.00 | 1.000 | 1.000 | 1.000 | 1.000 | 1 | 0.0 |
+
+## Method status (every catalog ID)
+
+| ID | method | owner | state | evidence |
+|---|---|---|---|---|
+| A1 | type-level Dirichlet smoothing, alpha 2/8/24/64 | claude | helps | results/A1.json; small: +0.14 [+0.03,+0.27], blend +0.14 [+0.05,+0.25]; alpha 24-64 on the size split. ONE effect found by A1,A2,A3,A5,A6,A8; under the ~0.2 noise line but CI clear |
+| A2 | 9-cell (type x signal) priors | claude | neutral | results/A2.json; +0.13 [+0.07,+0.20] is just alpha 24; 9-cell priors agree with type priors within 0.003; shrinking the ridge win rate toward the prior hurts (-2.9 at 50 pseudo-ticks) |
+| A3 | half-life grid 4..128, inf | claude | neutral | results/A3.json; +0.16 is alpha 24 again; half-life curve flat at alpha 8 (45.64 at hl 4 to 45.84 at hl 128) |
+| A4 | class-specific half-life and alpha | claude | neutral | results/A4.json; +0.03 [0.00,0.06]; short half-life on p1/p2 drops to ~41 |
+| A5 | inverse-density weights for short_history older ticks | claude | neutral | results/A5.json; no gain beyond alpha; weighting size counts -0.02/-0.12; weighting ridge rows cut short_history to 0.442 (confounded with a looser ridge penalty, not separated) |
+| A6 | prior strength scaled by effective sample size | claude | neutral | results/A6.json; +0.16 [+0.07,+0.27] ties fixed alpha 64; best at grid edge (a0=32, g=-1); a0>32 untested |
+| A7 | factorized win-rate x severity blended with direct 5-class | claude | neutral | results/A7.json; factorized B3 split is already the best; blending direct 5-class hurts (43.1 at w=0.25) |
+| A8 | leave-one-out episode / episode-type shrinkage | claude | neutral | results/A8.json; peer shares only hurt as weight grows; best cell is the no-peer alpha 64 control |
+| A9 | severity-given-win with lag features on the B4 base (new, from L-report finding that size is ~half the error) | claude | helps | results/A9.json; severity-given-win on B4: 51.47 [50.50,52.38], +0.58 [+0.21,+0.92] vs B4 (lead re-scored); per-machine ridge on P(pay>=2|win) with centred log1p lags 1,2,4 learned from train severity screen (lag 7 has no severity signal; null lags 9-12 score -0.2..-0.34); 292 cells so some selection optimism; moves p1/p2 error |
+| A1_B4 | type-level Dirichlet smoothing, alpha 2/8/24/64 rebased onto B4 | claude | helps | results/A1_B4.json; size-split prior on B4: ~51.16, +0.27 [+0.10,+0.44] vs B4 (lead re-scored); ONE effect (alpha ~64 shrinkage, moves p5/p20 only), the three IDs are not independent |
+| A4_B4 | class-specific half-life and alpha rebased onto B4 | claude | helps | results/A4_B4.json; size-split prior on B4: ~51.16, +0.27 [+0.10,+0.44] vs B4 (lead re-scored); ONE effect (alpha ~64 shrinkage, moves p5/p20 only), the three IDs are not independent |
+| A6_B4 | prior strength scaled by effective sample size rebased onto B4 | claude | helps | results/A6_B4.json; size-split prior on B4: ~51.16, +0.27 [+0.10,+0.44] vs B4 (lead re-scored); ONE effect (alpha ~64 shrinkage, moves p5/p20 only), the three IDs are not independent |
+| B0 | starter pooled (reference) | claude | baseline | results/B0.json |
+| B1 | pooled_recent | claude | baseline | - |
+| B2 | GB, HL 4/16/64/128 + LAGRESP (mainFiles/experiments/gb_proto.py) | claude | baseline | - |
+| B3 | pair-model prototype | claude | baseline | results/B3.json |
+| B4 | B4 = L2 structure (lam 0.05, lag 7 + 3 pairs); new base for all further tests | claude | baseline | results/B4.json |
+| C1 | B4 + A9 severity + alpha-64 size prior (+ best memory later) | claude | helps | results/C1.json; B4 + A9 severity + alpha-64 size prior: 51.72 [50.78,52.67], +0.83 [+0.53,+1.16] vs B4, +0.25 vs A9 alone; gains add as predicted (p1/p2 from A9, p5/p20 from alpha); plain pre-declared cell 51.715; 15 cells |
+| C2 | C2: win prob from M9b_B4 + size shares from C1 (composition, no new fitted knobs) | claude | helps | results/C2.json; 52.09 [51.16,52.97], +1.19 vs B4, +0.36 [+0.16,+0.57] vs C1; drift .184 shared .142 stable .090 short .191; selection optimism of members carries over |
+| E1 | recent residual pooling across peer machines | codex | neutral | results/E1.json; 45.75, vs B3 -0.07 [-0.15,+0.01]; blend over B4 0.00 [-0.04,+0.04]; lead re-scored via harness; built on the old B3 base |
+| E2 | cosine-similarity subgroup pooling; pool by type and signal | codex | neutral | results/E2.json; 45.77, vs B3 -0.05 [-0.17,+0.07]; blend over B4 -0.02; lead re-scored via harness; built on the old B3 base |
+| E3 | episode-level drift stats as features | codex | neutral | results/E3.json; 45.81, vs B3 -0.01 [-0.20,+0.15]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base |
+| E4 | peer lagged associations vs null controls | codex | neutral | results/E4.json; 45.77, vs B3 -0.06 [-0.15,+0.03]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base |
+| E5 | latent factor model for episode state | codex | neutral | results/E5.json; 45.78, vs B3 -0.04 [-0.18,+0.09]; blend over B4 0.00; lead re-scored via harness; built on the old B3 base |
+| G1 | observable-evidence gated stack (no volatility) | claude | neutral | results/G1.json; dev 54.35, +0.21 [-0.03,+0.43] vs TM_COMBINED, +0.06 vs team stack; 48 params; gates equal to ungated pool |
+| G2 | per-class / geometric pool | claude | neutral | results/G2.json; dev 54.31 saved (per-class geometric); pw/shares on 7 members 54.38 [+0.01,+0.45] vs TM_COMBINED; extra params hurt |
+| G3 | tiny MLP / boosted-tree meta-learner | claude | neutral | results/G3.json; dev 54.37, +0.23 [+0.06,+0.39] vs TM_COMBINED but unstable (alpha 1 vs 10 swings 0.4); trees overfit (train .0154 vs OOF .0200); ~250 weights |
+| K1 | extensive combination search around BEST (324 compositions, 154 blends, nested check) | claude | neutral | results/K1.json; BEST (TM_COMBINED3 54.77) is saturated: best composition 54.72, best blend 0.85 BEST + 0.15 C2 = 54.85 (+0.08 [-0.03,+0.17]); nested check over 478 combos: held-out gain +0.007, so the +0.08 is selection optimism; only C2 gets weight (stable 0.15) |
+| K2 | two-stage blends of small subsets (1681 structures) + observable gates | claude | neutral | results/K2.json; best 54.91, +0.13 [-0.00,+0.30] vs BEST: win = TM_COMBINED3+TM_E7+M9b_B4, shares = TM_MIXER3+C1+C2; top structures within 0.002 of each other; no gate (obs-fraction, cutoff, type) beats its ungated pair by >0.1; searching 1681 structures inflates this |
+| L1 | one-hot lags 1-8 + missing flag, regularized multinomial | claude | neutral | results/L1.json; vs L2 -0.02: one-hot lags + missing flag matches L2 only when pairs present; one-hot lags alone 31.3; logistic worse than linear |
+| L2 | per-machine ridge on lags + pairs (B3 variants: lambda, lag set, pair set) | claude | helps | results/L2.json; BIG: 50.89 [49.8,51.9], +5.07 [+4.22,+5.89] vs B3 (lead re-scored). lam 0.05 (near-OLS), lag 7 only + pairs (1,3),(2,5),(4,7); B3's lags 1-5 hurt and lam=20 over-shrinks. New base B4. Conditions .106/.216/.211/.183 |
+| L3 | all pairs among lags 1-8 with null controls (9-16); triples | claude | neutral | results/L3.json; best = the same top-3 pairs as L2 (50.88); all 28 pairs 41.9, all triples 41.4, null pairs cost several points each |
+| L4 | per-machine single-lag conditional lift | claude | neutral | results/L4.json; 46.71; vs L2 standalone -4.18, blend over L2 +0.07 [-0.16,+0.30]; only pair-joint cells work |
+| L5 | 3-state conditioning / log(1+y) levels vs win flag | claude | helps | results/L5.json; 51.09; vs L2 +0.20 [-0.05,+0.47], blend over L2 +0.21 [+0.01,+0.42]: centred log1p of lag-7 payout + flag pairs; marginal on top of L2 |
+| L6 | partial pooling of coefficients to the type mean | claude | neutral | results/L6.json; relative to L2: pooling to type mean gives nothing (50.74 pooled vs 50.77 control); effect signs differ per machine |
+| L7 | per-machine sparse feature selection from the screen | claude | alive | results/L7.json; 49.34; vs L2 standalone -1.55 but blend over L2 +0.25 [-0.02,+0.55] w .79; better short_history (.201 vs .216), worse drift/shared_change: possible complement |
+| L8 | mixture transition distribution (MTD) lags | claude | hurts | results/L8.json; -2.70 [-3.49,-1.87] vs B3; blend over L2 +0.05; short_history 0.99 (not investigated) |
+| L9 | signal x lag and type x lag interactions | claude | neutral | results/L9.json; relative to L2: no signal/type x lag prior cell beats its control; effect magnitude is smaller at signal +1 (diagnostic), sign-free interaction untested |
+| L10 | win model with payout-level features at the severity-screened lags 1,2,4 on B4 (idea from A9's finding) | claude | neutral | results/L10.json; best cell = L5 coding (log lag 7), 51.10, +0.21 [-0.03,+0.45] vs B4; composed with C1 shares 51.90, -0.18 vs C2; every other payout-level feature set hurt (47.6-50.6); win signal is lag 7 only, so win and size use disjoint lag structure (lags 1,2,4 carry severity, not win); 24 cells |
+| M1 | holdout-selected half-life variants (holdout length, grid, floor) | claude | neutral | results/M1.json; +0.01 [-0.01,+0.02]; 90 cells; hl 4-12 hurt at every holdout; floors hurt |
+| M2 | fixed-share over half-lives | claude | helps | results/M2.json; marginal: +0.26 [+0.02,+0.69], stable only (0.118->0.090); one cell (window 180 ~ whole history), dev-selected so optimistic; confirm on audit; on B4 (M2_B4) +0.22 [-0.01,+0.53], CI includes 0 |
+| M3 | dynamic model averaging | claude | helps | results/M3.json; same effect as M2 (+0.26 [+0.02,+0.69]); two methods agree, one effect, not two; on B4 (M3_B4) +0.20 [-0.03,+0.51], CI includes 0 |
+| M4 | BOCPD (Dirichlet-multinomial) | claude | neutral | results/M4.json; -0.11 [-0.29,+0.06]; converges to B3 as hazard->0 |
+| M5 | ADWIN | claude | neutral | results/M5.json; -0.07 [-0.19,+0.03] |
+| M6 | JSD/TV-gated blend of short and long windows | claude | hurts | results/M6.json; -0.30 [-0.66,-0.06]; 324 cells; blend weight 0 |
+| M7 | CUSUM / rescaled-range drift features | claude | neutral | results/M7.json; -0.06 [-0.23,+0.10]; shared_change -0.011 but stable +0.02 |
+| M8 | HMM, 2-3 regimes | claude | hurts | results/M8.json; -0.94 [-1.35,-0.65]; improves toward stay->1 i.e. toward B3 |
+| M9 | changepoints shared across an episode's machines | claude | helps | results/M9.json; helps only in one condition (rule 5): shared_change -0.074 [-0.110,-0.042] at h=1/5000 but drift +0.236 [+0.052,+0.453] when ungated; superseded by M9b |
+| M9b | M9b: episode-shared BOCPD gated by k-of-others peer shift (W=80, k=2-3), B3 fallback | claude | helps | results/M9b.json; +0.25 [+0.12,+0.40] (lead re-scored 46.07); 298-cell search so ~0.25 selection optimism; drift -0.009 [-0.014,-0.003], shared_change -0.020 [-0.036,-0.006], stable 0.000; k=3 +0.21, k=1,4 weaker; validate on audit |
+| M10 | half-life implied by Kalman gain (sanity check) | claude | hurts | results/M10.json; diagnostic only: -7.2; corr(log hl, B3's) = 0.00, does not corroborate hl 16 |
+| M1_B4 | holdout-selected half-life variants (holdout length, grid, floor) rebased onto B4 | claude | neutral | results/M1_B4.json; identical to B4 (50.89); holdout 40 + B3 grid is the optimum; half-lives 4-12 and floors still hurt on near-OLS ridge; holdout 60-80 drops to ~47; 150 cells |
+| M2_B4 | fixed-share over half-lives rebased onto B4 | claude | neutral | results/M2_B4.json; 51.11, +0.22 [-0.01,+0.53]; gain rests on ONE cell (window 190 = grid maximum), other windows ~50.93; stable only; 336 cells |
+| M3_B4 | dynamic model averaging rebased onto B4 | claude | neutral | results/M3_B4.json; 51.09, +0.20 [-0.03,+0.51]; flat plateau across windows 80-190 (51.02-51.09), stable only; 128 cells |
+| M9b_B4 | M9b rebased onto B4 | claude | helps | results/M9b_B4.json; 51.22 [50.22,52.15], +0.33 [+0.14,+0.53] vs B4 (lead re-scored); robust to neighbours (k=1-4: 51.08/51.22/51.17/51.02; lam 0.5 51.18); drift -0.014 [-0.029,-0.002], shared -0.015 [-0.030,-0.004], stable -0.001; 164 cells; survives rebase unlike M2/M3 |
+| P1 | simplex projection vs divide-by-sum vs softmax | claude | alive | - |
+| P2 | temperature / Dirichlet calibration, episodes held out | claude | alive | - |
+| P3 | affine 5x5 calibration per (type, signal) | claude | alive | - |
+| P4 | convex blend, R-weighted objective | claude | alive | - |
+| P5 | stack all helps members (episode-OOF) | claude | helps | -; FINAL: audit 54.09 [53.08,54.90], +1.83 [+1.18,+2.60] vs B4, +0.32 [-0.05,+0.67] vs C2; weights M9b_B4 .52 L7 .23 M2_B4 .12 L5 .08 S1 .04 / C1 .77 A9 .20; dev OOF 52.32 |
+| P6 | shrink ensemble toward the type prior | claude | alive | - |
+| P7 | clip bounds | claude | alive | - |
+| Q1 | GBM/log-odds local-level filter per machine (grid filter, random walk on log-odds) | claude | hurts | results/Q1.json; standalone 31.51 dev, ~23 below BEST: win flags carry almost no slow level-drift signal; win probability follows lag-pair parity, which a local-level filter cannot represent; train log-lik nearly flat across sigma |
+| Q2 | volatility-linked sigma + lag-pair-cell log-odds filters | claude | hurts | results/Q2.json; standalone 31-36 dev (cell filters 34-36), no skill; as a member of BEST OOF weight 0.00 in all 6 folds for every candidate (loss rises monotonically in w); filter pw correlates 0.53 with BEST pw; sigma=exp(-2.5-0.5z) learned on train |
+| Q3 | Q1 as a win-probability member of BEST (logit blend) | claude | neutral | results/Q3.json; 54.95, +0.18 [-0.00,+0.35] vs BEST; fitted coefficient is NEGATIVE (-0.146): BEST slightly over-shrinks toward the slow level; noise-level; vol-gated shrink never opens (as V3); 9 cells |
+| S1 | GB / HistGB second stage on B3 output + features | codex | alive | results/S1.json; 46.59 (+0.77 vs B3) but blend over B4 +0.06 [-0.07,+0.19]; rebase pending (S1_B4); built on old B3; lead re-scored via harness |
+| S2 | CatBoost / LightGBM | codex | alive | results/S2.json; CatBoost/LightGBM residual on B3: 46.77 (+0.94 vs B3, best learner) but blend over B4 +0.01 [-0.07,+0.09]; stable fixed (.115); rebase pending; built on old B3; lead re-scored via harness |
+| S3 | latent condition classifier + gating of specialists | codex | hurts | results/S3.json; 41.91 (-3.91 vs B3), blend over B4 +0.03; built on old B3; lead re-scored via harness |
+| S4 | rolling virtual cutoffs (row multiplication) | codex | neutral | results/S4.json; 45.02 (-0.80 vs B3), blend over B4 -0.02; rolling-cutoff row multiplication gave nothing on B3; built on old B3; lead re-scored via harness |
+| S5 | soft-target distillation from validation true q (episode-OOF) | codex | alive | results/S5.json; validation true-q distillation: 46.40 (+0.58 vs B3), nested diagnostic 46.31, blend over B4 0.00; rebase pending; built on old B3; lead re-scored via harness |
+| S6 | smoothed pseudo-targets from a future window (train only) | codex | hurts | results/S6.json; 34.74 (-11.08 vs B3): future-window pseudo-targets average through drift; built on old B3; lead re-scored via harness |
+| S7 | regularized multinomial logistic on full feature set | codex | neutral | results/S7.json; 44.73 (-1.09 vs B3), blend over B4 +0.09 [-0.02,+0.22]; built on old B3; lead re-scored via harness |
+| S8 | small MLP | codex | hurts | results/S8.json; 39.92 (-5.90 vs B3), blend over B4 +0.05; hit iteration cap; built on old B3; lead re-scored via harness |
+| S1_B4 | HistGB residual rebased onto B4 | codex | neutral | results/S1_B4.json; dev 50.99 vs B4 50.89 (+0.1); -3.8 vs BEST; lead re-scored |
+| S2_B4 | CatBoost/LightGBM residual rebased onto B4 | codex | neutral | results/S2_B4.json; dev 51.00 vs B4 50.89; -3.8 vs BEST; lead re-scored |
+| S5_B4 | soft-target distillation rebased onto B4 | codex | neutral | results/S5_B4.json; dev 51.05 vs B4 50.89; -3.7 vs BEST; lead re-scored |
+| TEAM_DIRECT | direct blends of team members | codex | neutral | results/TEAM_DIRECT.json; 54.27, -0.51 vs BEST; built on the older TM_COMBINED win model; lead re-scored |
+| TEAM_FACTOR | factorised pw/shares blends of team members | codex | neutral | results/TEAM_FACTOR.json; 54.34, -0.43 vs BEST; built on the older TM_COMBINED win model; lead re-scored |
+| TEAM_GATE | gated blends of team members | codex | neutral | results/TEAM_GATE.json; 54.29, -0.48 vs BEST; built on the older TM_COMBINED win model; lead re-scored |
+| TEAM_SIZE_MODES | two-mode size inference on TM_COMBINED win prob; mode centers learned only from outer-training DEV folds | codex | neutral | results/TEAM_SIZE_MODES.json; dev 54.87, +0.09 [-0.11,+0.30] vs BEST, +0.73 [+0.40,+1.07] vs old TM_COMBINED: independent reproduction of Pranav's two-mode size discovery without hard-coded modes or lags; selection optimism noted |
+| TEAM_VOLATILITY | volatility-memory blend of team members | codex | neutral | results/TEAM_VOLATILITY.json; 54.22, -0.55 vs BEST; built on the older TM_COMBINED win model; lead re-scored |
+| TEAM_VOLATILITY_CONTROL | control for the volatility-memory blend | codex | neutral | results/TEAM_VOLATILITY_CONTROL.json; 54.14, -0.63 vs BEST; built on the older TM_COMBINED win model; lead re-scored |
+| TM_COMBINED | zhill-branch combined 20% rule + 80% mixer | teammates | helps | results/TM_COMBINED.json; BEST SINGLE MODEL: dev 54.14 [53.1,55.1], audit 55.37 [54.5,56.1] (+1.3 over our stack 54.09); stdlib, deterministic, entry already built; tuned on all validation so optimistic |
+| TM_MIXER | Pranav pair mixer | teammates | helps | results/TM_MIXER.json; dev 53.87 [52.8,54.9], +1.79 [+0.98,+2.63] vs our C2; audit 55.20; stdlib only; their win model (p0 share .45 vs our .54) is much better on drift (.096 vs .184) and shared_change |
+| TM_RULE | zhill rule model v4 | teammates | helps | results/TM_RULE.json; dev 52.89, +0.81 [-0.19,+1.76] vs C2; best stable (.057); audit 52.85 |
+| TM_COMBINED3 | 20% rule model + 80% mixer v3 | teammates | helps | results/TM_COMBINED3.json; BEST FOUND: dev 54.77 [53.7,55.7], +0.63 [+0.35,+0.90] vs old TM_COMBINED; audit 55.90 [55.1,56.6]; adding our C2 gives +0.07 [-0.03,+0.17] (nothing); stdlib |
+| TM_MIXER3 | Pranav pair mixer v3 (two-mode payout size) | teammates | helps | results/TM_MIXER3.json; dev 54.59 [53.5,55.6], +0.45 [+0.10,+0.82] vs old TM_COMBINED; audit 55.77; size = one of two exact mixes per type switched by big wins at lags 1,2,3,4 (same lags our A9 found); modes read from validation targets (6 constants shared by all episodes, so in-sample leak is negligible) |
+| TM_E6 | Avyukth E6 signed-L1 logistic | teammates | neutral | results/TM_E6.json; dev 47.69, below B4; adds +0.22 [+0.02,+0.41] to C2 as a blend member (w .17); his E7 neural net not run (no torch locally); his blend claims 50.02 on a different 48-episode audit split |
+| TM_E7 | Avyukth E7 neural context | teammates | neutral | results/TM_E7.json; dev 49.42 [48.2,50.7]; -4.72 vs TM_COMBINED; adds +0.03 [-0.04,+0.11] to it (w .09); short_history .225 much better than his E6 (.327) as he claimed; needs torch |
+| TM_E67 | Avyukth final entry: E6+E7 50/50 | teammates | neutral | results/TM_E67.json; dev 50.02 [49.0,51.1] (his own audit claim 50.02 on a different split); -4.12 vs TM_COMBINED; blend weight 0 into it; needs torch==2.9.1 |
+| V1 | volatility screen + binned vol gate over 5 members | claude | neutral | results/V1.json; dev 54.27, +0.13 [-0.05,+0.29] vs TM_COMBINED; gate slopes ~0, so it is the static stack gain, not volatility; error rises with vol equally for every member (rho ~ +0.3 for ewv_w16, vy16, garch_h) |
+| V2 | softmax-linear vol/history gate | claude | neutral | results/V2.json; dev 54.27-54.30, +0.13..+0.16 [-0.05,+0.34]; same conclusion, 20-36 params |
+| V3 | vol-scaled shrinkage of p_win toward longer memory | claude | neutral | results/V3.json; dev 54.13, 0.00 [-0.10,+0.06]; optimiser never shrinks: TM_COMBINED p_win is already calibrated w.r.t. volatility |
+
+Counts: alive 10, baseline 5, helps 20, hurts 9, neutral 48

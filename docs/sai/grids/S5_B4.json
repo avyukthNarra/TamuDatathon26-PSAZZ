@@ -1,0 +1,7042 @@
+[
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009544417000142857
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.95793107587594,
+  "condition_ratios": {
+   "stable": 0.10480658609858556,
+   "short_history": 0.21403993454636094,
+   "drift": 0.20985000799212508,
+   "shared_change": 0.1810708212704824
+  },
+  "fit_seconds": 0.01028658400173299
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.022733577314156,
+  "condition_ratios": {
+   "stable": 0.10447031862956692,
+   "short_history": 0.21183552961882895,
+   "drift": 0.20897764135617153,
+   "shared_change": 0.17850212071226887
+  },
+  "fit_seconds": 0.011003709005308338
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 50.991608698493906,
+  "condition_ratios": {
+   "stable": 0.10676064835957823,
+   "short_history": 0.21207617256285277,
+   "drift": 0.21072930721765204,
+   "shared_change": 0.17709063609510117
+  },
+  "fit_seconds": 0.011706834004144184
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.41256592766962,
+  "condition_ratios": {
+   "stable": 0.12139705014862867,
+   "short_history": 0.22782957179293054,
+   "drift": 0.22625116742407186,
+   "shared_change": 0.18524001151648484
+  },
+  "fit_seconds": 0.012411584000801668
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009032957997987978
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.940835662054454,
+  "condition_ratios": {
+   "stable": 0.10536926718422118,
+   "short_history": 0.21483468307044717,
+   "drift": 0.2099896493394028,
+   "shared_change": 0.18115431766780962
+  },
+  "fit_seconds": 0.009892999994917773
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 50.99540627007793,
+  "condition_ratios": {
+   "stable": 0.10546123912064059,
+   "short_history": 0.21353871046238457,
+   "drift": 0.2089049493944781,
+   "shared_change": 0.17840136572662646
+  },
+  "fit_seconds": 0.010661291991709732
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.01364611712217,
+  "condition_ratios": {
+   "stable": 0.10719799492462992,
+   "short_history": 0.2131192583167113,
+   "drift": 0.20905837672924915,
+   "shared_change": 0.17524790250509747
+  },
+  "fit_seconds": 0.01138899999205023
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.75934761914336,
+  "condition_ratios": {
+   "stable": 0.11620369691225554,
+   "short_history": 0.21973564661324493,
+   "drift": 0.2166818936698392,
+   "shared_change": 0.17557191849223436
+  },
+  "fit_seconds": 0.012141457991674542
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008715040996321477
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.91292021144581,
+  "condition_ratios": {
+   "stable": 0.10570589712293124,
+   "short_history": 0.21574678373246456,
+   "drift": 0.2103392330844317,
+   "shared_change": 0.18213922580346328
+  },
+  "fit_seconds": 0.009460375003982335
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.94051719068365,
+  "condition_ratios": {
+   "stable": 0.10608248221586102,
+   "short_history": 0.2154338094322673,
+   "drift": 0.20934581908702476,
+   "shared_change": 0.18051526106532062
+  },
+  "fit_seconds": 0.010205250000581145
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.9715716988443,
+  "condition_ratios": {
+   "stable": 0.10693607370940113,
+   "short_history": 0.21526302904162065,
+   "drift": 0.2081111772970622,
+   "shared_change": 0.17819667786943422
+  },
+  "fit_seconds": 0.01094920800824184
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.96686278185755,
+  "condition_ratios": {
+   "stable": 0.11000981440589884,
+   "short_history": 0.21627059508715327,
+   "drift": 0.20756206869806926,
+   "shared_change": 0.17509950686336703
+  },
+  "fit_seconds": 0.011937750008655712
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008725291001610458
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.89386565144771,
+  "condition_ratios": {
+   "stable": 0.10564006986765385,
+   "short_history": 0.21604775838024087,
+   "drift": 0.21094118547235663,
+   "shared_change": 0.18306701227365993
+  },
+  "fit_seconds": 0.009475625003688037
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.898047005459084,
+  "condition_ratios": {
+   "stable": 0.10583842189065555,
+   "short_history": 0.21609835947609746,
+   "drift": 0.2106775025894638,
+   "shared_change": 0.18269434024814052
+  },
+  "fit_seconds": 0.010241791009320877
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.90268173215677,
+  "condition_ratios": {
+   "stable": 0.10621866385759836,
+   "short_history": 0.21622433978399824,
+   "drift": 0.2103056898172834,
+   "shared_change": 0.18213059841907034
+  },
+  "fit_seconds": 0.010982375009916723
+ },
+ {
+  "config_index": 0,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.90834162700068,
+  "condition_ratios": {
+   "stable": 0.107095676805319,
+   "short_history": 0.21639833158474836,
+   "drift": 0.20971956076611437,
+   "shared_change": 0.18114153120146187
+  },
+  "fit_seconds": 0.01170154100691434
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008846291995723732
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.958369399479245,
+  "condition_ratios": {
+   "stable": 0.1047066814708102,
+   "short_history": 0.2140335034535063,
+   "drift": 0.2100061856326108,
+   "shared_change": 0.18098046780718624
+  },
+  "fit_seconds": 0.009586125001078472
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.02252210637908,
+  "condition_ratios": {
+   "stable": 0.10417756201114337,
+   "short_history": 0.21188365460295774,
+   "drift": 0.20942858211156826,
+   "shared_change": 0.17831530717665214
+  },
+  "fit_seconds": 0.01029033400118351
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 50.99013541814477,
+  "condition_ratios": {
+   "stable": 0.10613424644892816,
+   "short_history": 0.212182989462585,
+   "drift": 0.21167541159535377,
+   "shared_change": 0.17680010822675168
+  },
+  "fit_seconds": 0.011009042005753145
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.40714333562404,
+  "condition_ratios": {
+   "stable": 0.1199945541329387,
+   "short_history": 0.227715747791284,
+   "drift": 0.22842721245958084,
+   "shared_change": 0.18509242483367555
+  },
+  "fit_seconds": 0.0118335000006482
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008726290994673036
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.93820217837388,
+  "condition_ratios": {
+   "stable": 0.10536067782276992,
+   "short_history": 0.21499330870195113,
+   "drift": 0.21009663172230011,
+   "shared_change": 0.18114087372545112
+  },
+  "fit_seconds": 0.009529415998258628
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 50.989797695499,
+  "condition_ratios": {
+   "stable": 0.10541020276559229,
+   "short_history": 0.21386719437499005,
+   "drift": 0.20920865480573686,
+   "shared_change": 0.17833787846486948
+  },
+  "fit_seconds": 0.010594624996883795
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.00353223834056,
+  "condition_ratios": {
+   "stable": 0.10704418616630595,
+   "short_history": 0.21365232599435105,
+   "drift": 0.2096906254525111,
+   "shared_change": 0.1751693104868387
+  },
+  "fit_seconds": 0.011388457991415635
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.73938245669301,
+  "condition_ratios": {
+   "stable": 0.11570596028605862,
+   "short_history": 0.2208375875365155,
+   "drift": 0.2180598116807772,
+   "shared_change": 0.1754502670823561
+  },
+  "fit_seconds": 0.012132707997807302
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.007937708011013456
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.911702621332786,
+  "condition_ratios": {
+   "stable": 0.10571922451908117,
+   "short_history": 0.21581710208433408,
+   "drift": 0.2103621665064516,
+   "shared_change": 0.1821453836988477
+  },
+  "fit_seconds": 0.008649791008792818
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.93773474030654,
+  "condition_ratios": {
+   "stable": 0.10611242363375001,
+   "short_history": 0.21558769609913253,
+   "drift": 0.20940526168749443,
+   "shared_change": 0.1805293472062638
+  },
+  "fit_seconds": 0.009350208012619987
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.965938297613924,
+  "condition_ratios": {
+   "stable": 0.10699270528452358,
+   "short_history": 0.21553586156310484,
+   "drift": 0.2082586267106488,
+   "shared_change": 0.17824020820420705
+  },
+  "fit_seconds": 0.010047083007520996
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.9563857186876,
+  "condition_ratios": {
+   "stable": 0.110122341240845,
+   "short_history": 0.21670475630577807,
+   "drift": 0.20788728784872262,
+   "shared_change": 0.17519579789269457
+  },
+  "fit_seconds": 0.01096729100390803
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009828916998230852
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.89367179711185,
+  "condition_ratios": {
+   "stable": 0.10564419050199522,
+   "short_history": 0.21605776804874996,
+   "drift": 0.2109443433165696,
+   "shared_change": 0.1830676862442622
+  },
+  "fit_seconds": 0.010698250000132248
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.897555409736,
+  "condition_ratios": {
+   "stable": 0.10584888483172113,
+   "short_history": 0.21612332069475318,
+   "drift": 0.21068562806220856,
+   "shared_change": 0.18269633358004664
+  },
+  "fit_seconds": 0.011714707987266593
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.90169031394622,
+  "condition_ratios": {
+   "stable": 0.10624026030298143,
+   "short_history": 0.2162723335387068,
+   "drift": 0.2103229366514274,
+   "shared_change": 0.18213559364348286
+  },
+  "fit_seconds": 0.012512874993262812
+ },
+ {
+  "config_index": 1,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.90610544812648,
+  "condition_ratios": {
+   "stable": 0.10714419299125011,
+   "short_history": 0.21649336584204537,
+   "drift": 0.20976524267666327,
+   "shared_change": 0.1811593887672157
+  },
+  "fit_seconds": 0.013232624987722374
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.007952959000249393
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.95978306817587,
+  "condition_ratios": {
+   "stable": 0.10483775492770007,
+   "short_history": 0.2139512527833429,
+   "drift": 0.20980184167798682,
+   "shared_change": 0.18100533705703864
+  },
+  "fit_seconds": 0.008733124996069819
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.026832250142114,
+  "condition_ratios": {
+   "stable": 0.10455562378883608,
+   "short_history": 0.21160350462663124,
+   "drift": 0.20885014014669714,
+   "shared_change": 0.17839851547349045
+  },
+  "fit_seconds": 0.009529333998216316
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 51.00013264809233,
+  "condition_ratios": {
+   "stable": 0.10694783419720238,
+   "short_history": 0.2115746856246155,
+   "drift": 0.21047441118119148,
+   "shared_change": 0.17687318223829873
+  },
+  "fit_seconds": 0.010274375003064051
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.4267783811219,
+  "condition_ratios": {
+   "stable": 0.12193981886955636,
+   "short_history": 0.22679634090069178,
+   "drift": 0.22573621033889926,
+   "shared_change": 0.18490365399648845
+  },
+  "fit_seconds": 0.011016417003702372
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008568125005695038
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.940756550333354,
+  "condition_ratios": {
+   "stable": 0.10538286572744368,
+   "short_history": 0.21484412498496588,
+   "drift": 0.20998085926561827,
+   "shared_change": 0.18114738407433054
+  },
+  "fit_seconds": 0.009411499995621853
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 50.99524921524695,
+  "condition_ratios": {
+   "stable": 0.10549249994883601,
+   "short_history": 0.21356206109333065,
+   "drift": 0.20887495277537071,
+   "shared_change": 0.1783912453374734
+  },
+  "fit_seconds": 0.01021891699929256
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.01379378020557,
+  "condition_ratios": {
+   "stable": 0.10725251637775524,
+   "short_history": 0.2131521108985642,
+   "drift": 0.20898615861641287,
+   "shared_change": 0.175219128712856
+  },
+  "fit_seconds": 0.011021124999388121
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.760276802934904,
+  "condition_ratios": {
+   "stable": 0.11631680228174858,
+   "short_history": 0.21980236003455816,
+   "drift": 0.21649318460572173,
+   "shared_change": 0.17549425761334073
+  },
+  "fit_seconds": 0.01186845799384173
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008055084006628022
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.9127470785513,
+  "condition_ratios": {
+   "stable": 0.10570996211772947,
+   "short_history": 0.21575356336568152,
+   "drift": 0.21034084671348485,
+   "shared_change": 0.18214279764867053
+  },
+  "fit_seconds": 0.008768834013608284
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.940108978710825,
+  "condition_ratios": {
+   "stable": 0.10609123272376542,
+   "short_history": 0.2154502777271253,
+   "drift": 0.2093492483039817,
+   "shared_change": 0.18052436798351237
+  },
+  "fit_seconds": 0.009471167009905912
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.97094906068024,
+  "condition_ratios": {
+   "stable": 0.10695263424512728,
+   "short_history": 0.21529272412123418,
+   "drift": 0.2081112335226416,
+   "shared_change": 0.17820788302950757
+  },
+  "fit_seconds": 0.010376375008490868
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.96576995908975,
+  "condition_ratios": {
+   "stable": 0.11003705192552005,
+   "short_history": 0.21634113275233396,
+   "drift": 0.2075548554779066,
+   "shared_change": 0.17510991539358373
+  },
+  "fit_seconds": 0.011216042010346428
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008633249992271885
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.89382647404455,
+  "condition_ratios": {
+   "stable": 0.10564091097788222,
+   "short_history": 0.2160490758766258,
+   "drift": 0.2109421238278489,
+   "shared_change": 0.18306754539278783
+  },
+  "fit_seconds": 0.00940954199177213
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.89795158615568,
+  "condition_ratios": {
+   "stable": 0.10584047515917981,
+   "short_history": 0.21610156100386432,
+   "drift": 0.2106798033307719,
+   "shared_change": 0.182695624584255
+  },
+  "fit_seconds": 0.010140500002307817
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.90249609221894,
+  "condition_ratios": {
+   "stable": 0.10622266162556618,
+   "short_history": 0.21623068443378807,
+   "drift": 0.21031015296576228,
+   "shared_change": 0.18213298788187623
+  },
+  "fit_seconds": 0.010858666995773092
+ },
+ {
+  "config_index": 2,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.90799637980964,
+  "condition_ratios": {
+   "stable": 0.10710209638883968,
+   "short_history": 0.2164146233347426,
+   "drift": 0.20972506284193118,
+   "shared_change": 0.18114528954454048
+  },
+  "fit_seconds": 0.011590374997467734
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008528624995960854
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.96054378225878,
+  "condition_ratios": {
+   "stable": 0.10474600030229989,
+   "short_history": 0.21391431833766572,
+   "drift": 0.20996249471977116,
+   "shared_change": 0.18090307053698765
+  },
+  "fit_seconds": 0.009286458996939473
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.02774023586999,
+  "condition_ratios": {
+   "stable": 0.10428601930899198,
+   "short_history": 0.21157967364929475,
+   "drift": 0.20931375167055993,
+   "shared_change": 0.17814464714215897
+  },
+  "fit_seconds": 0.010021209003753029
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 50.999720974883104,
+  "condition_ratios": {
+   "stable": 0.1063701298578354,
+   "short_history": 0.21158673295036315,
+   "drift": 0.21146443874032012,
+   "shared_change": 0.17648679779574608
+  },
+  "fit_seconds": 0.01074808400881011
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.42263556179167,
+  "condition_ratios": {
+   "stable": 0.12063892652678153,
+   "short_history": 0.22649766729847776,
+   "drift": 0.22806488990402268,
+   "shared_change": 0.18456557973343632
+  },
+  "fit_seconds": 0.011497875006170943
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008625292000942864
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.93832610969344,
+  "condition_ratios": {
+   "stable": 0.1053738834972609,
+   "short_history": 0.2149868369921745,
+   "drift": 0.21008697393866163,
+   "shared_change": 0.18113233439284565
+  },
+  "fit_seconds": 0.009370209008920938
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 50.99003210757821,
+  "condition_ratios": {
+   "stable": 0.105441155177487,
+   "short_history": 0.21386065881859845,
+   "drift": 0.20917795156155186,
+   "shared_change": 0.17832252657763029
+  },
+  "fit_seconds": 0.010102875006850809
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.00448003673056,
+  "condition_ratios": {
+   "stable": 0.10710241594800328,
+   "short_history": 0.21362323543646172,
+   "drift": 0.2096205518355153,
+   "shared_change": 0.17512280317250742
+  },
+  "fit_seconds": 0.010967916998197325
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.74179228260531,
+  "condition_ratios": {
+   "stable": 0.11582887004877952,
+   "short_history": 0.22077093119774524,
+   "drift": 0.21789118071223093,
+   "shared_change": 0.1753380052265059
+  },
+  "fit_seconds": 0.011742084010620601
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.00822912500007078
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.911565451872285,
+  "condition_ratios": {
+   "stable": 0.10572280829799051,
+   "short_history": 0.2158212516962061,
+   "drift": 0.21036391931622617,
+   "shared_change": 0.18214859840131073
+  },
+  "fit_seconds": 0.00894862499262672
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.937408950005846,
+  "condition_ratios": {
+   "stable": 0.10612002077203107,
+   "short_history": 0.21559813497302344,
+   "drift": 0.20940910874295168,
+   "shared_change": 0.1805375992579234
+  },
+  "fit_seconds": 0.009657041999162175
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.965399409000426,
+  "condition_ratios": {
+   "stable": 0.10700734482101279,
+   "short_history": 0.2155607554171348,
+   "drift": 0.2082598324312968,
+   "shared_change": 0.1782492605452188
+  },
+  "fit_seconds": 0.010363833003793843
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.955619384568706,
+  "condition_ratios": {
+   "stable": 0.11014702830491055,
+   "short_history": 0.21675206504873165,
+   "drift": 0.20788284542620625,
+   "shared_change": 0.1751990780082844
+  },
+  "fit_seconds": 0.011098500006482936
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009937167007592507
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.8936396830489,
+  "condition_ratios": {
+   "stable": 0.10564490146643911,
+   "short_history": 0.21605860389265666,
+   "drift": 0.21094528858743708,
+   "shared_change": 0.18306816979690635
+  },
+  "fit_seconds": 0.010746792002464645
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.897477409009184,
+  "condition_ratios": {
+   "stable": 0.10585061347220999,
+   "short_history": 0.21612533824883487,
+   "drift": 0.21068794895242424,
+   "shared_change": 0.18269749280727002
+  },
+  "fit_seconds": 0.011784041998907924
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.9015395063798,
+  "condition_ratios": {
+   "stable": 0.10624361167161925,
+   "short_history": 0.21627629696513925,
+   "drift": 0.21032744983875154,
+   "shared_change": 0.18213773485195917
+  },
+  "fit_seconds": 0.012694875011220574
+ },
+ {
+  "config_index": 3,
+  "config": {
+   "signal": 0,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.90583000270574,
+  "condition_ratios": {
+   "stable": 0.10714936185791092,
+   "short_history": 0.21650470443300524,
+   "drift": 0.20977091776388992,
+   "shared_change": 0.1811627161603474
+  },
+  "fit_seconds": 0.013604083011159673
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008369957999093458
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.95718867337279,
+  "condition_ratios": {
+   "stable": 0.10482461694824337,
+   "short_history": 0.21423629276073247,
+   "drift": 0.20989565595386941,
+   "shared_change": 0.18087940151267087
+  },
+  "fit_seconds": 0.009112250001635402
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.01788901046834,
+  "condition_ratios": {
+   "stable": 0.10456147563988422,
+   "short_history": 0.21238325056881108,
+   "drift": 0.20917202669659468,
+   "shared_change": 0.17811552042053388
+  },
+  "fit_seconds": 0.009850791000644676
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 50.98078500340376,
+  "condition_ratios": {
+   "stable": 0.1071048757583672,
+   "short_history": 0.21307092937745636,
+   "drift": 0.21108730641648676,
+   "shared_change": 0.17639291971469068
+  },
+  "fit_seconds": 0.010854332998860627
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.3800172843896,
+  "condition_ratios": {
+   "stable": 0.12277183701735742,
+   "short_history": 0.22977485399837622,
+   "drift": 0.22689200252282285,
+   "shared_change": 0.18435482890560306
+  },
+  "fit_seconds": 0.011674958004732616
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008306874995469116
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.93938213851266,
+  "condition_ratios": {
+   "stable": 0.10542905965055836,
+   "short_history": 0.21501155536611066,
+   "drift": 0.21002571884796467,
+   "shared_change": 0.1810160187756092
+  },
+  "fit_seconds": 0.009099000002606772
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 50.99120300645218,
+  "condition_ratios": {
+   "stable": 0.10565761256400232,
+   "short_history": 0.21389827034292042,
+   "drift": 0.20906027024716461,
+   "shared_change": 0.1780780577989573
+  },
+  "fit_seconds": 0.009901416997308843
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.00295567240596,
+  "condition_ratios": {
+   "stable": 0.10766199817197646,
+   "short_history": 0.21386005205557482,
+   "drift": 0.20938638289096353,
+   "shared_change": 0.17470120922318894
+  },
+  "fit_seconds": 0.010730958994827233
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.72977435836741,
+  "condition_ratios": {
+   "stable": 0.11756852501779338,
+   "short_history": 0.22138408293126646,
+   "drift": 0.21725863466663706,
+   "shared_change": 0.17473824485061693
+  },
+  "fit_seconds": 0.01158920899615623
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009023332997458056
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.91229383287129,
+  "condition_ratios": {
+   "stable": 0.10572863349088656,
+   "short_history": 0.21579949677097157,
+   "drift": 0.2103631030584848,
+   "shared_change": 0.18209790234584625
+  },
+  "fit_seconds": 0.009949040992069058
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.938857522104314,
+  "condition_ratios": {
+   "stable": 0.10614195496667948,
+   "short_history": 0.21557206411312216,
+   "drift": 0.20940478464145137,
+   "shared_change": 0.18041207220887273
+  },
+  "fit_seconds": 0.010747457999968901
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.9679990911682,
+  "condition_ratios": {
+   "stable": 0.10707065910925921,
+   "short_history": 0.2155029697003189,
+   "drift": 0.20827533035162982,
+   "shared_change": 0.17798804208547236
+  },
+  "fit_seconds": 0.011558665995835327
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.95969706226243,
+  "condition_ratios": {
+   "stable": 0.11033253377539205,
+   "short_history": 0.21675322901643096,
+   "drift": 0.20785504233491064,
+   "shared_change": 0.17466332981874336
+  },
+  "fit_seconds": 0.012334374987403862
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009668541999417357
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.89375312985689,
+  "condition_ratios": {
+   "stable": 0.10564505961919758,
+   "short_history": 0.21605520664996375,
+   "drift": 0.21094419211135648,
+   "shared_change": 0.18306199360059358
+  },
+  "fit_seconds": 0.010455541996634565
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.897761816122504,
+  "condition_ratios": {
+   "stable": 0.10585100084631072,
+   "short_history": 0.21611735250343891,
+   "drift": 0.21068498993137352,
+   "shared_change": 0.1826817016476502
+  },
+  "fit_seconds": 0.011196999999810942
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.90209961078873,
+  "condition_ratios": {
+   "stable": 0.10624420462698868,
+   "short_history": 0.21626336989994357,
+   "drift": 0.21032065760732238,
+   "shared_change": 0.18210497956241684
+  },
+  "fit_seconds": 0.011954208006500266
+ },
+ {
+  "config_index": 4,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.90699585216762,
+  "condition_ratios": {
+   "stable": 0.10715218198539507,
+   "short_history": 0.2164723291192581,
+   "drift": 0.20976338605145506,
+   "shared_change": 0.18109183166058973
+  },
+  "fit_seconds": 0.01270045799901709
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009523375003482215
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.95737657886837,
+  "condition_ratios": {
+   "stable": 0.10472525067550248,
+   "short_history": 0.2142748073724537,
+   "drift": 0.21003660313342468,
+   "shared_change": 0.1807819384583452
+  },
+  "fit_seconds": 0.010272334009641781
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.01860384385113,
+  "condition_ratios": {
+   "stable": 0.10425883132467494,
+   "short_history": 0.21244104936153235,
+   "drift": 0.20958319033245598,
+   "shared_change": 0.1778832902277215
+  },
+  "fit_seconds": 0.011118209004052915
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 50.979492929472,
+  "condition_ratios": {
+   "stable": 0.10644330919531324,
+   "short_history": 0.2132387956005764,
+   "drift": 0.21198218317296944,
+   "shared_change": 0.17611105871867933
+  },
+  "fit_seconds": 0.012066334005794488
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.37514416443797,
+  "condition_ratios": {
+   "stable": 0.1212524896821132,
+   "short_history": 0.2297262563804901,
+   "drift": 0.2289866663725151,
+   "shared_change": 0.1842889431767626
+  },
+  "fit_seconds": 0.013035916999797337
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008329541989951394
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.936835786388755,
+  "condition_ratios": {
+   "stable": 0.10541539278498914,
+   "short_history": 0.21517412534969524,
+   "drift": 0.21012869232706582,
+   "shared_change": 0.18099967100375575
+  },
+  "fit_seconds": 0.009097583999391645
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 50.98542855809889,
+  "condition_ratios": {
+   "stable": 0.10558110512229055,
+   "short_history": 0.21429232723562702,
+   "drift": 0.20935061880762795,
+   "shared_change": 0.17800322508487068
+  },
+  "fit_seconds": 0.009969458988052793
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 50.99336128883883,
+  "condition_ratios": {
+   "stable": 0.10744752143508918,
+   "short_history": 0.21442556785903977,
+   "drift": 0.21001841228067747,
+   "shared_change": 0.17460349961920243
+  },
+  "fit_seconds": 0.010795416994369589
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.71150228599669,
+  "condition_ratios": {
+   "stable": 0.11698597915277985,
+   "short_history": 0.22244682248080655,
+   "drift": 0.21861522130747546,
+   "shared_change": 0.17460609261790172
+  },
+  "fit_seconds": 0.011612292000791058
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008208708008169197
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.91109987750276,
+  "condition_ratios": {
+   "stable": 0.10574060317853429,
+   "short_history": 0.21586818045149828,
+   "drift": 0.2103867011136626,
+   "shared_change": 0.18210420230813143
+  },
+  "fit_seconds": 0.009004958003060892
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.936126662321264,
+  "condition_ratios": {
+   "stable": 0.10616728193202761,
+   "short_history": 0.2157239305783514,
+   "drift": 0.20946628216423635,
+   "shared_change": 0.18042598252358444
+  },
+  "fit_seconds": 0.009764417001861148
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.9622169223927,
+  "condition_ratios": {
+   "stable": 0.107114371502122,
+   "short_history": 0.215803194536034,
+   "drift": 0.20843044628044818,
+   "shared_change": 0.1780232531717016
+  },
+  "fit_seconds": 0.010473292000824586
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.94940430059597,
+  "condition_ratios": {
+   "stable": 0.11041874972420249,
+   "short_history": 0.21718210371760197,
+   "drift": 0.2081951779649004,
+   "shared_change": 0.17475953434684044
+  },
+  "fit_seconds": 0.011226707996684127
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.010622708010487258
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.893559571159216,
+  "condition_ratios": {
+   "stable": 0.10564914118839873,
+   "short_history": 0.2160651309625015,
+   "drift": 0.2109473992542446,
+   "shared_change": 0.1830627153796457
+  },
+  "fit_seconds": 0.011395375011488795
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.8972708958612,
+  "condition_ratios": {
+   "stable": 0.10586136503051571,
+   "short_history": 0.21614210330080988,
+   "drift": 0.21069324351677313,
+   "shared_change": 0.1826838139772264
+  },
+  "fit_seconds": 0.012144083011662588
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.90110365195151,
+  "condition_ratios": {
+   "stable": 0.10626562177804003,
+   "short_history": 0.21631148484413829,
+   "drift": 0.21033814979982235,
+   "shared_change": 0.18211021023698323
+  },
+  "fit_seconds": 0.012881500006187707
+ },
+ {
+  "config_index": 5,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.904753145772276,
+  "condition_ratios": {
+   "stable": 0.10720040593323191,
+   "short_history": 0.2165674622512499,
+   "drift": 0.20980970425927067,
+   "shared_change": 0.1811098618068228
+  },
+  "fit_seconds": 0.013607708009658381
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008911083001294173
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.95903067086327,
+  "condition_ratios": {
+   "stable": 0.1048593203685876,
+   "short_history": 0.21414680437386543,
+   "drift": 0.20984192815972033,
+   "shared_change": 0.18081766955090842
+  },
+  "fit_seconds": 0.010207999992417172
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.02232237638533,
+  "condition_ratios": {
+   "stable": 0.10465113824124962,
+   "short_history": 0.2121383580379403,
+   "drift": 0.2090273826711538,
+   "shared_change": 0.1780066402840374
+  },
+  "fit_seconds": 0.011105540994321927
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 50.989312938348284,
+  "condition_ratios": {
+   "stable": 0.1073026671079518,
+   "short_history": 0.2125644708106956,
+   "drift": 0.21079657629682902,
+   "shared_change": 0.17620496413260264
+  },
+  "fit_seconds": 0.011842915992019698
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.39467033931124,
+  "condition_ratios": {
+   "stable": 0.12329750297158958,
+   "short_history": 0.22875453336978308,
+   "drift": 0.22628280339485274,
+   "shared_change": 0.1840735336901968
+  },
+  "fit_seconds": 0.01254266599426046
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.00847958298982121
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.93932011301331,
+  "condition_ratios": {
+   "stable": 0.10544367698610924,
+   "short_history": 0.215020891316337,
+   "drift": 0.21001432282456214,
+   "shared_change": 0.18100919837907684
+  },
+  "fit_seconds": 0.009205541995470412
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 50.9912111868169,
+  "condition_ratios": {
+   "stable": 0.10568982968364399,
+   "short_history": 0.21391315121261018,
+   "drift": 0.20902354138662935,
+   "shared_change": 0.17806693358954362
+  },
+  "fit_seconds": 0.009989832993596792
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.003168532301345,
+  "condition_ratios": {
+   "stable": 0.10772455179060841,
+   "short_history": 0.21389054669329538,
+   "drift": 0.20930125332412416,
+   "shared_change": 0.17467365184053152
+  },
+  "fit_seconds": 0.010775167000247166
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.73091276199787,
+  "condition_ratios": {
+   "stable": 0.11769817810181335,
+   "short_history": 0.2214453693937097,
+   "drift": 0.21704176675785117,
+   "shared_change": 0.1746580105247693
+  },
+  "fit_seconds": 0.011559791993931867
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008622791996458545
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.91212927466567,
+  "condition_ratios": {
+   "stable": 0.10573281272630972,
+   "short_history": 0.21580617111180675,
+   "drift": 0.210364089985673,
+   "shared_change": 0.18210129840006345
+  },
+  "fit_seconds": 0.00937087499187328
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.93846788913747,
+  "condition_ratios": {
+   "stable": 0.10615115277107746,
+   "short_history": 0.2155883876236265,
+   "drift": 0.20940663534464507,
+   "shared_change": 0.18042073911832318
+  },
+  "fit_seconds": 0.010098124999785796
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.967372487437075,
+  "condition_ratios": {
+   "stable": 0.10708797286243031,
+   "short_history": 0.2155364979951039,
+   "drift": 0.20827209415476636,
+   "shared_change": 0.17799832767924367
+  },
+  "fit_seconds": 0.010802124990732409
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.95871694048005,
+  "condition_ratios": {
+   "stable": 0.11036204575325409,
+   "short_history": 0.21681789537423665,
+   "drift": 0.20784261740971752,
+   "shared_change": 0.17467215925407314
+  },
+  "fit_seconds": 0.011509666990605183
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008498084003804252
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.89371447332117,
+  "condition_ratios": {
+   "stable": 0.10564590278270021,
+   "short_history": 0.21605651878132115,
+   "drift": 0.21094509618768886,
+   "shared_change": 0.1830625160641476
+  },
+  "fit_seconds": 0.009236999991117045
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.89766772844416,
+  "condition_ratios": {
+   "stable": 0.10585305905768777,
+   "short_history": 0.2161205406170608,
+   "drift": 0.21068720423994383,
+   "shared_change": 0.18268295762029813
+  },
+  "fit_seconds": 0.00996958400355652
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.9019166219972,
+  "condition_ratios": {
+   "stable": 0.10624821211738933,
+   "short_history": 0.2162696974146113,
+   "drift": 0.21032494577480493,
+   "shared_change": 0.18210730624142007
+  },
+  "fit_seconds": 0.010679541999706998
+ },
+ {
+  "config_index": 6,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.906649377145335,
+  "condition_ratios": {
+   "stable": 0.10715875322398688,
+   "short_history": 0.2164890623986052,
+   "drift": 0.20976854365488737,
+   "shared_change": 0.1810954566926477
+  },
+  "fit_seconds": 0.011407625002902932
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009021041987580247
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.959587731353814,
+  "condition_ratios": {
+   "stable": 0.10476973296744138,
+   "short_history": 0.2141495735682757,
+   "drift": 0.20998667333921453,
+   "shared_change": 0.18070825925941733
+  },
+  "fit_seconds": 0.0097703339997679
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.02395859577821,
+  "condition_ratios": {
+   "stable": 0.10437911981783772,
+   "short_history": 0.21211858393932526,
+   "drift": 0.20945144907452604,
+   "shared_change": 0.17772352574911252
+  },
+  "fit_seconds": 0.010811374988406897
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 50.98914908598583,
+  "condition_ratios": {
+   "stable": 0.10670215866776907,
+   "short_history": 0.21261764814544395,
+   "drift": 0.21173512881068707,
+   "shared_change": 0.1758288681296142
+  },
+  "fit_seconds": 0.011582249993807636
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.39107872482765,
+  "condition_ratios": {
+   "stable": 0.12187110688552807,
+   "short_history": 0.2285192322132176,
+   "drift": 0.22852592236247146,
+   "shared_change": 0.18383155170977128
+  },
+  "fit_seconds": 0.012313791987253353
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008739665994653478
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.93697530855916,
+  "condition_ratios": {
+   "stable": 0.10543045283090385,
+   "short_history": 0.2151667540711137,
+   "drift": 0.21011611971389357,
+   "shared_change": 0.1809916489182709
+  },
+  "fit_seconds": 0.009519749990431592
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 50.9857246851958,
+  "condition_ratios": {
+   "stable": 0.10561594897468411,
+   "short_history": 0.2142782613239371,
+   "drift": 0.20931665904134514,
+   "shared_change": 0.1779890671490471
+  },
+  "fit_seconds": 0.010262750001857057
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 50.99437399026253,
+  "condition_ratios": {
+   "stable": 0.10751403943516531,
+   "short_history": 0.21438698647280385,
+   "drift": 0.2099335958326182,
+   "shared_change": 0.17456691278611244
+  },
+  "fit_seconds": 0.010997124991263263
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.71440862439903,
+  "condition_ratios": {
+   "stable": 0.1171262092954111,
+   "short_history": 0.22234592642228385,
+   "drift": 0.21840945372951825,
+   "shared_change": 0.1745013074428528
+  },
+  "fit_seconds": 0.011775624996516854
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008681082996190526
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.91096974023168,
+  "condition_ratios": {
+   "stable": 0.10574436858681914,
+   "short_history": 0.21587225966061707,
+   "drift": 0.21038783518159615,
+   "shared_change": 0.18210727367943128
+  },
+  "fit_seconds": 0.009426874996279366
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.935817314974585,
+  "condition_ratios": {
+   "stable": 0.10617557964966332,
+   "short_history": 0.21573404203617177,
+   "drift": 0.20946856032377886,
+   "shared_change": 0.18043391115655483
+  },
+  "fit_seconds": 0.010155374999158084
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.96170739895288,
+  "condition_ratios": {
+   "stable": 0.10713016365709943,
+   "short_history": 0.21582344858154248,
+   "drift": 0.20842828503553645,
+   "shared_change": 0.17803645327604908
+  },
+  "fit_seconds": 0.010889666998991743
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.94868340406114,
+  "condition_ratios": {
+   "stable": 0.11044636760219385,
+   "short_history": 0.21722876705502406,
+   "drift": 0.2081851274669676,
+   "shared_change": 0.17476195546327603
+  },
+  "fit_seconds": 0.011595792006119154
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009658250011852942
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.89352792030688,
+  "condition_ratios": {
+   "stable": 0.1056498558714832,
+   "short_history": 0.2160659633851996,
+   "drift": 0.21094831166600375,
+   "shared_change": 0.18306318858660386
+  },
+  "fit_seconds": 0.010421083003166132
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.89719407844275,
+  "condition_ratios": {
+   "stable": 0.1058631028146524,
+   "short_history": 0.21614411220785082,
+   "drift": 0.2106954816585496,
+   "shared_change": 0.1826849459090673
+  },
+  "fit_seconds": 0.011147625002195127
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.9009545271002,
+  "condition_ratios": {
+   "stable": 0.1062689933263285,
+   "short_history": 0.21631550067366667,
+   "drift": 0.2103424944629549,
+   "shared_change": 0.18211229183623368
+  },
+  "fit_seconds": 0.01186062500346452
+ },
+ {
+  "config_index": 7,
+  "config": {
+   "signal": 0,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.90448499412316,
+  "condition_ratios": {
+   "stable": 0.10720574552388576,
+   "short_history": 0.21657840479096652,
+   "drift": 0.2098150517994914,
+   "shared_change": 0.18111306788912676
+  },
+  "fit_seconds": 0.012578708003275096
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008238249996793456
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.968270785631184,
+  "condition_ratios": {
+   "stable": 0.10430311678942512,
+   "short_history": 0.21324797033403423,
+   "drift": 0.210004795207805,
+   "shared_change": 0.1812560177118514
+  },
+  "fit_seconds": 0.008958083009929396
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.04128825259261,
+  "condition_ratios": {
+   "stable": 0.10335909798327025,
+   "short_history": 0.20991378657988244,
+   "drift": 0.20956993738753946,
+   "shared_change": 0.17923285475030412
+  },
+  "fit_seconds": 0.009679958006017841
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 51.01611877572457,
+  "condition_ratios": {
+   "stable": 0.10491870794880508,
+   "short_history": 0.20827356689962065,
+   "drift": 0.21226649984767318,
+   "shared_change": 0.17893673322327736
+  },
+  "fit_seconds": 0.010380457999417558
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.404227121939684,
+  "condition_ratios": {
+   "stable": 0.11954599735231931,
+   "short_history": 0.2209186663267169,
+   "drift": 0.23079928283636758,
+   "shared_change": 0.19024146094543334
+  },
+  "fit_seconds": 0.011092250002548099
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009035999988554977
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.95055605044952,
+  "condition_ratios": {
+   "stable": 0.10502614196061322,
+   "short_history": 0.21413211653431785,
+   "drift": 0.20992696450642515,
+   "shared_change": 0.18136385948481173
+  },
+  "fit_seconds": 0.009943624987499788
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 51.01558005293998,
+  "condition_ratios": {
+   "stable": 0.10466199051683986,
+   "short_history": 0.21179818550341378,
+   "drift": 0.20890359879290554,
+   "shared_change": 0.17908141136225555
+  },
+  "fit_seconds": 0.010725957996328361
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.04143583452094,
+  "condition_ratios": {
+   "stable": 0.1058614642405182,
+   "short_history": 0.20976989335481172,
+   "drift": 0.20928618610170172,
+   "shared_change": 0.17714453735595473
+  },
+  "fit_seconds": 0.011465749994385988
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.766166907781916,
+  "condition_ratios": {
+   "stable": 0.11506542277141414,
+   "short_history": 0.21371066514363463,
+   "drift": 0.21808863823326025,
+   "shared_change": 0.18069330351279025
+  },
+  "fit_seconds": 0.012230499996803701
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008815249995677732
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.91863035680475,
+  "condition_ratios": {
+   "stable": 0.10562164785605503,
+   "short_history": 0.21534770050911556,
+   "drift": 0.2102328362432974,
+   "shared_change": 0.18220032284775403
+  },
+  "fit_seconds": 0.009677291993284598
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.954146279456346,
+  "condition_ratios": {
+   "stable": 0.10586646208369026,
+   "short_history": 0.21444416091821292,
+   "drift": 0.2091000305375683,
+   "shared_change": 0.18070653071728893
+  },
+  "fit_seconds": 0.010602291993563995
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.99583973198763,
+  "condition_ratios": {
+   "stable": 0.10652830085925502,
+   "short_history": 0.2132792151196719,
+   "drift": 0.2077578804803922,
+   "shared_change": 0.17870086489332407
+  },
+  "fit_seconds": 0.011507417002576403
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.99996514585211,
+  "condition_ratios": {
+   "stable": 0.1095463498703593,
+   "short_history": 0.21262946170721142,
+   "drift": 0.20714797829571763,
+   "shared_change": 0.1765617791390959
+  },
+  "fit_seconds": 0.012266124991583638
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008529457991244271
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.89491219574035,
+  "condition_ratios": {
+   "stable": 0.1056385050515496,
+   "short_history": 0.21596877312837826,
+   "drift": 0.2109154465071522,
+   "shared_change": 0.18307633317094268
+  },
+  "fit_seconds": 0.009394124994287267
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.900622618793655,
+  "condition_ratios": {
+   "stable": 0.105836605533509,
+   "short_history": 0.2159014196363877,
+   "drift": 0.2106139788542228,
+   "shared_change": 0.18271802168881965
+  },
+  "fit_seconds": 0.010240666000754572
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.90775120409248,
+  "condition_ratios": {
+   "stable": 0.1062214873408507,
+   "short_history": 0.21582779726791837,
+   "drift": 0.21018140770118768,
+   "shared_change": 0.1821790846574929
+  },
+  "fit_seconds": 0.010980499995639548
+ },
+ {
+  "config_index": 8,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.917919187655755,
+  "condition_ratios": {
+   "stable": 0.10707725695681797,
+   "short_history": 0.2156108686785968,
+   "drift": 0.20948955984992987,
+   "shared_change": 0.18129065393148322
+  },
+  "fit_seconds": 0.011705707991495728
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008550375001505017
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.971921008044035,
+  "condition_ratios": {
+   "stable": 0.10418327655837455,
+   "short_history": 0.21310314225008875,
+   "drift": 0.21003559234427777,
+   "shared_change": 0.1811526794936024
+  },
+  "fit_seconds": 0.009284041996579617
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.04803321731486,
+  "condition_ratios": {
+   "stable": 0.10302378981743882,
+   "short_history": 0.2097026470993205,
+   "drift": 0.20971595467427342,
+   "shared_change": 0.1790120009475412
+  },
+  "fit_seconds": 0.009994584004743956
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 51.02803521232646,
+  "condition_ratios": {
+   "stable": 0.10424942464854622,
+   "short_history": 0.20780963075873032,
+   "drift": 0.21264278495677588,
+   "shared_change": 0.1785950630218141
+  },
+  "fit_seconds": 0.010706834000302479
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.42599966477921,
+  "condition_ratios": {
+   "stable": 0.11815904376636871,
+   "short_history": 0.2194775717911877,
+   "drift": 0.23192478771468816,
+   "shared_change": 0.18988811870979744
+  },
+  "fit_seconds": 0.011422791998484172
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008231457992224023
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.94941995330326,
+  "condition_ratios": {
+   "stable": 0.10500397856632818,
+   "short_history": 0.21420270957262819,
+   "drift": 0.21000504549564816,
+   "shared_change": 0.1813423849396109
+  },
+  "fit_seconds": 0.008944041997892782
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 51.0132852250164,
+  "condition_ratios": {
+   "stable": 0.104579814378022,
+   "short_history": 0.2119479470244368,
+   "drift": 0.2091080158381876,
+   "shared_change": 0.1790210379669035
+  },
+  "fit_seconds": 0.009642499993788078
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.03628537178014,
+  "condition_ratios": {
+   "stable": 0.105666018900232,
+   "short_history": 0.21004003027120297,
+   "drift": 0.20980306235679952,
+   "shared_change": 0.17702749064981024
+  },
+  "fit_seconds": 0.010339166998164728
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.7561478961468,
+  "condition_ratios": {
+   "stable": 0.11458586115680895,
+   "short_history": 0.21409889258375034,
+   "drift": 0.21925733315390156,
+   "shared_change": 0.1805491392535312
+  },
+  "fit_seconds": 0.011087374994531274
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008624417008832097
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.917595120418646,
+  "condition_ratios": {
+   "stable": 0.10563289946475823,
+   "short_history": 0.21540548991731312,
+   "drift": 0.2102533923077122,
+   "shared_change": 0.18220655680021985
+  },
+  "fit_seconds": 0.009411125007318333
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.95186173904248,
+  "condition_ratios": {
+   "stable": 0.10588892368169366,
+   "short_history": 0.21456167242055552,
+   "drift": 0.20915492652504214,
+   "shared_change": 0.1807228502434714
+  },
+  "fit_seconds": 0.010256833003950305
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.99128105850225,
+  "condition_ratios": {
+   "stable": 0.10657824129112546,
+   "short_history": 0.21349161774678596,
+   "drift": 0.20787794274875684,
+   "shared_change": 0.17873920465759435
+  },
+  "fit_seconds": 0.011090708008850925
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.99204892130622,
+  "condition_ratios": {
+   "stable": 0.10963878325393916,
+   "short_history": 0.21288048204033172,
+   "drift": 0.20746030147727765,
+   "shared_change": 0.1766365641154729
+  },
+  "fit_seconds": 0.012024791998555884
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009674542001448572
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.89472514136692,
+  "condition_ratios": {
+   "stable": 0.10564247320175936,
+   "short_history": 0.2159783043940979,
+   "drift": 0.21091852451564652,
+   "shared_change": 0.1830770870794752
+  },
+  "fit_seconds": 0.010502292003366165
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.900148057848696,
+  "condition_ratios": {
+   "stable": 0.10584668099813659,
+   "short_history": 0.21592514847329933,
+   "drift": 0.210621978621923,
+   "shared_change": 0.18272017796492895
+  },
+  "fit_seconds": 0.011255834004259668
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.9068270025224,
+  "condition_ratios": {
+   "stable": 0.106242280260363,
+   "short_history": 0.21587018987994328,
+   "drift": 0.21019827883484996,
+   "shared_change": 0.18218461700214503
+  },
+  "fit_seconds": 0.01196604200231377
+ },
+ {
+  "config_index": 9,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.91574484563069,
+  "condition_ratios": {
+   "stable": 0.10712393521024977,
+   "short_history": 0.2157040765011061,
+   "drift": 0.20953553595910274,
+   "shared_change": 0.1813060790362889
+  },
+  "fit_seconds": 0.01267537499370519
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008638667000923306
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.968140231907704,
+  "condition_ratios": {
+   "stable": 0.10430207390752838,
+   "short_history": 0.21325934963544294,
+   "drift": 0.2100049996828912,
+   "shared_change": 0.18125753833105201
+  },
+  "fit_seconds": 0.009357000002637506
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.040931018674186,
+  "condition_ratios": {
+   "stable": 0.1033569272131906,
+   "short_history": 0.20994114013111367,
+   "drift": 0.2095710609916049,
+   "shared_change": 0.17923945804924005
+  },
+  "fit_seconds": 0.010099084000103176
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 51.01533325051594,
+  "condition_ratios": {
+   "stable": 0.10491528298154995,
+   "short_history": 0.20833249934602557,
+   "drift": 0.21226815017647088,
+   "shared_change": 0.17895201287731152
+  },
+  "fit_seconds": 0.010810667008627206
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.402703617702315,
+  "condition_ratios": {
+   "stable": 0.11954316910134882,
+   "short_history": 0.22103432112951474,
+   "drift": 0.2307983696066594,
+   "shared_change": 0.19027347191990676
+  },
+  "fit_seconds": 0.011532834003446624
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008953958007623442
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.95043400235668,
+  "condition_ratios": {
+   "stable": 0.10502841841052418,
+   "short_history": 0.21414057081592971,
+   "drift": 0.20992658352564997,
+   "shared_change": 0.181364793275376
+  },
+  "fit_seconds": 0.00998375000199303
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 51.01520751726,
+  "condition_ratios": {
+   "stable": 0.10466682496432012,
+   "short_history": 0.21182631718195927,
+   "drift": 0.20890180768855837,
+   "shared_change": 0.17908459028661866
+  },
+  "fit_seconds": 0.010746750005637296
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.040693235589714,
+  "condition_ratios": {
+   "stable": 0.10587011469078945,
+   "short_history": 0.20982586826336377,
+   "drift": 0.20927965165949797,
+   "shared_change": 0.17715485746698006
+  },
+  "fit_seconds": 0.011490999997477047
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.7652215821515,
+  "condition_ratios": {
+   "stable": 0.11507884347340885,
+   "short_history": 0.21379545667196523,
+   "drift": 0.21806057197720993,
+   "shared_change": 0.18071119185877427
+  },
+  "fit_seconds": 0.012221375000081025
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008072292010183446
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.918471314734965,
+  "condition_ratios": {
+   "stable": 0.10562434739817221,
+   "short_history": 0.2153539968072645,
+   "drift": 0.2102351933698991,
+   "shared_change": 0.1822036920292762
+  },
+  "fit_seconds": 0.008786332997260615
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.953770691878724,
+  "condition_ratios": {
+   "stable": 0.10587233363299892,
+   "short_history": 0.2144599420442055,
+   "drift": 0.209105269384658,
+   "shared_change": 0.1807143581465975
+  },
+  "fit_seconds": 0.009558750010910444
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.99511471395059,
+  "condition_ratios": {
+   "stable": 0.10653892768607534,
+   "short_history": 0.2133144747459783,
+   "drift": 0.20776429733959823,
+   "shared_change": 0.17871547245952749
+  },
+  "fit_seconds": 0.010547333004069515
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.998762358456624,
+  "condition_ratios": {
+   "stable": 0.10956365674801961,
+   "short_history": 0.21269777912757956,
+   "drift": 0.20715325482035357,
+   "shared_change": 0.17658186492836542
+  },
+  "fit_seconds": 0.01146079201134853
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008737083000596613
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.8948722024258,
+  "condition_ratios": {
+   "stable": 0.10563928439401013,
+   "short_history": 0.21597015014180057,
+   "drift": 0.21091640696002176,
+   "shared_change": 0.18307692189141683
+  },
+  "fit_seconds": 0.009495332997175865
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.9005249081212,
+  "condition_ratios": {
+   "stable": 0.10583851349716954,
+   "short_history": 0.21590477448676396,
+   "drift": 0.21061634397802112,
+   "shared_change": 0.18271944498697307
+  },
+  "fit_seconds": 0.010312833008356392
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.90755887205431,
+  "condition_ratios": {
+   "stable": 0.10622522359084284,
+   "short_history": 0.21583457423310842,
+   "drift": 0.21018597923549884,
+   "shared_change": 0.18218181125195756
+  },
+  "fit_seconds": 0.011099458002718166
+ },
+ {
+  "config_index": 10,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.91754825369091,
+  "condition_ratios": {
+   "stable": 0.10708336643210697,
+   "short_history": 0.2156278264905554,
+   "drift": 0.20949588379580383,
+   "shared_change": 0.181295600280576
+  },
+  "fit_seconds": 0.011846958004753105
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008649374998640269
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.97189388391603,
+  "condition_ratios": {
+   "stable": 0.10418488403227436,
+   "short_history": 0.21310323159873104,
+   "drift": 0.21003684291495672,
+   "shared_change": 0.18115223766296615
+  },
+  "fit_seconds": 0.009661374991992489
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.04799564326454,
+  "condition_ratios": {
+   "stable": 0.10302684964988049,
+   "short_history": 0.20970178644403215,
+   "drift": 0.20971814407630965,
+   "shared_change": 0.17901107288980248
+  },
+  "fit_seconds": 0.01051875000121072
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 51.02800255786991,
+  "condition_ratios": {
+   "stable": 0.10425444375190772,
+   "short_history": 0.20780696845653698,
+   "drift": 0.21264657568838818,
+   "shared_change": 0.17859192527967158
+  },
+  "fit_seconds": 0.01132791698910296
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.42626110944205,
+  "condition_ratios": {
+   "stable": 0.1181647206115484,
+   "short_history": 0.21945702764745623,
+   "drift": 0.23192868320396506,
+   "shared_change": 0.1898744142363538
+  },
+  "fit_seconds": 0.012164250001660548
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008225334007875063
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.94931696289054,
+  "condition_ratios": {
+   "stable": 0.10500730120157287,
+   "short_history": 0.21420647825035832,
+   "drift": 0.21000642967017377,
+   "shared_change": 0.18134343150150647
+  },
+  "fit_seconds": 0.008982667000964284
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 51.01303525713709,
+  "condition_ratios": {
+   "stable": 0.10458697364107214,
+   "short_history": 0.21195875025415378,
+   "drift": 0.20911056611808126,
+   "shared_change": 0.17902357838213975
+  },
+  "fit_seconds": 0.00972116700722836
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.03593300184796,
+  "condition_ratios": {
+   "stable": 0.10567830607967238,
+   "short_history": 0.21005479428298027,
+   "drift": 0.2098033904318492,
+   "shared_change": 0.17703257934104064
+  },
+  "fit_seconds": 0.010443959006806836
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.75589452516231,
+  "condition_ratios": {
+   "stable": 0.11460214203170307,
+   "short_history": 0.21411913902910715,
+   "drift": 0.21924427484334946,
+   "shared_change": 0.18054927464462797
+  },
+  "fit_seconds": 0.011192667006980628
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.007730209006695077
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.917459742737115,
+  "condition_ratios": {
+   "stable": 0.10563536981055698,
+   "short_history": 0.21540986660587016,
+   "drift": 0.21025594624503827,
+   "shared_change": 0.182209687924212
+  },
+  "fit_seconds": 0.008448167005553842
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.951549582508434,
+  "condition_ratios": {
+   "stable": 0.10589424738315328,
+   "short_history": 0.21457230737279503,
+   "drift": 0.20916063580015692,
+   "shared_change": 0.18073004031389614
+  },
+  "fit_seconds": 0.009165000010398217
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.990632686661186,
+  "condition_ratios": {
+   "stable": 0.10658803981204165,
+   "short_history": 0.2135184002862818,
+   "drift": 0.20788779209102004,
+   "shared_change": 0.1787526221751924
+  },
+  "fit_seconds": 0.01008824999735225
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.99107711223596,
+  "condition_ratios": {
+   "stable": 0.10965528546640821,
+   "short_history": 0.21292699064381515,
+   "drift": 0.20746718528041155,
+   "shared_change": 0.17665637013628724
+  },
+  "fit_seconds": 0.01094116699823644
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008466583007248119
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.89469221996715,
+  "condition_ratios": {
+   "stable": 0.10564312909045773,
+   "short_history": 0.2159792019301323,
+   "drift": 0.21091948536491378,
+   "shared_change": 0.18307762311751283
+  },
+  "fit_seconds": 0.009268583002267405
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.900067681574534,
+  "condition_ratios": {
+   "stable": 0.10584828747991794,
+   "short_history": 0.21592732653379873,
+   "drift": 0.21062434173057995,
+   "shared_change": 0.18272147594838326
+  },
+  "fit_seconds": 0.010053542006062344
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.90665286711278,
+  "condition_ratios": {
+   "stable": 0.10624541186056606,
+   "short_history": 0.21587615048322917,
+   "drift": 0.21020286042362554,
+   "shared_change": 0.18218706999362036
+  },
+  "fit_seconds": 0.010823292002896778
+ },
+ {
+  "config_index": 11,
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.915454257794764,
+  "condition_ratios": {
+   "stable": 0.10712883022045151,
+   "short_history": 0.21571540198042702,
+   "drift": 0.20954180219722546,
+   "shared_change": 0.18131049445605674
+  },
+  "fit_seconds": 0.01159708300838247
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008959500002674758
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.9666706215849,
+  "condition_ratios": {
+   "stable": 0.10432436148892767,
+   "short_history": 0.21346903556339947,
+   "drift": 0.2100929882683201,
+   "shared_change": 0.18107335391642135
+  },
+  "fit_seconds": 0.009693999993032776
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.03569070295594,
+  "condition_ratios": {
+   "stable": 0.1034426558146971,
+   "short_history": 0.2105033394895767,
+   "drift": 0.20986383601299677,
+   "shared_change": 0.1787815649053618
+  },
+  "fit_seconds": 0.01041258400073275
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 51.00252112093832,
+  "condition_ratios": {
+   "stable": 0.10525294056964916,
+   "short_history": 0.2093520403103939,
+   "drift": 0.21289988683661082,
+   "shared_change": 0.17814486734068996
+  },
+  "fit_seconds": 0.011440834001405165
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.35941064660079,
+  "condition_ratios": {
+   "stable": 0.12107688065079428,
+   "short_history": 0.2229607850387585,
+   "drift": 0.2322207441272052,
+   "shared_change": 0.1894844159722444
+  },
+  "fit_seconds": 0.012437500001396984
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009144708994426765
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.9484929181437,
+  "condition_ratios": {
+   "stable": 0.10508031467156914,
+   "short_history": 0.21433282302150683,
+   "drift": 0.20999773239447753,
+   "shared_change": 0.18122895954578927
+  },
+  "fit_seconds": 0.009891541994875297
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 51.01054022693993,
+  "condition_ratios": {
+   "stable": 0.10484676028510342,
+   "short_history": 0.21222097709698298,
+   "drift": 0.2090871622704104,
+   "shared_change": 0.17875508428941148
+  },
+  "fit_seconds": 0.010621916997479275
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.027116664692805,
+  "condition_ratios": {
+   "stable": 0.10630799269841183,
+   "short_history": 0.2107176540395246,
+   "drift": 0.20979115663645428,
+   "shared_change": 0.1765647648431053
+  },
+  "fit_seconds": 0.011363583995262161
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.73175506399361,
+  "condition_ratios": {
+   "stable": 0.11644444150999927,
+   "short_history": 0.21563593373247625,
+   "drift": 0.2190692385017248,
+   "shared_change": 0.17961516459357443
+  },
+  "fit_seconds": 0.012076958999386989
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008515084002283402
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.91789648147789,
+  "condition_ratios": {
+   "stable": 0.10564616379858928,
+   "short_history": 0.2154031753496307,
+   "drift": 0.21026130549268338,
+   "shared_change": 0.18215979668621263
+  },
+  "fit_seconds": 0.009298124990891665
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.95237723776449,
+  "condition_ratios": {
+   "stable": 0.10592255347269669,
+   "short_history": 0.21458294467101538,
+   "drift": 0.20917060060191384,
+   "shared_change": 0.18060461848298417
+  },
+  "fit_seconds": 0.010082708991831169
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.99265640179167,
+  "condition_ratios": {
+   "stable": 0.10666438987890037,
+   "short_history": 0.21351000220075791,
+   "drift": 0.2079028255715315,
+   "shared_change": 0.17848284285915864
+  },
+  "fit_seconds": 0.010887166994507425
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.991461521607015,
+  "condition_ratios": {
+   "stable": 0.10988766705820079,
+   "short_history": 0.21314783659278252,
+   "drift": 0.2075049106423237,
+   "shared_change": 0.17612993478666367
+  },
+  "fit_seconds": 0.011773209000239149
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009052749999682419
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.8947994800798,
+  "condition_ratios": {
+   "stable": 0.10564356570280636,
+   "short_history": 0.2159761866485347,
+   "drift": 0.21091852004015862,
+   "shared_change": 0.18307122900629796
+  },
+  "fit_seconds": 0.009916958006215282
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.90033711576314,
+  "condition_ratios": {
+   "stable": 0.10584939906361947,
+   "short_history": 0.21592027483763424,
+   "drift": 0.21062165020120505,
+   "shared_change": 0.18270514871982538
+  },
+  "fit_seconds": 0.010647041010088287
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.9072810145494,
+  "condition_ratios": {
+   "stable": 0.10624762025754592,
+   "short_history": 0.21585611630299767,
+   "drift": 0.21019672971768746,
+   "shared_change": 0.1821528538943296
+  },
+  "fit_seconds": 0.011363166006049141
+ },
+ {
+  "config_index": 12,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.916556199991,
+  "condition_ratios": {
+   "stable": 0.10713572722369887,
+   "short_history": 0.21568723632511835,
+   "drift": 0.209535206288233,
+   "shared_change": 0.18123634463332278
+  },
+  "fit_seconds": 0.01227516600920353
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008048499992582947
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.97007268297204,
+  "condition_ratios": {
+   "stable": 0.10420279644262331,
+   "short_history": 0.21337102649410902,
+   "drift": 0.210105693997995,
+   "shared_change": 0.180965916882334
+  },
+  "fit_seconds": 0.008936708996770903
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.04375527922186,
+  "condition_ratios": {
+   "stable": 0.10311828690845379,
+   "short_history": 0.21026563293943237,
+   "drift": 0.20991929687445232,
+   "shared_change": 0.1785452011133223
+  },
+  "fit_seconds": 0.009753124992130324
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 51.01658463985153,
+  "condition_ratios": {
+   "stable": 0.10459272785309844,
+   "short_history": 0.20879420845954128,
+   "drift": 0.21318813729724065,
+   "shared_change": 0.17777747555164003
+  },
+  "fit_seconds": 0.010506499995244667
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.38509485109384,
+  "condition_ratios": {
+   "stable": 0.11965607555021093,
+   "short_history": 0.22132608263414494,
+   "drift": 0.233123179293108,
+   "shared_change": 0.18920811284522993
+  },
+  "fit_seconds": 0.011221958993701264
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008683624997502193
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.947461739424405,
+  "condition_ratios": {
+   "stable": 0.10505297044510409,
+   "short_history": 0.2144045062934157,
+   "drift": 0.210071606034006,
+   "shared_change": 0.18120609040455257
+  },
+  "fit_seconds": 0.009413457999471575
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 51.008635456263406,
+  "condition_ratios": {
+   "stable": 0.10474889111292837,
+   "short_history": 0.2123614671645227,
+   "drift": 0.20928772182880503,
+   "shared_change": 0.1786875951571887
+  },
+  "fit_seconds": 0.010136791999684647
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.02402968549356,
+  "condition_ratios": {
+   "stable": 0.10608352060316516,
+   "short_history": 0.21090758848142852,
+   "drift": 0.21023442994757646,
+   "shared_change": 0.17644058611187052
+  },
+  "fit_seconds": 0.010858041991014034
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.72499045844422,
+  "condition_ratios": {
+   "stable": 0.1159137429970406,
+   "short_history": 0.21587496966743305,
+   "drift": 0.22020287862478632,
+   "shared_change": 0.1794040744549623
+  },
+  "fit_seconds": 0.011578666992136277
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008398500009207055
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.91688713664272,
+  "condition_ratios": {
+   "stable": 0.10565533992117591,
+   "short_history": 0.2154598260123092,
+   "drift": 0.2102825105985371,
+   "shared_change": 0.18216620171383002
+  },
+  "fit_seconds": 0.009137417000602
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.95014925546347,
+  "condition_ratios": {
+   "stable": 0.10594068553582199,
+   "short_history": 0.21469758233277578,
+   "drift": 0.20922729709058335,
+   "shared_change": 0.1806211265840121
+  },
+  "fit_seconds": 0.00989329200820066
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.98816651977436,
+  "condition_ratios": {
+   "stable": 0.10670594225841569,
+   "short_history": 0.2137230411561443,
+   "drift": 0.20802387553302237,
+   "shared_change": 0.1785216486947468
+  },
+  "fit_seconds": 0.010594667008263059
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.98389118143151,
+  "condition_ratios": {
+   "stable": 0.10996392186460079,
+   "short_history": 0.21338788705764217,
+   "drift": 0.20781850787192832,
+   "shared_change": 0.1761989019642579
+  },
+  "fit_seconds": 0.011306832995614968
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008917625003959984
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.89461261434494,
+  "condition_ratios": {
+   "stable": 0.10564750276963156,
+   "short_history": 0.2159856379521902,
+   "drift": 0.2109216455312139,
+   "shared_change": 0.18307202907622727
+  },
+  "fit_seconds": 0.009699041009298526
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.89986301192398,
+  "condition_ratios": {
+   "stable": 0.10585939289716101,
+   "short_history": 0.2159438069103467,
+   "drift": 0.2106297678767502,
+   "shared_change": 0.18270742363225145
+  },
+  "fit_seconds": 0.010405541004729457
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.906355149798436,
+  "condition_ratios": {
+   "stable": 0.10626823668896875,
+   "short_history": 0.21589840774815275,
+   "drift": 0.2102138477681295,
+   "shared_change": 0.18215857258871032
+  },
+  "fit_seconds": 0.011373000001185574
+ },
+ {
+  "config_index": 13,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.91439856234997,
+  "condition_ratios": {
+   "stable": 0.10718188632007315,
+   "short_history": 0.21577938451207312,
+   "drift": 0.20958084041736671,
+   "shared_change": 0.18125215474962367
+  },
+  "fit_seconds": 0.012252250002347864
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008206208993215114
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.9665434014735,
+  "condition_ratios": {
+   "stable": 0.1043235217004271,
+   "short_history": 0.21348087035351263,
+   "drift": 0.2100926530820481,
+   "shared_change": 0.18107444836853967
+  },
+  "fit_seconds": 0.009086833990295418
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.03532295369475,
+  "condition_ratios": {
+   "stable": 0.10344068132326703,
+   "short_history": 0.21053599151617625,
+   "drift": 0.20986307868744986,
+   "shared_change": 0.17878553053032442
+  },
+  "fit_seconds": 0.00985887499700766
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 51.00172026072636,
+  "condition_ratios": {
+   "stable": 0.10524961379915969,
+   "short_history": 0.2094170442642452,
+   "drift": 0.21289774456919439,
+   "shared_change": 0.17815922341557744
+  },
+  "fit_seconds": 0.010588374992948957
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.35789905366158,
+  "condition_ratios": {
+   "stable": 0.1210734815287564,
+   "short_history": 0.22308908733685648,
+   "drift": 0.23221395743450907,
+   "shared_change": 0.18950935278023845
+  },
+  "fit_seconds": 0.011335167000652291
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008270916994661093
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.948373650402246,
+  "condition_ratios": {
+   "stable": 0.10508265946877951,
+   "short_history": 0.21434146518802696,
+   "drift": 0.2099970033757597,
+   "shared_change": 0.18122972898659895
+  },
+  "fit_seconds": 0.008993041992653161
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 51.01019075898516,
+  "condition_ratios": {
+   "stable": 0.10485162509735262,
+   "short_history": 0.21224835292782704,
+   "drift": 0.20908446971471875,
+   "shared_change": 0.17875776927632264
+  },
+  "fit_seconds": 0.00969737498962786
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.0264322642371,
+  "condition_ratios": {
+   "stable": 0.1063171608072359,
+   "short_history": 0.2107737545519733,
+   "drift": 0.20978229562462788,
+   "shared_change": 0.1765714421162542
+  },
+  "fit_seconds": 0.010399207996670157
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.730826273711465,
+  "condition_ratios": {
+   "stable": 0.11645921448971205,
+   "short_history": 0.21572797016473802,
+   "drift": 0.21903487037161104,
+   "shared_change": 0.17962933511514656
+  },
+  "fit_seconds": 0.011128124999231659
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009346291990368627
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.917741878423556,
+  "condition_ratios": {
+   "stable": 0.10564890320550607,
+   "short_history": 0.21540943098789683,
+   "drift": 0.21026334806811817,
+   "shared_change": 0.18216307071610996
+  },
+  "fit_seconds": 0.010224666999420151
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.952013780494156,
+  "condition_ratios": {
+   "stable": 0.1059286341656136,
+   "short_history": 0.2145984356806134,
+   "drift": 0.20917507957282735,
+   "shared_change": 0.18061216777244143
+  },
+  "fit_seconds": 0.010987249988829717
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.99192890203491,
+  "condition_ratios": {
+   "stable": 0.10667549934961283,
+   "short_history": 0.2135449225411606,
+   "drift": 0.20790996129830908,
+   "shared_change": 0.1784968256204761
+  },
+  "fit_seconds": 0.011714207998011261
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.99026029005749,
+  "condition_ratios": {
+   "stable": 0.10990654222967959,
+   "short_history": 0.2132135631022324,
+   "drift": 0.20750783514116639,
+   "shared_change": 0.17615328862367127
+  },
+  "fit_seconds": 0.012423124993802048
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008958416990935802
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.894759950898454,
+  "condition_ratios": {
+   "stable": 0.10564434714044832,
+   "short_history": 0.21597755848352104,
+   "drift": 0.21091945017008448,
+   "shared_change": 0.18307180814549306
+  },
+  "fit_seconds": 0.009908291991450824
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.90024058047156,
+  "condition_ratios": {
+   "stable": 0.10585131239988133,
+   "short_history": 0.21592361699180582,
+   "drift": 0.21062393930637466,
+   "shared_change": 0.18270654658122573
+  },
+  "fit_seconds": 0.010871874997974373
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.907069084219025,
+  "condition_ratios": {
+   "stable": 0.10625136940664698,
+   "short_history": 0.2158648985374377,
+   "drift": 0.21020115451059215,
+   "shared_change": 0.1821555243761787
+  },
+  "fit_seconds": 0.011778458996559493
+ },
+ {
+  "config_index": 14,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 0
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.91619526454252,
+  "condition_ratios": {
+   "stable": 0.10714188484859005,
+   "short_history": 0.21570410711489338,
+   "drift": 0.209540776375537,
+   "shared_change": 0.1812411599271229
+  },
+  "fit_seconds": 0.012577749992487952
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008382499989238568
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.1,
+  "points": 50.970051984330645,
+  "condition_ratios": {
+   "stable": 0.10420441947500199,
+   "short_history": 0.2133706344199786,
+   "drift": 0.21010686148472849,
+   "shared_change": 0.18096543059085163
+  },
+  "fit_seconds": 0.009167457988951355
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25,
+  "points": 51.04373617441161,
+  "condition_ratios": {
+   "stable": 0.1031214833287324,
+   "short_history": 0.2102631414886238,
+   "drift": 0.20992193847991344,
+   "shared_change": 0.17854361436101812
+  },
+  "fit_seconds": 0.01000470799044706
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.5,
+  "points": 51.016573114435715,
+  "condition_ratios": {
+   "stable": 0.1045979925401992,
+   "short_history": 0.20879025487143288,
+   "drift": 0.2131911425265084,
+   "shared_change": 0.1777742220078032
+  },
+  "fit_seconds": 0.010825124991242774
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 1,
+  "points": 50.385308341993635,
+  "condition_ratios": {
+   "stable": 0.1196624899784804,
+   "short_history": 0.22130954791878202,
+   "drift": 0.233125945929107,
+   "shared_change": 0.18919528354800147
+  },
+  "fit_seconds": 0.011594874988077208
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.00765229100943543
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.1,
+  "points": 50.94735971920182,
+  "condition_ratios": {
+   "stable": 0.10505663232946579,
+   "short_history": 0.2144080793024804,
+   "drift": 0.21007270505795209,
+   "shared_change": 0.18120718956189807
+  },
+  "fit_seconds": 0.008366416004719213
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.25,
+  "points": 51.00841289887723,
+  "condition_ratios": {
+   "stable": 0.10475651322607749,
+   "short_history": 0.21237000136818857,
+   "drift": 0.20928936379956653,
+   "shared_change": 0.17869032586689126
+  },
+  "fit_seconds": 0.00906691599811893
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 0.5,
+  "points": 51.02363386436048,
+  "condition_ratios": {
+   "stable": 0.10609745024235893,
+   "short_history": 0.21092419360711676,
+   "drift": 0.210234886560188,
+   "shared_change": 0.17644608391231903
+  },
+  "fit_seconds": 0.00977758300723508
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 100
+  },
+  "strength": 1,
+  "points": 50.72461036796093,
+  "condition_ratios": {
+   "stable": 0.11593468163854236,
+   "short_history": 0.2159001362595051,
+   "drift": 0.2201900112132876,
+   "shared_change": 0.17940629000457714
+  },
+  "fit_seconds": 0.010759625001810491
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.008494791996781714
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.1,
+  "points": 50.91675526184285,
+  "condition_ratios": {
+   "stable": 0.10565791401964836,
+   "short_history": 0.21546415774853125,
+   "drift": 0.21028475297638866,
+   "shared_change": 0.1821692616691044
+  },
+  "fit_seconds": 0.009411791994352825
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.25,
+  "points": 50.94984387872924,
+  "condition_ratios": {
+   "stable": 0.1059463708422775,
+   "short_history": 0.21470822004171633,
+   "drift": 0.2092322283669544,
+   "shared_change": 0.18062810541197538
+  },
+  "fit_seconds": 0.010153583003557287
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 0.5,
+  "points": 50.98753185438763,
+  "condition_ratios": {
+   "stable": 0.10671658027472446,
+   "short_history": 0.2137497383101008,
+   "drift": 0.20803213607174284,
+   "shared_change": 0.17853464287406426
+  },
+  "fit_seconds": 0.01087554199330043
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 1000
+  },
+  "strength": 1,
+  "points": 50.9828559478825,
+  "condition_ratios": {
+   "stable": 0.10998253055578971,
+   "short_history": 0.21343574468846038,
+   "drift": 0.20782869953590818,
+   "shared_change": 0.17621782957174614
+  },
+  "fit_seconds": 0.01160341699142009
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0,
+  "points": 50.89045837328262,
+  "condition_ratios": {
+   "stable": 0.10551941600120765,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "fit_seconds": 0.009312875001342036
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.1,
+  "points": 50.8945800840357,
+  "condition_ratios": {
+   "stable": 0.10564816419024468,
+   "short_history": 0.21598653218102726,
+   "drift": 0.210922577227682,
+   "shared_change": 0.18307255581939966
+  },
+  "fit_seconds": 0.010101209001732059
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.25,
+  "points": 50.899783726136555,
+  "condition_ratios": {
+   "stable": 0.10586100901114655,
+   "short_history": 0.21594597677096264,
+   "drift": 0.21063205210447808,
+   "shared_change": 0.18270869812947488
+  },
+  "fit_seconds": 0.010865042000659741
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 0.5,
+  "points": 50.90618427692466,
+  "condition_ratios": {
+   "stable": 0.10627138842870439,
+   "short_history": 0.21590424708863593,
+   "drift": 0.21021828141371385,
+   "shared_change": 0.18216097279361038
+  },
+  "fit_seconds": 0.011619166994933039
+ },
+ {
+  "config_index": 15,
+  "config": {
+   "signal": 1,
+   "pairs": 1,
+   "prior": 1,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10000
+  },
+  "strength": 1,
+  "points": 50.914115857548644,
+  "condition_ratios": {
+   "stable": 0.10718685094769213,
+   "short_history": 0.21579065096572794,
+   "drift": 0.2095864824202141,
+   "shared_change": 0.18125645539451762
+  },
+  "fit_seconds": 0.012378416999126785
+ }
+]

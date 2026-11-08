@@ -1,0 +1,27 @@
+{
+  "frozen_results_sha256": "9e45a867834d0ac5ef436cf7353a67bf4b8e77ebbd49416517cb86b8589cbd48",
+  "prediction_sha256": {
+    "1": "d4fa92fa9e51cfd314fc5d775884e952d6e022d8a418b91130a03f07225f61f6",
+    "2": "ae69d51b9a293282099356818fa132eb9f00417e42cd98f1c528d74b7280595a",
+    "3": "c66cd9eaa46216e2cea78e56d56cbf48a99e6507b229fb45d5b03db0b0465269",
+    "4": "d03eae1e793adff501b1b37b8fc86f6f0ddd47011d3a16c4da7b641bec3bbb27",
+    "5": "421d0e772492531f07bbb4f56dff85748444e964b18837904b2304ad2882a3dc",
+    "6": "193f3f668fd367dc98c05d6d458cc8f3916d8e1000b87b3cc92b181f2e718678",
+    "7": "d1dac30aae12a4d060b2c3b42b95a639f7f728b85f69815f22ab08deada9e9be",
+    "8": "d0f5ad28663d0210d8bda55521de924f97c39625111af7aaea0ba330962ecc08",
+    "9": "ae2e27a61990cc843a0c90f5a8647ad1fd79e4e0ab760dfef2a0746299a40e52",
+    "10": "07558a5483d2a4e7ea77caeaa475a09c4d327188ebe3469cdbe820fde48bc0b0"
+  },
+  "top10": [
+    "factorised:TM_RULE+TM_MIXER4+C2",
+    "factorised:TM_RULE+TM_MIXER4+C1",
+    "linear:TM_RULE+TM_MIXER4+C2",
+    "geometric:TM_RULE+TM_MIXER4+C2",
+    "geometric:TM_RULE+TM_MIXER4+C1",
+    "linear:TM_RULE+TM_MIXER4+C1",
+    "linear:TM_RULE+TM_MIXER3+TM_MIXER4",
+    "geometric:TM_RULE+TM_MIXER4+TM_COMBINED3",
+    "geometric:TM_RULE+TM_MIXER4+M9b_B4",
+    "geometric:TM_RULE+TM_MIXER4+S5_B4"
+  ]
+}

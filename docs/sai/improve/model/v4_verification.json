@@ -1,0 +1,28 @@
+{
+  "reusable_model_reproduction_max_abs_diff": 2.220446049250313e-16,
+  "two_run_max_abs_diff": 0.0,
+  "n_queries": 768,
+  "files": {
+    "IMP_M0V4_validation.csv": {
+      "rows": 768,
+      "sha256": "1f63d573789fe30171ca872f42a8e8663c11c07cbb8a044aa15a404192317871"
+    },
+    "IMP_M1V4_validation.csv": {
+      "rows": 768,
+      "sha256": "751559503bef90db00f127bf57da643330a17b567043509e8c8ee45f2ec19901"
+    },
+    "IMP_M2V4_validation.csv": {
+      "rows": 768,
+      "sha256": "8ed24116dc3946155eb63de26bede27266206bd0ce63c823101a3eacfac9871d"
+    },
+    "IMP_M3V4_validation.csv": {
+      "rows": 768,
+      "sha256": "1f63d573789fe30171ca872f42a8e8663c11c07cbb8a044aa15a404192317871"
+    },
+    "IMP_M5V4_validation.csv": {
+      "rows": 768,
+      "sha256": "4429a8ad12521b50104a1d72c393f880feca477fd89a01703795c09dbbfe75e0"
+    }
+  },
+  "target_dependency": "Both Beta mixture means and size modes fit all 96 validation targets, including reserved audit episodes. No new audit scoring."
+}

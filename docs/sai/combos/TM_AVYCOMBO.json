@@ -1,0 +1,28 @@
+{
+  "id": "TM_AVYCOMBO",
+  "leakage": "No validation targets read at runtime; fits train priors and selects memory prequentially in pre-cutoff histories; upstream hyperparameters validation-tuned.",
+  "dev": {
+    "scope": "dev",
+    "points": 38.92281366959232,
+    "R": 0.5415124021949577,
+    "n_episodes": 72,
+    "condition_ratios": {
+      "stable": 0.2487171952264855,
+      "short_history": 0.7518106917321172,
+      "drift": 0.6455221179065963,
+      "shared_change": 0.5199996039146314
+    },
+    "mean_error": 0.10077611781430133,
+    "ci95": [
+      37.46531868166178,
+      40.21854009690322
+    ],
+    "class_error_shares": {
+      "p_0": 0.645382655479633,
+      "p_1": 0.20492959791335794,
+      "p_2": 0.11491518744191057,
+      "p_5": 0.03238571288672018,
+      "p_20": 0.002386846278378164
+    }
+  }
+}

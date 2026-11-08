@@ -1,0 +1,34 @@
+{
+ "id": "TM_COMBINED3",
+ "owner": "teammates",
+ "description": "20% zhill rule model + 80% mixer v3 (same blend weights as the zhill-branch entry, recomputed here from saved predictions)",
+ "params": {
+  "rule_weight": 0.2
+ },
+ "scope": "dev",
+ "points": 54.77398565347036,
+ "ci95": [
+  53.737327140644695,
+  55.714773653299446
+ ],
+ "condition_ratios": {
+  "stable": 0.0655625930223658,
+  "short_history": 0.14885998143040838,
+  "drift": 0.07603375601643553,
+  "shared_change": 0.09118574170660068
+ },
+ "R": 0.09541051804395259,
+ "class_error_shares": {
+  "p_0": 0.5220787669068069,
+  "p_1": 0.2402039043245471,
+  "p_2": 0.17281216003194455,
+  "p_5": 0.0594692741164869,
+  "p_20": 0.005435894620214574
+ },
+ "runtime_seconds": 0.0,
+ "seed": 0,
+ "stdlib_only": true,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72
+}

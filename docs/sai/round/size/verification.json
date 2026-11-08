@@ -1,0 +1,79 @@
+{
+  "canonical_baseline_max_abs_diff": 2.220446049250313e-16,
+  "two_run_exact_sizes_max_diff": 0.0,
+  "saved_sizes_max_diff": 0.0,
+  "all_csv_p0_max_diff": 1.7763568394002505e-15,
+  "csv_count": 14,
+  "files": {
+    "R5_BASE_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 0.0,
+      "sha256": "8afeae73040efcf2efbef00acc20b2c8e13b13c25a923cec642bcfee33b3f362"
+    },
+    "R5_H12_HALF_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 2.220446049250313e-16,
+      "sha256": "598b6a65fa76ddee7a6a3167a814d891aece105a38f8a6ea1aafa9ef90dac646"
+    },
+    "R5_H12_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 2.220446049250313e-16,
+      "sha256": "1bb4fb19a2601247071534959df888c1b6f6483f02645eae7b08d66f6608cc87"
+    },
+    "R5_H40_HALF_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 2.220446049250313e-16,
+      "sha256": "23931669d04c2aa6067cb1997756e4bcb5121e0cb3b6dcbd09c7d4e1cf30abbd"
+    },
+    "R5_H40_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 4.440892098500626e-16,
+      "sha256": "0d4f7fb13975eff6a78d22615a4ba48e4a370938fb9db7348ce95ac84841a403"
+    },
+    "R5_HINF_HALF_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 8.881784197001252e-16,
+      "sha256": "995ef9278ba5475ffdc7a53e030d1b77035c6732b12495808862aae602787e1a"
+    },
+    "R5_HINF_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 1.7763568394002505e-15,
+      "sha256": "3303ed5d66c99ddb8efcca3f214cd0420fc2586000dffe6e5483437d42b1b2fe"
+    },
+    "R5_M12_40_HALF_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 2.220446049250313e-16,
+      "sha256": "186a6b11901eb399d7be7f738d4f28ea0d4013df17896f067d9b754d8310354a"
+    },
+    "R5_M12_40_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 2.220446049250313e-16,
+      "sha256": "618f6beeddf89a1f2579e14262247e859d612961929a604d85e32d171c0db9d3"
+    },
+    "R5_M40_INF_HALF_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 5.551115123125783e-16,
+      "sha256": "8ba6fecc0cd80b1125fc370ebf474ca99784a889250e978f04708804b3cc7a10"
+    },
+    "R5_M40_INF_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 9.43689570931383e-16,
+      "sha256": "644d4e852c4f1b5198f35b5bcf88525d5b300a0b21af3a49a1109134137f7c3e"
+    },
+    "R5_MALL_HALF_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 3.3306690738754696e-16,
+      "sha256": "8e200ce2eb125f55338e8e351037e2a2b281494f879cdca294e7afe53d7d4150"
+    },
+    "R5_MALL_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 6.661338147750939e-16,
+      "sha256": "fd11d658ebdd9af98c8d40ea52495b67b98ff976fb1414a92d113e373af71385"
+    },
+    "R5_OOF_validation.csv": {
+      "rows": 768,
+      "p0_max_diff": 1.1102230246251565e-16,
+      "sha256": "3599ac136943929a9d0ad25b7dfaab1d1249a841dc4d3fa888243f11cbb19123"
+    }
+  }
+}

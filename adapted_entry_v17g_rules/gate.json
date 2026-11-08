@@ -1,0 +1,12 @@
+{
+  "win_members": [
+    "v13_short",
+    "exact",
+    "sysid"
+  ],
+  "size_member": "v13_short",
+  "margin": 0.1,
+  "all_members_points": 57.971407,
+  "chosen_points": 57.971407,
+  "kit_round": "main"
+}

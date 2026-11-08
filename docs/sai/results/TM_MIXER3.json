@@ -1,0 +1,34 @@
+{
+ "id": "TM_MIXER3",
+ "owner": "teammates",
+ "description": "Pranav pair mixer v3 (COMBINED_SOLUTIONS 6a8098c): payout size is a two-mode switch per type (2 exact mixes read from validation targets), mode set by whether spin 1,2,3,4 back was a big win",
+ "params": {
+  "source_branch": "origin/COMBINED_SOLUTIONS@6a8098c"
+ },
+ "scope": "dev",
+ "points": 54.59299100169987,
+ "ci95": [
+  53.52158532102889,
+  55.57640756105219
+ ],
+ "condition_ratios": {
+  "stable": 0.0792541256396758,
+  "short_history": 0.1520082848348329,
+  "drift": 0.07315383299289671,
+  "shared_change": 0.09175248801915295
+ },
+ "R": 0.09904218287163957,
+ "class_error_shares": {
+  "p_0": 0.5223076685525635,
+  "p_1": 0.24113972145522192,
+  "p_2": 0.17028585245731084,
+  "p_5": 0.06074781938666989,
+  "p_20": 0.00551893814823376
+ },
+ "runtime_seconds": 0.0,
+ "seed": 0,
+ "stdlib_only": true,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72
+}

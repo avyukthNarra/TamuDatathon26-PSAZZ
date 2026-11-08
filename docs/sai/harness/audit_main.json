@@ -1,0 +1,29 @@
+{
+ "rule": "first 6 per condition by sha256('audit-v1|'+episode_id)",
+ "episodes": [
+  "main-validation-e00000",
+  "main-validation-e00001",
+  "main-validation-e00002",
+  "main-validation-e00009",
+  "main-validation-e00018",
+  "main-validation-e00020",
+  "main-validation-e00025",
+  "main-validation-e00026",
+  "main-validation-e00032",
+  "main-validation-e00036",
+  "main-validation-e00041",
+  "main-validation-e00045",
+  "main-validation-e00047",
+  "main-validation-e00052",
+  "main-validation-e00056",
+  "main-validation-e00057",
+  "main-validation-e00063",
+  "main-validation-e00066",
+  "main-validation-e00067",
+  "main-validation-e00069",
+  "main-validation-e00070",
+  "main-validation-e00077",
+  "main-validation-e00081",
+  "main-validation-e00085"
+ ]
+}

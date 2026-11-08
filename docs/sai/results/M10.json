@@ -1,0 +1,68 @@
+{
+ "id": "M10",
+ "owner": "claude-w2",
+ "description": "Kalman steady-state gain half-life",
+ "params": {
+  "blk": 16,
+  "mult": 0.5,
+  "hl_min": 16,
+  "mode": "kalman+hold"
+ },
+ "scope": "dev",
+ "points": 38.59352320696287,
+ "ci95": [
+  37.291438741543075,
+  39.92859009438326
+ ],
+ "condition_ratios": {
+  "stable": 0.14435158848479573,
+  "short_history": 0.34395158520941843,
+  "drift": 0.9762958771314508,
+  "shared_change": 0.7540609744062441
+ },
+ "R": 0.5546650063079772,
+ "class_error_shares": {
+  "p_0": 0.6438777319590694,
+  "p_1": 0.20109310601597577,
+  "p_2": 0.11680525493540195,
+  "p_5": 0.03523237399036027,
+  "p_20": 0.0029915330991924396
+ },
+ "runtime_seconds": 0.047244583009160124,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": 0.0,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "extra": {
+  "vs_B3": {
+   "diff": -7.228961410628777,
+   "ci95": [
+    -8.469084043397439,
+    -6.0682686112273005
+   ]
+  },
+  "blend_gain": {
+   "points": 45.82248461759165,
+   "ci95": [
+    44.74847632985979,
+    46.90060343816345
+   ],
+   "vs_base": {
+    "diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ]
+   },
+   "w_mean": 0.0
+  },
+  "cond_ratio_diff_vs_B3": {
+   "stable": 0.026488412888951485,
+   "short_history": 0.0,
+   "drift": 0.5773847602480899,
+   "shared_change": 0.3771834789276711
+  },
+  "grid_cells_completed": 36
+ }
+}

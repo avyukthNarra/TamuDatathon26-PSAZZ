@@ -1,0 +1,233 @@
+# Experiment log (House Edge, main round)
+
+Running history, newest at the bottom. Not committed yet; we're iterating.
+Scores are validation technical points out of 60 (reference pooled = 30.0).
+"tune/audit" = the two halves from `slot_forecasting.experiments.episode_folds`.
+Per-condition numbers are loss ratios vs the reference (lower is better).
+Scripts live in `mainFiles/experiments/`; run them from `mainFiles/`.
+
+## 2026-11-07
+
+### 1. Starter, 6 baselines (`run_starter.py`)
+global 26.73, context 29.69, empirical 29.92, **pooled 30.00** (default output),
+recent 30.74, pooled_recent 30.83. Deterministic: two runs gave identical CSVs.
+
+### 2. Included experiment loop (`run_experiments.py`)
+12 candidates (pooled/recent/pooled_recent + lag-k local count models). Chose
+pooled_recent, audit 30.56. Local lag-count models did not beat plain recency.
+
+### 3. Grid on H (half_life) x alpha (prior_strength) (`experiments/tune_recency.py`)
+Best H=16, alpha=10: tune 31.15, audit 30.62 (default H=24, alpha=20 audit 30.56).
+Flat plateau, all cells within ~0.1 pt. **Null result: knob tuning is not the lever.**
+short_history stays worse than reference (1.03).
+Note: condition labels are not in test, so per-condition H/alpha can't be used at
+test time (short_history is detectable from tick gaps though).
+
+### 4. Data look
+Per-machine lag correlations are weak (mean |r| 0.08-0.13 vs ~0.05 noise floor);
+jackpot machines lean positive at lags 2-4, steady/balanced mixed in sign.
+
+### 5. Gradient boosting on lag + EWMA + episode features (`experiments/gb_proto.py`)
+sklearn HistGradientBoostingClassifier (lr 0.03, 200 iters, leaf 80, depth 4, l2 5).
+Train rows = every 2nd tick (after 24 prior obs) of train histories, label = payout
+at that tick, features use ticks strictly before it. Features: type/signal one-hot,
+EWMA payout class freqs at the half-lives in `HL`, lags 1-8 (present, win, >=2, >=5),
+other machines' recent win rate and mean payout in the episode.
+
+| HL (EWMA half-lives) | all | tune | audit | stable | short | drift | shared |
+|---|---|---|---|---|---|---|---|
+| pooled_recent(10,16) baseline | 30.90 | 31.15 | 30.62 | 0.963 | 0.997 | 0.944 | 0.863 |
+| 8,32 | 32.04 | 32.52 | 31.50 | 0.855 | 0.917 | 0.969 | 0.751 |
+| **4,16,64,128** | **32.72** | 33.28 | 32.09 | 0.819 | 0.893 | 0.904 | 0.719 |
+| 4,8,16,32,64,128 | 32.67 | 33.19 | 32.10 | 0.826 | 0.885 | 0.911 | 0.726 |
+
+Takeaways: GB beats baseline by ~1.8 pts on all conditions once multiple memory
+lengths are given (short vs long EWMA acts as a drift signal). Blending GB with
+pooled_recent was worse than GB alone. Only 3 HL sets tried, picked looking at
+validation, so audit is not fully independent.
+Needs scikit-learn + numpy (not stdlib), so a pinned requirements.txt and the
+team's OK before this can be submitted.
+
+## Ideas queue
+- Add explicit short-minus-long EWMA difference and recent-variance features
+- Train on train+validation for the final fit (keep validation held out while tuning)
+- More training rows (stride 1), per-class hyperparameters, seeds/bagging
+- Per-type models, or type x lag interaction features
+- Check test-time features for short-history gaps (missing ticks) match training
+- Packaging: predict.py + reproduce.json + saved model (stdlib fallback?)
+
+### 6. Error diagnosis of GB (HL 4,16,64,128) vs TRUE probs (`experiments/diagnose_gb.py`)
+Mean sq err 0.160 (ref 0.192; floor if we only knew the global true mean 0.239).
+- 67% of error is in p_0, 19% p_1, 11% p_2, 3% p_5, 0.3% p_20. The jackpot tail is irrelevant to the score.
+- Pred std of p_0 is 0.21 vs true 0.39; corr(pred,true) only 0.54-0.65 per class. Big hidden state left.
+- By type: steady 0.209, balanced 0.193, jackpot 0.080 (jackpot is easy because p_0 is high and stable).
+- p_0 over-predicted vs truth by ~0.02-0.04 in every type (steady .432/.403, balanced .565/.526,
+  jackpot .773/.754): systematic bias. Training rows span all ticks; queries are at cutoff 192-256.
+- Training has no tick/cutoff feature and no row weighting toward late ticks.
+- Worst episodes are stable/drift/short_history (~0.23-0.27 each), best are shared_change (~0.07).
+
+### 7. Tick feature + late-row weighting, and per-machine lag response (`experiments/gb_proto.py`, env flags)
+Flags: TICK=1 (cutoff as feature), WEIGHT=1 (rows with tick>=150 weighted 3x), LAGRESP=1
+(per machine, win rate after win vs after loss at lag k for k=1..8, shrunken to the machine's
+own win rate with m=10, plus one summed "expected effect" feature). HL=4,16,64,128 throughout.
+
+| variant | all | tune | audit | stable | short | drift | shared |
+|---|---|---|---|---|---|---|---|
+| entry 5 best (none) | 32.72 | 33.28 | 32.09 | 0.819 | 0.893 | 0.904 | 0.719 |
+| TICK + WEIGHT | 32.66 | 33.16 | 32.10 | 0.817 | 0.902 | 0.904 | 0.726 |
+| **LAGRESP** | **32.99** | 33.45 | **32.47** | 0.804 | 0.858 | 0.905 | 0.709 |
+| TICK + WEIGHT + LAGRESP | 32.64 | 32.95 | 32.28 | 0.830 | 0.880 | 0.911 | 0.732 |
+
+Takeaways: LAGRESP helps (+0.27 all, +0.37 audit), mostly short_history and stable. TICK/WEIGHT did
+not help, so the late-tick bias hypothesis from entry 6 is NOT confirmed (p_0 bias not re-measured;
+may be episode-level base-rate shift between train and validation). Combining all three was worse
+than LAGRESP alone, likely noise-level (~0.2) or the weighting hurting. Keep LAGRESP, drop TICK/WEIGHT.
+Not checked: multiple seeds. Differences under ~0.2 should be treated as noise.
+
+## 2026-11-07 master test (docs/sai, branch sai/master-test). Scope dev (72 episodes); B3 = 45.82 [44.75,46.90]
+
+### W2 memory (M1-M10), worker report reviewed, M2/M3/M8/M9 re-scored by the lead through the harness
+- M2 fixed-share and M3 DMA: 46.08 / 46.09, +0.26 [+0.02,+0.69] vs B3, all of it in stable (0.118 -> 0.090). The gain
+  comes from a 180-tick window (almost the whole history), i.e. picking hl=inf more often. Verdict helps, marginal
+  (best cell picked on dev). M2 and M3 are one effect.
+- Nothing else beats B3's holdout memory. Hard change-point windows (BOCPD MAP 36.8, ADWIN 34.6) are far worse; they
+  only reach B3 when multiplied onto its weights. HMM hurts every condition (-0.94). Half-lives 4-12 hurt again at every holdout.
+- M9 (episode-shared BOCPD): shared_change 0.375 -> 0.350 (0.303 in pure-survival cells) but drift 0.40 -> 0.63 in those
+  cells. Alive; follow-up is a peer-agreement gate.
+- M10 Kalman half-life disagrees with B3's choice (corr 0.00) yet B3's choice is what scores well; no corroboration.
+- Takeaway: B3's memory is near a plateau. Verdicts: helps M2,M3; alive M9; neutral M1,M4,M5,M7; hurts M6,M8,M10.
+
+### W1-A frequency and shrinkage (A1-A8), worker report reviewed
+Each A method tested (1) as B3's payout-size split / win prior with the pair-ridge win model kept, (2) standalone.
+- The only lever found is a stronger prior on the size shares, alpha 24-64: +0.14 to +0.16 [CI ~+0.03..+0.27]
+  (A1, A2, A3, A5, A6, A8 all rediscover the same effect). Verdict: A1 helps (tiny), rest neutral.
+- p1 and p2 error shares do not move (0.229, 0.137): the size split is NOT where the p1/p2 error lives. Only p5 shrinks.
+  So the remaining p1+p2 error is probably conditional structure (lags/state affecting severity), not shrinkage.
+- Signal moves win rate ~7 points but barely moves size shares; with/without-signal cross is a null.
+- Shrinking the ridge win probability toward a type/cell rate hurts badly (-2.9 at 50 pseudo-ticks): per-machine win
+  rates are far from type priors.
+- Standalone frequency models score 29.9-30.8 (~15 below B3); blend weight 0.00, zero stack value.
+- Implication: look at severity-given-win with lag features (L5 log levels / 3-state) rather than more shrinkage.
+
+### M9b peer-agreement-gated episode changepoints (follow-up to M9), worker report reviewed, lead re-scored: 46.07
+- No gate keeps M9's shared_change gain without the drift loss. Ungated pure-survival pooling: shared_change -0.074
+  [-0.110,-0.042] (real) but drift +0.236 [+0.052,+0.453]. The h=1/200 cell that looked best (0.303) is not CI-significant.
+- Common-shift z statistic cannot discriminate shared change from independent drift (both give large C).
+- Best cell: pool only if >=2 of 7 peers' own posteriors show a regime start in the last 80 ticks (W=40 never fires),
+  fall back to B3's holdout half-life. 46.07 [44.98,47.15], +0.25 [+0.12,+0.40] vs B3; drift 0.399->0.390, shared_change
+  0.377->0.357, stable unchanged. 298 cells searched, so expect ~0.25 selection optimism; neighbours k=3 +0.21.
+- Falling back to a machine's OWN BOCPD weights is terrible (drift 1.15); B3's holdout memory is the right fallback.
+- Verdicts: M9 helps (one condition, superseded), M9b helps (marginal, to validate on audit).
+
+### W1-L lag structure (L1-L9), worker report reviewed, L2/L5/L7/L4/L8 re-scored by the lead through the harness
+**Headline: L2 = 50.89 [49.8,51.9] on dev, +5.07 [+4.22,+5.89] over B3 (45.82).** Engine checked: reads only grid[:cutoff],
+no truth/ref/condition/outcome. Lags and pairs are learned from train histories with null controls (9-16), they coincide
+with B3's pairs (1,3),(2,5),(4,7) and single lag 7.
+- B3's extra single lags 1-5 hurt, and lam=20 over-shrinks the real pair effects: lower lambda was monotonically better
+  and plateaus at 0.05-0.5 (near-OLS). Conditions: stable .106, short .216, drift .211, shared .183 (B3 .118/.344/.399/.377).
+- More structure does not help: all 28 pairs 41.9, all triples 41.4, null pairs 9-16 each cost several points, one-hot
+  lags without pairs 31.3, logistic worse than linear, per-machine selection (L7) 49.3, MTD 43.1, conditional-lift NB 46.7.
+- Pooling coefficients to the type mean (L6) and signal/type x lag priors (L9) add nothing: effect signs differ per machine.
+- L5: centred log1p of the lag-7 payout with flag pairs 51.09, +0.20 over L2 (marginal).
+- Error shares on L2: p0 0.49, p1 0.25, p2 0.19, p5 0.07: the SIZE side is now ~half the remaining error, so size/severity
+  work (A methods, lag effects on severity) is worth much more on this base than it was on B3.
+- All earlier M and A results were measured on the weak B3 lam-20 model and must be re-tested on L2 (= "B4").
+
+### Codex W3/W4 first batch (E1-E5, S1), merged and re-scored by the lead through the harness (values reproduce)
+- E1-E5 (peer residual pooling, cosine/type/signal pooling, episode drift features, null-controlled peer lag screen,
+  latent factor): 45.75-45.81 on dev, within noise of B3; blend over B4 gains 0.00. Verdict neutral (built on old B3).
+- S1 HistGB residual on B3: 46.59, +0.77 [+0.07,+1.51] vs B3; drift .399->.339, shared .377->.297, stable worse
+  (.118->.162). Against B4 it adds only +0.06 [-0.06,+0.19]. Needs rebase onto B4 (note in docs/sai/CODEX_REBASE.md).
+
+### Codex W3/W4 first batch (E1-E5, S1), merged and re-scored by the lead through the harness (values reproduce)
+- E1-E5 (peer residual pooling, cosine/type/signal pooling, episode drift features, null-controlled peer lag screen,
+  latent factor): 45.75-45.81 on dev, within noise of B3; blend over B4 gains 0.00. Verdict neutral (built on old B3).
+- S1 HistGB residual on B3: 46.59, +0.77 [+0.07,+1.51] vs B3; drift .399->.339, shared .377->.297, stable worse
+  (.118->.162). Against B4 it adds only +0.06 [-0.06,+0.19]. Needs rebase onto B4 (note in docs/sai/CODEX_REBASE.md).
+
+### Codex W4 complete (S1-S8, 2464 declared cells), merged and re-scored by the lead (values reproduce). ALL on the old B3 base.
+Dev points: S1 46.59, S2 46.77 (CatBoost/LightGBM, best), S3 41.91, S4 45.02, S5 46.40, S6 34.74, S7 44.73, S8 39.92 (B3 45.82, B4 50.89).
+- As blend members over B4 none adds anything: S1 +0.06, S2 +0.01, S3 +0.03, S4 -0.02, S5 0.00, S6 -0.02, S7 +0.09, S8 +0.05 (all CIs include 0).
+- S2 fixes stable (.162->.115 vs S1) and S1/S2 improve drift/shared vs B3, but B4 already beats them in every condition.
+- S3 (condition classifier gating), S6 (future-window targets average through drift), S8 (MLP) clearly hurt; S4 row multiplication did nothing.
+- Learners on B3 output cannot rescue a weak base; the question is whether residual learning on B4 keeps any gain. Rebase pending in Codex.
+
+### B4 size/severity rebase (A1_B4, A4_B4, A6_B4, A9), worker report reviewed, all four re-scored by the lead (match)
+- A9 (severity given win): 51.47 [50.50,52.38], +0.58 [+0.21,+0.92] over B4 (50.89). Per-machine ridge adjusting P(payout>=2 | win)
+  on centred log1p lagged payouts at lags 1, 2, 4 (learned from a train severity screen with null lags 9-16). Lag 7 carries NO
+  severity signal; win lags and severity lags differ. Conditions: stable .090, short .203, drift .203, shared .167. p1/p2 error
+  fell. Effect is per-machine: a pooled train beta alone equals B4. 292 cells, so some selection optimism. Null lags 9-12: -0.2..-0.34.
+- A1_B4/A4_B4/A6_B4 (alpha ~64 size-split prior): ~51.16, +0.27 [+0.10,+0.44]. One effect (p5/p20 shrinkage), not three.
+- A9 touches p1/p2 and alpha touches p5/p20, so they should add; combination queued as C1.
+
+### B4 memory rebase (M1_B4, M2_B4, M3_B4, M9b_B4), worker report reviewed, lead re-scored (match)
+- M9b_B4: 51.22, +0.33 [+0.14,+0.53] over B4; drift .211->.197, shared .183->.168, stable unchanged. Survives the rebase and is robust to neighbours (k=1-4, lam 0.5). Helps.
+- M2_B4 +0.22 [-0.01,+0.53] (one cell, window 190 = grid max) and M3_B4 +0.20 [-0.03,+0.51]: the B3 "helps" does not hold up on B4 (CI includes 0). Neutral.
+- M1_B4 = B4 exactly: holdout-40 B3-grid memory is at a plateau; half-lives 4-12, floors, longer holdouts still hurt with the near-OLS ridge.
+- Lambda 0.05/0.5/2 does not reopen gains for any memory method.
+
+### C1 (B4 + A9 severity + alpha-64 size prior) and C2 (composition with M9b_B4), lead re-scored
+- C1 = 51.72 [50.78,52.67], +0.83 [+0.53,+1.16] vs B4, +0.25 [+0.09,+0.45] vs A9 alone: the two gains add (predicted +0.85, got +0.82).
+  Plain pre-declared combo (alpha 64, A9 lam 20) 51.715. Re-screening severity with lag 7 / pairs adds <= 0.006. 15 cells.
+- C2 = win probability of M9b_B4 + size shares of C1: 52.09 [51.16,52.97], +1.19 vs B4, +0.36 [+0.16,+0.57] vs C1.
+  Conditions: stable .090, short .191, drift .184, shared .142 (B4 .106/.216/.211/.183). No new fitted parameters; the
+  win model and the size model are independent so their gains compose. Members were each selected on dev (optimism carries over).
+
+### L10 payout-level features in the win model (B4 base), worker report reviewed
+- Best cell is L5's coding (centred log1p at lag 7): 51.10, +0.21 [-0.03,+0.45] vs B4; composed with C1 shares 51.90, -0.18 vs C2.
+- Payout-level lags 1,2,4 (which drive severity in A9) carry NO win signal; every extra feature set hurt (47.6-50.6).
+  Win lags {7, pairs} and size lags {1,2,4} are disjoint, which is why the two gains compose independently.
+
+### FINAL: W5 stack scored once on the reserved audit set (24 episodes)
+- Stack 54.09 [53.08,54.90]; B4 52.26 [50.95,53.35]; C2 53.77 [52.71,54.66]; B3 46.78 [45.21,48.52]. Stack vs B4 +1.83 [+1.18,+2.60];
+  stack vs C2 +0.32 [-0.05,+0.67]. Dev OOF stack 52.32. Gains hold on episodes no choice was made on (audit is somewhat easier than dev).
+- Winner = stack, but C2 (M9b win memory + C1 sizes, no fitted stacking weights) is within noise of it and simpler.
+- Not done: Codex rebase onto B4 (S1_B4, S2_B4, S5_B4), stdlib port (dropped by request). See docs/sai/FINAL.md.
+
+### Teammates' pushed work pulled and re-scored through the harness (see docs/sai/TEAM_COMPARISON.md)
+- zhill-branch combined (20% rule model + 80% Pranav pair mixer), stdlib: dev 54.14 [53.1,55.1], audit 55.37 [54.5,56.1]. Pair mixer alone 53.87 / 55.20; rule model 52.89 / 52.85; Avyukth E6 47.69 / 50.37.
+- This beats our best (stack 52.32 dev OOF / 54.09 audit; C2 52.09 / 53.77): TM_COMBINED - C2 on audit +1.59 [+0.91,+2.24]. Their win model is far better on drift and shared_change.
+- Team stack (ours + theirs) 54.29 dev OOF, only +0.15 [-0.05,+0.34] over TM_COMBINED; size-share averaging with C1 gives 54.37 dev (+0.23 [+0.10,+0.35]).
+- Lesson: our "half-lives 4-12 hurt" was specific to the near-OLS ridge; their mixer's short memories (12, 40) fix drift. Remaining TM_COMBINED error is ~54% payout size.
+
+### V1-V3 volatility modeling (worker report reviewed; lead re-scored, match)
+- Volatility features (EWMA/rolling/GARCH-style conditional variance of the win flag, vol-of-vol, short-long gap, peer volatility) predict ERROR but not WHICH model is best:
+  error rises with volatility equally for every member (Spearman ~ +0.3 for ewv_w16, vy16, garch_h), TM_COMBINED is best in almost every vol tercile.
+- V1/V2 gated blends: +0.13..+0.16 over TM_COMBINED (CI includes 0), gate slopes fit ~0 => it is the static stack gain. V3 vol-scaled shrinkage: 0.00, never shrinks.
+- Verdict: volatility is shared noise, not a selection or calibration signal for these models. 21 settings tried.
+
+### G1-G3 richer blends (worker report reviewed; lead re-scored G1-G3, match) and the full team stack on audit
+- G1 gated stack (observable evidence) 54.35, G2 per-class/geometric pool 54.31 (pw/shares on 7 members 54.38), G3 tiny MLP 54.37 (unstable; trees overfit):
+  all +0.17..+0.24 over TM_COMBINED (54.14), none beats the plain team stack (54.29 OOF) by more than noise. Error correlations: C1, A9, M9b, M2, M3, B4, L5 are 0.90-0.98 with each other, TM_MIXER 0.99 with TM_COMBINED; TM_E7 and L7 are the only distinct members (0.6-0.7).
+- Subset search over 12 models (298 subsets, dev OOF): best 1-member TM_COMBINED 54.14, best 2-member TM_COMBINED 79% + C2 21% = 54.27, best 3-member 54.28; composition (win prob TM_COMBINED, sizes avg(C1, TM)) 54.37.
+- Full team stack on audit (extra logged looks, who=W5_final / TEAM_COMPARE): 55.59 [54.89,56.17] vs TM_COMBINED 55.37 [54.5,56.1] vs our own stack 54.09.
+- Conclusion: blending is saturated near 54.3-54.4 dev / ~55.4-55.6 audit; the lever left is payout-size modelling (~54% of remaining error).
+
+### Pranav COMBINED_SOLUTIONS 6a8098c: two-mode payout size (re-scored through the harness)
+- Size given win is exactly one of two mixes per machine type (6 constants), switched by big wins at lags 1,2,3,4 (our A9 had found lags 1,2,4 statistically). Mixer v3: dev 54.59, audit 55.77.
+- 20% rule model + 80% mixer v3: dev 54.77 [53.7,55.7], audit 55.90 [55.1,56.6]; +0.63 [+0.35,+0.90] over the previous best (old TM_COMBINED 54.14). Our C2 adds +0.07 [-0.03,+0.17].
+- Error shares now p0 .52, p1 .24, p2 .17, p5 .06: win probability is the larger error again. Modes are read from validation targets (round two must re-derive them from the new kit's validation targets).
+
+### K1 combination search around BEST (TM_COMBINED3 54.77), worker report reviewed, K1a-c re-scored by the lead
+- 324 pw x shares compositions: none beats BEST (best 54.72). 154 convex blends of 2-4 members: best 0.85 BEST + 0.15 C2 = 54.85, +0.08 [-0.03,+0.17] over BEST.
+- Nested selection check (10 half-splits, 478 combos): held-out gain +0.007 => the +0.08 is selection optimism. Only C2 gets any weight (0.15, stable across folds); TM_E7, L7, TM_RULE, TM_E6 get ~0.
+- Verdict: BEST is saturated under blending of the available members.
+
+### Q1/Q3 geometric-Brownian-motion (random walk on log-odds) filter, worker report reviewed, lead re-scored
+- Q1 (per-machine grid filter, sigma per machine / pooled / BMA): 31.5 / 31.1 / 31.3 dev, ~23 points below BEST: no skill alone. Win flags carry little slow level-drift signal; the real structure is lag-pair parity.
+- Q3 (Q1 as a logit-blend member of BEST): 54.95, +0.18 [-0.00,+0.35]; fitted coefficient negative (BEST slightly over-shrinks toward the slow level). Noise-level. Vol-gated shrink never opens (same as V3).
+- Q2 (volatility-linked sigma, pair-cell filters) is running as a separate Haiku worker.
+
+### K2 two-stage small-subset blends and observable gates (Haiku worker, lead re-scored): 54.91 dev
+- 1681 pw-set x shares-set structures (each 1-3 members), 6-fold dev OOF: best 54.91, +0.13 [-0.00,+0.30] over BEST (54.77); the top structures are within 0.002 of each other.
+  win = TM_COMBINED3 + TM_E7 + M9b_B4, shares = TM_MIXER3 + C1 + C2. Searching 1681 structures inflates it, same as K1's nested check (held-out gain ~0).
+- No observable gate (observed-tick fraction, cutoff, machine type) beats its ungated pair by more than 0.1; some gate fits go unstable.
+
+### Q2 volatility-linked random-walk filter and lag-pair-cell filters (Haiku worker report reviewed)
+- Standalone 31-36 dev, member weight 0.00 in all 6 OOF folds for every candidate (loss rises monotonically with w), filter pw correlates 0.53 with BEST pw. Verdict hurts/no value.
+- Overall: random walk (geometric Brownian motion) on log-odds, volatility-linked noise, gated and neural blends and a 1681-structure search all fail to beat the best model by more than noise.
+
+### Codex branch merged into sai/master-test (consolidation); Codex's B4 learners and team analyses re-scored by the lead
+- S1_B4 / S2_B4 / S5_B4 (residual learners and distillation on B4): 50.99 / 51.00 / 51.05 dev vs B4 50.89: +0.1, far below BEST (54.77). Residual learning on B4 adds nothing material.
+- TEAM_DIRECT/FACTOR/GATE/VOLATILITY (blends of team members on the older win model): 54.1-54.3, below BEST (-0.4..-0.6).
+- TEAM_SIZE_MODES: re-derives the two-mode payout size with mode centers learned from DEV training folds only (no hard-coded modes/lags) on TM_COMBINED's win prob: 54.87, +0.73 [+0.40,+1.07] over old TM_COMBINED, +0.09 [-0.11,+0.30] over BEST. Confirms Pranav's finding independently.

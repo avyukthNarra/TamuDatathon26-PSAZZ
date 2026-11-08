@@ -1,0 +1,29 @@
+{
+  "n_queries": 768,
+  "IMP_M5_reproduction_max_abs_diff": 2.220446049250313e-16,
+  "two_run_max_abs_diff": 0.0,
+  "new_win_priors_read_validation_targets": false,
+  "inherited_size_modes_read_validation_targets": true,
+  "files": {
+    "IMP_M1_validation.csv": {
+      "sha256": "104952093e1a541c03d042a3cccc363e3d057d9b6af179cbc1ee8d1c1ea8c5d8",
+      "rows": 768
+    },
+    "IMP_M2_validation.csv": {
+      "sha256": "bbf57c113ff9892fc3922844d29480507a2a8b46212595b97ced3aba60bd133b",
+      "rows": 768
+    },
+    "IMP_M3_validation.csv": {
+      "sha256": "f3d9f1269a8233833c853f0bdf0a59eb36482572cfbfa74dc035a1bddc6f1e76",
+      "rows": 768
+    },
+    "IMP_M4_validation.csv": {
+      "sha256": "370068f9a8b8939be871ad52d0fc19ed7a56078cc2b5472e45f05006b9e5c48a",
+      "rows": 768
+    },
+    "IMP_M5_validation.csv": {
+      "sha256": "81339c365bdf5930031f7e61884a901e66ea3614025d3e074304d1110582c9d4",
+      "rows": 768
+    }
+  }
+}

@@ -1,0 +1,15 @@
+# Team source audit (no metrics or experiments)
+- Latest COMBINED adds validation-target-derived two-mode severity head; cached TM_MIXER uses adapt without modes and is stale for latest entry.
+- COMBINED entry/run_pair_mixer load all validation targets with no partition filter; reserved audit targets therefore contaminate learned modes if supplied.
+- Official rules allow public validation learning; contamination is an internal held-out-audit concern, not an official rule violation.
+- zhill build is 20% average(full,binary) RuleForecaster plus 80% no-mode mixer; cached generation script matches this design; source SHA absent from cache.
+- pranav adaptive-mixer predates exact-payout size cells, extra size keys and two-mode head.
+- Mixer fit learns type size priors from train history; adapt rediscovers lag pairs among lags1..8 and chooses parity/full on train cutoff labels.
+- Mixer query walk emits before update, None means missing, unavailable pair falls back to rate; all tables decay across missing ticks by default.
+- Mixer win experts use half-lives12/40, cumulative squared-loss log weights eta16, k_win.25, alpha0; size hl80 eta8.
+- Rule default37 lag rules include no-rule/singles/pairs through8; forget(.95,1), trust_forget.99 in zhill build; missing contexts skip.
+- Rule historical trust scores use final-query pooled baseline/size prior, so their historical scoring is not fully prefix-only although query inputs stay pre-cutoff.
+- Combo adaptive uses independent tree/LR soft hl(None,16,32,64), temperature128, latest24 eligible rows stride4, prefix strictly before scored tick.
+- Combo selector <=6 evaluations x4 memories x2 families; selector trees8, final trees100, n_jobs1; each selector fit uses full earlier prefix despite misleading24-row fit docstring.
+- Combo requires numpy/sklearn; mixer/rule stdlib; official runtime30min 2CPU16GiB, reproduction tolerance1e-8.
+- Best hooks: mixer walk residuals+fast/slow disagreement+lag coverage; adapt memory/noise separately, preserve fixed pair confidence; train/dev-only learned modes.

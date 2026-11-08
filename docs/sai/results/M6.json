@@ -1,0 +1,70 @@
+{
+ "id": "M6",
+ "owner": "claude-w2",
+ "description": "JSD/TV-gated blend of short and long memory pair-ridge fits",
+ "params": {
+  "dist": "jsd",
+  "ws": 40,
+  "hl_s": 16,
+  "hl_l": "b3",
+  "qthr": 0.7,
+  "a": 10
+ },
+ "scope": "dev",
+ "points": 45.518637672778205,
+ "ci95": [
+  44.46278152070945,
+  46.54345736830836
+ ],
+ "condition_ratios": {
+  "stable": 0.15412367403903204,
+  "short_history": 0.34395158520941843,
+  "drift": 0.39891111688336106,
+  "shared_change": 0.3755791546140415
+ },
+ "R": 0.31814138268646325,
+ "class_error_shares": {
+  "p_0": 0.5901783247339659,
+  "p_1": 0.22771754953828507,
+  "p_2": 0.13603167375007788,
+  "p_5": 0.04223512660835163,
+  "p_20": 0.003837325369319564
+ },
+ "runtime_seconds": 0.13331637499504723,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": 0.0,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "extra": {
+  "vs_B3": {
+   "diff": -0.30384694481344354,
+   "ci95": [
+    -0.6566560826030685,
+    -0.06152305842638734
+   ]
+  },
+  "blend_gain": {
+   "points": 45.82248461759165,
+   "ci95": [
+    44.74847632985979,
+    46.90060343816345
+   ],
+   "vs_base": {
+    "diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ]
+   },
+   "w_mean": 0.0
+  },
+  "cond_ratio_diff_vs_B3": {
+   "stable": 0.036260498443187794,
+   "short_history": 0.0,
+   "drift": 1.1102230246251565e-16,
+   "shared_change": -0.0012983408645314554
+  },
+  "grid_cells_completed": 324
+ }
+}

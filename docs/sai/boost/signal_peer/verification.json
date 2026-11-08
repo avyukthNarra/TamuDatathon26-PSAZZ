@@ -1,0 +1,139 @@
+{
+  "two_run_max_abs_diff": 0.0,
+  "baseline_max_abs_diff": 1.021405182655144e-14,
+  "n_csv_files": 33,
+  "files": {
+    "BOOST_T2BASE_validation.csv": {
+      "rows": 768,
+      "sha256": "9391777d9ccbce5a430e0ed70f62abbe5edfe4829589e02c61484aea4f8a6d2b"
+    },
+    "BOOST_T2GROUP100_validation.csv": {
+      "rows": 768,
+      "sha256": "bd4d1ad6c2b17ea3db4448f7eea705d8b53d4091d9b0df5be4533e3e6b1598e0"
+    },
+    "BOOST_T2GROUP25_validation.csv": {
+      "rows": 768,
+      "sha256": "6ffe0525d7b41e84ee8cbd0d9b60f2a7f0fc09ef1e377d7ea60e1186daee69fb"
+    },
+    "BOOST_T2S10_validation.csv": {
+      "rows": 768,
+      "sha256": "61034c158376c51da5fd9d64f6fcb2342426001418815107d3e20cf1f91c3d0f"
+    },
+    "BOOST_T2S20_validation.csv": {
+      "rows": 768,
+      "sha256": "98a26492585a9e7fecb48aed7cea133f4a4417e01bd5bd37882d904063347d47"
+    },
+    "BOOST_T2S5_validation.csv": {
+      "rows": 768,
+      "sha256": "9eacfd8b83c00e28b5b948048db5a71ac220ffd145bbbc8f5903ea4e59964835"
+    },
+    "BOOST_T2TYPE100_validation.csv": {
+      "rows": 768,
+      "sha256": "eaef9cbbec1255a2834cef28177904685f73fafa6e153f2e6d975229ea15e7c2"
+    },
+    "BOOST_T2TYPE25_validation.csv": {
+      "rows": 768,
+      "sha256": "44831d68f7b5ef3f7c821b9b6448306038d33530285026c9643fea547685db43"
+    },
+    "BOOST_T3BASE_validation.csv": {
+      "rows": 768,
+      "sha256": "9391777d9ccbce5a430e0ed70f62abbe5edfe4829589e02c61484aea4f8a6d2b"
+    },
+    "BOOST_T3CO12B16_validation.csv": {
+      "rows": 768,
+      "sha256": "96b145073bcadc35acba5e2cb5790c7ba4abccb109c5c532625de233c13fcb25"
+    },
+    "BOOST_T3CO12B4_validation.csv": {
+      "rows": 768,
+      "sha256": "6fe1db4a10c07d24f6f04a02039683696697d23d290c1945633cfe889fec50ee"
+    },
+    "BOOST_T3CO32B16_validation.csv": {
+      "rows": 768,
+      "sha256": "6821e8b8333643cd64c2daef7e3e58a3de0e2049c7aad5681a32b0bbd98f8be4"
+    },
+    "BOOST_T3CO32B4_validation.csv": {
+      "rows": 768,
+      "sha256": "e16d9cb8db5e55a591e457ba512faf670f5ea818c01ce3422264afe4133749ee"
+    },
+    "BOOST_T3CP2W12B16_validation.csv": {
+      "rows": 768,
+      "sha256": "86653cc98e07cfffad1563761972220cb19431e0e1df691d64259f48d4df760f"
+    },
+    "BOOST_T3CP2W12B4_validation.csv": {
+      "rows": 768,
+      "sha256": "0f17f7c6c94b8820fd4632fe85b6280bbaa41ecfbfee023d348d3759c89ca5ab"
+    },
+    "BOOST_T3CP2W32B16_validation.csv": {
+      "rows": 768,
+      "sha256": "87c0d6352e17c29e7c37e19e097ef92bb0658808a58c2e915f978824e36ddeba"
+    },
+    "BOOST_T3CP2W32B4_validation.csv": {
+      "rows": 768,
+      "sha256": "584ed9845a1983dec4efbfa0ae4cc9a2dc6b2fcf28fb23270d55b206c61bbf27"
+    },
+    "BOOST_T3CP3W12B16_validation.csv": {
+      "rows": 768,
+      "sha256": "e19a2be1e2d1a04f48f8fe60effb42b8748867938a089f62bbd5346589ca599c"
+    },
+    "BOOST_T3CP3W12B4_validation.csv": {
+      "rows": 768,
+      "sha256": "79a93aefb579c63f901be1a7dca0ea32e9e78376f13165da538995c1aedadc89"
+    },
+    "BOOST_T3CP3W32B16_validation.csv": {
+      "rows": 768,
+      "sha256": "872d9706588f016ffbf019ed3c0ce0fe6b4524d79ab9d9699c6cd29bdcf5e981"
+    },
+    "BOOST_T3CP3W32B4_validation.csv": {
+      "rows": 768,
+      "sha256": "a98a101d2340e5e96a63edcfea72e9ad6dce3f98e9547d7efb33a75a39c1c579"
+    },
+    "BOOST_T3O12B16_validation.csv": {
+      "rows": 768,
+      "sha256": "767c30197bd7d9150ad9a583a0e20182d7aba2f20dc127cd41a2d281c1c0e4f1"
+    },
+    "BOOST_T3O12B4_validation.csv": {
+      "rows": 768,
+      "sha256": "c9b1c278a27aa08a98e8578f3cb9e2ad822e5df6eadc4be0a3de5b9357639792"
+    },
+    "BOOST_T3O32B16_validation.csv": {
+      "rows": 768,
+      "sha256": "74c5399656b8b1749c3eea28726e91453abdc139cc564fee92adead77b290e75"
+    },
+    "BOOST_T3O32B4_validation.csv": {
+      "rows": 768,
+      "sha256": "51d70993450459920a2211575fd7249816eb3d4b256e96c984a79b82b9cb8d2c"
+    },
+    "BOOST_T3P2W12B16_validation.csv": {
+      "rows": 768,
+      "sha256": "44e2e5df1dbe11bb2586385dadada059c94187839ad67bdab55cfe600e6806da"
+    },
+    "BOOST_T3P2W12B4_validation.csv": {
+      "rows": 768,
+      "sha256": "a90fd0545f14fc2d5d3e8e1f225a29d7824d3cb1d1625b8f79808f6e717a8f70"
+    },
+    "BOOST_T3P2W32B16_validation.csv": {
+      "rows": 768,
+      "sha256": "c430949bb297a4da0389dfdc19f48153618bbaa04c8b330ebb4d5a8df1ba99ab"
+    },
+    "BOOST_T3P2W32B4_validation.csv": {
+      "rows": 768,
+      "sha256": "ad3816f8a917dfc109884ccd9aec177ae1182feb2dbe0379ca4e99f96fb6d258"
+    },
+    "BOOST_T3P3W12B16_validation.csv": {
+      "rows": 768,
+      "sha256": "91f02f9d0934fb086964fdf6e7cecf43053066f918e1a5285b8b105accf15a91"
+    },
+    "BOOST_T3P3W12B4_validation.csv": {
+      "rows": 768,
+      "sha256": "89e7b0a5f2d1e2cfdf49bc424f60801ebc1ff19c22a04e17eb6ae4cef28f92d4"
+    },
+    "BOOST_T3P3W32B16_validation.csv": {
+      "rows": 768,
+      "sha256": "16015ad680dba2ba7ce8339f60c4a29f0e1ef734bbedaf1d39860bc24d18f6ba"
+    },
+    "BOOST_T3P3W32B4_validation.csv": {
+      "rows": 768,
+      "sha256": "743dd35cf70722328fb359eeba0573edeed6e8b67dcfa27d7d1280f923f4fcd3"
+    }
+  }
+}

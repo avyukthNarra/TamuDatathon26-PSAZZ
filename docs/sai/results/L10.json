@@ -1,0 +1,39 @@
+{
+ "id": "L10",
+ "owner": "claude",
+ "description": "B4 win model + payout-level features | best L5_log7_lam0.5",
+ "params": {
+  "set": "L5_log7",
+  "lam": 0.5,
+  "lags": [
+   7
+  ],
+  "coding": "log"
+ },
+ "scope": "dev",
+ "points": 51.09599018200439,
+ "ci95": [
+  49.983931011435104,
+  52.071665666766314
+ ],
+ "condition_ratios": {
+  "stable": 0.10738681088940048,
+  "short_history": 0.20833286359703843,
+  "drift": 0.202329241841369,
+  "shared_change": 0.1789928504550212
+ },
+ "R": 0.17426044169570729,
+ "class_error_shares": {
+  "p_0": 0.48765188005410237,
+  "p_1": 0.2509883872741788,
+  "p_2": 0.18944693120192513,
+  "p_5": 0.0654658424407475,
+  "p_20": 0.006446959029046186
+ },
+ "runtime_seconds": 0.23361837498669047,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": 0.0,
+ "python": "3.13.3",
+ "n_episodes": 72
+}

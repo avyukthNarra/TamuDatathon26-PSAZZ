@@ -1,0 +1,11 @@
+test_as_split_excludes_cutoff (test_experiments.WinHeadTests.test_as_split_excludes_cutoff) ... ok
+test_baseline_matches_original_walk_with_gaps_and_varying_cutoffs (test_experiments.WinHeadTests.test_baseline_matches_original_walk_with_gaps_and_varying_cutoffs) ... ok
+test_target_changes_do_not_affect_forecast (test_experiments.WinHeadTests.test_target_changes_do_not_affect_forecast) ... ok
+test_uniform_pair_prior_has_no_effect (test_experiments.WinHeadTests.test_uniform_pair_prior_has_no_effect) ... ok
+test_hierarchical_pseudocounts_change_v4_prediction (test_v4.V4Tests.test_hierarchical_pseudocounts_change_v4_prediction) ... ok
+test_v4_reproduces_original_beta_posterior_and_online_weights (test_v4.V4Tests.test_v4_reproduces_original_beta_posterior_and_online_weights) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.109s
+
+OK

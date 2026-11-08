@@ -1,0 +1,273 @@
+{
+  "machines": 224,
+  "families": {
+    "win_pair": {
+      "median_gain_bic": 16.20142145254974,
+      "strong_gain_over_null_count": 151,
+      "median_bic_advantage_over_known_pair": 0.0,
+      "beats_known_by10_count": 17,
+      "temporal_logloss": 0.865288616656601,
+      "temporal_brier": 0.2555508856476613
+    },
+    "win_triple": {
+      "median_gain_bic": 15.234769285995405,
+      "strong_gain_over_null_count": 141,
+      "median_bic_advantage_over_known_pair": 0.0,
+      "beats_known_by10_count": 63,
+      "temporal_logloss": 0.6192407291439999,
+      "temporal_brier": 0.17750583198248587
+    },
+    "win_full_pair": {
+      "median_gain_bic": 10.59784127186769,
+      "strong_gain_over_null_count": 115,
+      "median_bic_advantage_over_known_pair": -4.93292589326412,
+      "beats_known_by10_count": 10,
+      "temporal_logloss": 0.8597378977869947,
+      "temporal_brier": 0.25511702250038987
+    },
+    "big_pair": {
+      "median_gain_bic": 4.778398356796648,
+      "strong_gain_over_null_count": 52,
+      "median_bic_advantage_over_known_pair": -7.15955007111981,
+      "beats_known_by10_count": 2,
+      "temporal_logloss": 0.6719646783365516,
+      "temporal_brier": 0.20119288110633207
+    },
+    "big_triple": {
+      "median_gain_bic": 5.3948317005389335,
+      "strong_gain_over_null_count": 68,
+      "median_bic_advantage_over_known_pair": -6.055227589003676,
+      "beats_known_by10_count": 7,
+      "temporal_logloss": 0.6732235176645496,
+      "temporal_brier": 0.20130648187065792
+    },
+    "big_full_pair": {
+      "median_gain_bic": -0.1168107792573263,
+      "strong_gain_over_null_count": 20,
+      "median_bic_advantage_over_known_pair": -12.413218185510175,
+      "beats_known_by10_count": 0,
+      "temporal_logloss": 0.6727252001495142,
+      "temporal_brier": 0.20122667790687238
+    },
+    "payout_pair": {
+      "median_gain_bic": -15.962453107681458,
+      "strong_gain_over_null_count": 29,
+      "median_bic_advantage_over_known_pair": -45.53990999765362,
+      "beats_known_by10_count": 0,
+      "temporal_logloss": 0.8193023449920569,
+      "temporal_brier": 0.24726565158952243
+    },
+    "active_pair_count": {
+      "median_gain_bic": 6.904323706495882,
+      "strong_gain_over_null_count": 98,
+      "median_bic_advantage_over_known_pair": -7.644647632756715,
+      "beats_known_by10_count": 22,
+      "temporal_logloss": 0.6828770007635071,
+      "temporal_brier": 0.20294440762993174
+    },
+    "joint_three_pairs": {
+      "median_gain_bic": 0.0,
+      "strong_gain_over_null_count": 75,
+      "median_bic_advantage_over_known_pair": -16.52534203321474,
+      "beats_known_by10_count": 5,
+      "temporal_logloss": 0.8267742097790186,
+      "temporal_brier": 0.24389353251858195
+    },
+    "known_win_pair": {
+      "median_gain_bic": 13.644313114598905,
+      "strong_gain_over_null_count": 130,
+      "median_bic_advantage_over_known_pair": 0.0,
+      "beats_known_by10_count": 0,
+      "temporal_logloss": 0.8702719519050435,
+      "temporal_brier": 0.25605158348253076
+    }
+  },
+  "win_pair_winners": {
+    "[4, 7]": 54,
+    "[4, 6]": 4,
+    "[3, 5]": 2,
+    "[1, 7]": 3,
+    "[1, 2]": 21,
+    "[2, 5]": 51,
+    "[1, 3]": 41,
+    "[7, 8]": 4,
+    "[6, 8]": 2,
+    "[3, 4]": 5,
+    "[1, 8]": 3,
+    "[3, 6]": 1,
+    "[2, 8]": 1,
+    "[5, 7]": 4,
+    "[6, 7]": 2,
+    "[1, 4]": 5,
+    "[1, 5]": 1,
+    "[2, 3]": 3,
+    "[2, 4]": 6,
+    "[5, 6]": 2,
+    "[2, 7]": 2,
+    "[1, 6]": 2,
+    "[3, 8]": 5
+  },
+  "polarity": {
+    "match_high": 110,
+    "differ_high_or_one_cell": 114
+  },
+  "known_pair_fraction": 0.6517857142857143,
+  "conditions": {
+    "drift": {
+      "machines": 49,
+      "strong_win_pair_count": 39,
+      "strong_known_pair_count": 23,
+      "strong_winner_counts": {
+        "[2, 5]": 12,
+        "[2, 8]": 1,
+        "[7, 8]": 1,
+        "[4, 7]": 8,
+        "[4, 6]": 1,
+        "[1, 5]": 1,
+        "[1, 7]": 1,
+        "[5, 6]": 2,
+        "[2, 4]": 2,
+        "[2, 3]": 1,
+        "[3, 4]": 1,
+        "[1, 3]": 3,
+        "[1, 4]": 3,
+        "[5, 7]": 1,
+        "[1, 8]": 1
+      },
+      "strong_polarity_counts": {
+        "match_high": 16,
+        "differ_high_or_one_cell": 23
+      },
+      "temporal_logloss": {
+        "win_pair": 1.1725755090653007,
+        "win_triple": 0.6945386355625944,
+        "win_full_pair": 1.1768565275964862,
+        "big_pair": 0.7733268567169463,
+        "big_triple": 0.7697266176025381,
+        "big_full_pair": 0.7751750764428831,
+        "payout_pair": 1.0632696811931046,
+        "active_pair_count": 0.8282916995191982,
+        "joint_three_pairs": 1.118341287509027,
+        "known_win_pair": 1.1986932727724433
+      }
+    },
+    "shared_change": {
+      "machines": 57,
+      "strong_win_pair_count": 36,
+      "strong_known_pair_count": 19,
+      "strong_winner_counts": {
+        "[4, 6]": 2,
+        "[7, 8]": 2,
+        "[1, 3]": 6,
+        "[1, 2]": 1,
+        "[3, 4]": 3,
+        "[1, 8]": 1,
+        "[2, 5]": 9,
+        "[4, 7]": 4,
+        "[2, 7]": 2,
+        "[5, 7]": 1,
+        "[1, 6]": 1,
+        "[3, 8]": 3,
+        "[3, 5]": 1
+      },
+      "strong_polarity_counts": {
+        "match_high": 12,
+        "differ_high_or_one_cell": 24
+      },
+      "temporal_logloss": {
+        "win_pair": 1.2206728540758778,
+        "win_triple": 0.7418059658044632,
+        "win_full_pair": 1.200581194187318,
+        "big_pair": 0.8364886109298446,
+        "big_triple": 0.8220973930985527,
+        "big_full_pair": 0.8281686801125911,
+        "payout_pair": 1.14450367594756,
+        "active_pair_count": 0.8760232216770936,
+        "joint_three_pairs": 1.156471839895904,
+        "known_win_pair": 1.242491373891014
+      }
+    },
+    "short_history": {
+      "machines": 61,
+      "strong_win_pair_count": 29,
+      "strong_known_pair_count": 28,
+      "strong_winner_counts": {
+        "[4, 7]": 13,
+        "[2, 5]": 7,
+        "[1, 2]": 1,
+        "[1, 3]": 8
+      },
+      "strong_polarity_counts": {
+        "match_high": 25,
+        "differ_high_or_one_cell": 4
+      },
+      "temporal_logloss": {
+        "win_pair": 0.4514627970113768,
+        "win_triple": 0.6640621512784797,
+        "win_full_pair": 0.44124816315807636,
+        "big_pair": 0.6509489052787718,
+        "big_triple": 0.6825045009244907,
+        "big_full_pair": 0.648696553972195,
+        "payout_pair": 0.5615656476470439,
+        "active_pair_count": 0.5484630623667955,
+        "joint_three_pairs": 0.4654331390766153,
+        "known_win_pair": 0.38197099189434464
+      }
+    },
+    "stable": {
+      "machines": 57,
+      "strong_win_pair_count": 47,
+      "strong_known_pair_count": 47,
+      "strong_winner_counts": {
+        "[4, 7]": 16,
+        "[2, 5]": 14,
+        "[1, 3]": 17
+      },
+      "strong_polarity_counts": {
+        "match_high": 29,
+        "differ_high_or_one_cell": 18
+      },
+      "temporal_logloss": {
+        "win_pair": 0.29021599619110106,
+        "win_triple": 0.41696984546903687,
+        "win_full_pair": 0.29131105341115704,
+        "big_pair": 0.41409095386787503,
+        "big_triple": 0.4306384364751121,
+        "big_full_pair": 0.4236600351188837,
+        "payout_pair": 0.3065496966487387,
+        "active_pair_count": 0.3746682096795149,
+        "joint_three_pairs": 0.28343743673480737,
+        "known_win_pair": 0.27131325491465264
+      }
+    }
+  },
+  "well_supported_known_cell_rates": {
+    "machines": 126,
+    "high_deciles": [
+      0.20441988950276244,
+      0.31617586912065443,
+      0.37142857142857144,
+      0.40977914389799636,
+      0.4507042253521127,
+      0.5483007646559048,
+      0.5961538461538461,
+      0.6391941391941393,
+      0.6875,
+      0.7344441371681416,
+      0.85
+    ],
+    "low_deciles": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.012195121951219513,
+      0.018524871355060035,
+      0.023809523809523822,
+      0.04258886653252865,
+      0.08163265306122448,
+      0.11324786324786325,
+      0.3113207547169811
+    ]
+  }
+}

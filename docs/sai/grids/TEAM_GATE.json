@@ -1,0 +1,296 @@
+[
+ {
+  "reg": 0.01,
+  "inner_dev_points": {
+   "0.0001": 53.59132627362109,
+   "0.001": 53.99474750551507,
+   "0.01": 54.19221032306257
+  },
+  "mean_gate": {
+   "TM_COMBINED": 0.6351723825086093,
+   "TM_MIXER": 0.009388003996127891,
+   "TM_RULE": 0.11765498782847207,
+   "C2": 0.18494871792431153,
+   "TM_E7": 0.05283590774247921
+  },
+  "feature_names": [
+   "ess_16",
+   "ess_128",
+   "obs_recent",
+   "obs_old",
+   "obs_count",
+   "obs_cutoff",
+   "moment_4_logmean",
+   "moment_4_var",
+   "moment_16_var",
+   "moment_40_logmean",
+   "moment_40_var",
+   "drift_tv",
+   "drift_l2",
+   "drift_jsd",
+   "cusum_range",
+   "type_balanced",
+   "type_jackpot",
+   "type_steady",
+   "win_disagreement_sd",
+   "win_disagreement_range",
+   "mixer_minus_rule",
+   "disagreement_to_base"
+  ],
+  "fold": 0,
+  "train_episodes": 60,
+  "predicted_episodes": 12
+ },
+ {
+  "reg": 0.01,
+  "inner_dev_points": {
+   "0.0001": 53.80874610314052,
+   "0.001": 54.00163240592137,
+   "0.01": 54.12749073227998
+  },
+  "mean_gate": {
+   "TM_COMBINED": 0.6503114553807464,
+   "TM_MIXER": 0.009487849398943723,
+   "TM_RULE": 0.09955799912006585,
+   "C2": 0.17821378115508923,
+   "TM_E7": 0.06242891494515485
+  },
+  "feature_names": [
+   "ess_16",
+   "ess_128",
+   "obs_recent",
+   "obs_old",
+   "obs_count",
+   "obs_cutoff",
+   "moment_4_logmean",
+   "moment_4_var",
+   "moment_16_var",
+   "moment_40_logmean",
+   "moment_40_var",
+   "drift_tv",
+   "drift_l2",
+   "drift_jsd",
+   "cusum_range",
+   "type_balanced",
+   "type_jackpot",
+   "type_steady",
+   "win_disagreement_sd",
+   "win_disagreement_range",
+   "mixer_minus_rule",
+   "disagreement_to_base"
+  ],
+  "fold": 1,
+  "train_episodes": 60,
+  "predicted_episodes": 12
+ },
+ {
+  "reg": 0.01,
+  "inner_dev_points": {
+   "0.0001": 53.773813939364786,
+   "0.001": 54.00730140125922,
+   "0.01": 54.25662567961059
+  },
+  "mean_gate": {
+   "TM_COMBINED": 0.5750054311300175,
+   "TM_MIXER": 0.00950048868018552,
+   "TM_RULE": 0.12252478709141042,
+   "C2": 0.21816809521566172,
+   "TM_E7": 0.07480119788272489
+  },
+  "feature_names": [
+   "ess_16",
+   "ess_128",
+   "obs_recent",
+   "obs_old",
+   "obs_count",
+   "obs_cutoff",
+   "moment_4_logmean",
+   "moment_4_var",
+   "moment_16_var",
+   "moment_40_logmean",
+   "moment_40_var",
+   "drift_tv",
+   "drift_l2",
+   "drift_jsd",
+   "cusum_range",
+   "type_balanced",
+   "type_jackpot",
+   "type_steady",
+   "win_disagreement_sd",
+   "win_disagreement_range",
+   "mixer_minus_rule",
+   "disagreement_to_base"
+  ],
+  "fold": 2,
+  "train_episodes": 60,
+  "predicted_episodes": 12
+ },
+ {
+  "reg": 0.01,
+  "inner_dev_points": {
+   "0.0001": 54.22831128719535,
+   "0.001": 54.32593956934215,
+   "0.01": 54.3716109287725
+  },
+  "mean_gate": {
+   "TM_COMBINED": 0.70224187490366,
+   "TM_MIXER": 0.009577279544385607,
+   "TM_RULE": 0.05135448278364013,
+   "C2": 0.18588654123907547,
+   "TM_E7": 0.05093982152923867
+  },
+  "feature_names": [
+   "ess_16",
+   "ess_128",
+   "obs_recent",
+   "obs_old",
+   "obs_count",
+   "obs_cutoff",
+   "moment_4_logmean",
+   "moment_4_var",
+   "moment_16_var",
+   "moment_40_logmean",
+   "moment_40_var",
+   "drift_tv",
+   "drift_l2",
+   "drift_jsd",
+   "cusum_range",
+   "type_balanced",
+   "type_jackpot",
+   "type_steady",
+   "win_disagreement_sd",
+   "win_disagreement_range",
+   "mixer_minus_rule",
+   "disagreement_to_base"
+  ],
+  "fold": 3,
+  "train_episodes": 60,
+  "predicted_episodes": 12
+ },
+ {
+  "reg": 0.01,
+  "inner_dev_points": {
+   "0.0001": 54.16322605009329,
+   "0.001": 54.25806944507877,
+   "0.01": 54.27903659780844
+  },
+  "mean_gate": {
+   "TM_COMBINED": 0.6502660081752952,
+   "TM_MIXER": 0.00945353847840634,
+   "TM_RULE": 0.09938129332359612,
+   "C2": 0.15080737878254946,
+   "TM_E7": 0.09009178124015273
+  },
+  "feature_names": [
+   "ess_16",
+   "ess_128",
+   "obs_recent",
+   "obs_old",
+   "obs_count",
+   "obs_cutoff",
+   "moment_4_logmean",
+   "moment_4_var",
+   "moment_16_var",
+   "moment_40_logmean",
+   "moment_40_var",
+   "drift_tv",
+   "drift_l2",
+   "drift_jsd",
+   "cusum_range",
+   "type_balanced",
+   "type_jackpot",
+   "type_steady",
+   "win_disagreement_sd",
+   "win_disagreement_range",
+   "mixer_minus_rule",
+   "disagreement_to_base"
+  ],
+  "fold": 4,
+  "train_episodes": 60,
+  "predicted_episodes": 12
+ },
+ {
+  "reg": 0.01,
+  "inner_dev_points": {
+   "0.0001": 54.30089815884607,
+   "0.001": 54.35736193019269,
+   "0.01": 54.399440306211275
+  },
+  "mean_gate": {
+   "TM_COMBINED": 0.664531100848249,
+   "TM_MIXER": 0.00953615362905356,
+   "TM_RULE": 0.12472291071246916,
+   "C2": 0.1916595429649328,
+   "TM_E7": 0.009550291845295501
+  },
+  "feature_names": [
+   "ess_16",
+   "ess_128",
+   "obs_recent",
+   "obs_old",
+   "obs_count",
+   "obs_cutoff",
+   "moment_4_logmean",
+   "moment_4_var",
+   "moment_16_var",
+   "moment_40_logmean",
+   "moment_40_var",
+   "drift_tv",
+   "drift_l2",
+   "drift_jsd",
+   "cusum_range",
+   "type_balanced",
+   "type_jackpot",
+   "type_steady",
+   "win_disagreement_sd",
+   "win_disagreement_range",
+   "mixer_minus_rule",
+   "disagreement_to_base"
+  ],
+  "fold": 5,
+  "train_episodes": 60,
+  "predicted_episodes": 12
+ },
+ {
+  "reg": 0.01,
+  "inner_dev_points": {
+   "0.0001": 54.14146364377982,
+   "0.001": 54.13141855493932,
+   "0.01": 54.235111176146546
+  },
+  "mean_gate": {
+   "TM_COMBINED": 0.6471031815833663,
+   "TM_MIXER": 0.009498848014325554,
+   "TM_RULE": 0.1009734515379257,
+   "C2": 0.18680234847759922,
+   "TM_E7": 0.05562217038678336
+  },
+  "feature_names": [
+   "ess_16",
+   "ess_128",
+   "obs_recent",
+   "obs_old",
+   "obs_count",
+   "obs_cutoff",
+   "moment_4_logmean",
+   "moment_4_var",
+   "moment_16_var",
+   "moment_40_logmean",
+   "moment_40_var",
+   "drift_tv",
+   "drift_l2",
+   "drift_jsd",
+   "cusum_range",
+   "type_balanced",
+   "type_jackpot",
+   "type_steady",
+   "win_disagreement_sd",
+   "win_disagreement_range",
+   "mixer_minus_rule",
+   "disagreement_to_base"
+  ],
+  "fold": null,
+  "train_episodes": 72,
+  "predicted_episodes": 24
+ }
+]

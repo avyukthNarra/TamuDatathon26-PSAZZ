@@ -1,0 +1,10 @@
+test_bma_weights_and_empty_history (test_bma.BMATests.test_bma_weights_and_empty_history) ... ok
+test_centering_is_strictly_causal_and_gaps_stay_zero (test_bma.BMATests.test_centering_is_strictly_causal_and_gaps_stay_zero) ... ok
+test_matches_supplied_reference_on_nontied_random_inputs (test_bma.BMATests.test_matches_supplied_reference_on_nontied_random_inputs) ... ok
+test_prediction_ignores_post_cutoff_and_truth (test_bma.BMATests.test_prediction_ignores_post_cutoff_and_truth) ... ok
+test_supports_are_all_42_unique_subsets_and_penalized (test_bma.BMATests.test_supports_are_all_42_unique_subsets_and_penalized) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.022s
+
+OK

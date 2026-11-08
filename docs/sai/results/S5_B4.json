@@ -1,0 +1,275 @@
+{
+ "id": "S5_B4",
+ "owner": "codex",
+ "description": "B4 residual ridge",
+ "params": {
+  "config": {
+   "signal": 1,
+   "pairs": 0,
+   "prior": 0,
+   "density": 1
+  },
+  "model": {
+   "family": "ridge",
+   "alpha": 10
+  },
+  "strength": 0.25
+ },
+ "scope": "dev",
+ "points": 51.04803321731486,
+ "ci95": [
+  50.01915283781617,
+  51.99449650287735
+ ],
+ "condition_ratios": {
+  "stable": 0.10302378981743882,
+  "short_history": 0.2097026470993205,
+  "drift": 0.20971595467427342,
+  "shared_change": 0.1790120009475412
+ },
+ "R": 0.17536359813464347,
+ "class_error_shares": {
+  "p_0": 0.4980616458154998,
+  "p_1": 0.248310188876288,
+  "p_2": 0.18546778746821135,
+  "p_5": 0.06202100991487013,
+  "p_20": 0.006139367925130686
+ },
+ "runtime_seconds": 2.525552332997904,
+ "seed": 20261107,
+ "stdlib_only": false,
+ "determinism_max_diff": 0.0,
+ "python": "3.13.3",
+ "n_episodes": 72,
+ "extra": {
+  "smoke": [
+   {
+    "params": {
+     "family": "ridge",
+     "alpha": 10
+    },
+    "strength": 0,
+    "points": 50.14035692715878
+   },
+   {
+    "params": {
+     "family": "ridge",
+     "alpha": 10
+    },
+    "strength": 0.1,
+    "points": 50.106636176969324
+   },
+   {
+    "params": {
+     "family": "ridge",
+     "alpha": 10
+    },
+    "strength": 0.25,
+    "points": 49.926110082083625
+   },
+   {
+    "params": {
+     "family": "ridge",
+     "alpha": 10
+    },
+    "strength": 0.5,
+    "points": 49.27761123934531
+   },
+   {
+    "params": {
+     "family": "ridge",
+     "alpha": 10
+    },
+    "strength": 1,
+    "points": 47.086232470410984
+   }
+  ],
+  "declared_cells": 320,
+  "completed_cells": 320,
+  "standalone_vs_B4": {
+   "diff": 0.15757484403223998,
+   "ci95": [
+    0.04727024505893294,
+    0.27271083935413426
+   ]
+  },
+  "episode_oof_blend": {
+   "w_per_fold": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "w_mean": 1.0,
+   "points": 51.04803321731486,
+   "ci95": [
+    50.01915283781617,
+    51.99449650287735
+   ],
+   "condition_ratios": {
+    "stable": 0.10302378981743882,
+    "short_history": 0.20970264709932054,
+    "drift": 0.20971595467427342,
+    "shared_change": 0.17901200094754113
+   },
+   "vs_base": {
+    "diff": 0.15757484403223998,
+    "ci95": [
+     0.04727024505891908,
+     0.2727108393541344
+    ]
+   }
+  },
+  "B4_condition_ratios": {
+   "stable": 0.10551941600120766,
+   "short_history": 0.21602902560836054,
+   "drift": 0.21113430029752245,
+   "shared_change": 0.18332901494514262
+  },
+  "conditional_hybrid_vs_B4": {
+   "stable": {
+    "diff": 0.026944547743028124,
+    "ci95": [
+     -0.004059371506451014,
+     0.05715361619383436
+    ]
+   },
+   "short_history": {
+    "diff": 0.06835961986937633,
+    "ci95": [
+     -0.007201179203845774,
+     0.13622863391476192
+    ]
+   },
+   "drift": {
+    "diff": 0.015309964742023396,
+    "ci95": [
+     -0.04069833627828547,
+     0.07555942724298266
+    ]
+   },
+   "shared_change": {
+    "diff": 0.04662755826340259,
+    "ci95": [
+     -0.008604838836297013,
+     0.10705818175797129
+    ]
+   }
+  },
+  "feature_metadata": {
+   "base": "B4",
+   "base_params": {
+    "lam": 0.05,
+    "lags": [
+     7
+    ],
+    "pairs": [
+     [
+      1,
+      3
+     ],
+     [
+      2,
+      5
+     ],
+     [
+      4,
+      7
+     ]
+    ]
+   },
+   "train_hash": "b814b70a21f669f09b55630c1bb22dc98e00de984bbfbd53399010c184b48446",
+   "validation_hash": "2abc692d486d52adef4561dd347f8a230392d0ff61db04f6f10a187716e86053",
+   "source_hash": "cb9039a88adcf28cc960cf69bc5dc1aeaec17bec0e295f1b2c68500223e7d09f",
+   "core_hash": "3898b7b538a75ae2e808cffc82c3b5797eda7d0ccc82b24929547fa25319df57",
+   "screen_sha256": "e8ab19238af24e91f9397f6d396a2aeae26d107b7b0e38b174dd74ebdcc6fcca",
+   "feature_pairs": [
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     5
+    ],
+    [
+     4,
+     7
+    ]
+   ],
+   "signal_toggle": "explicit signal columns only; A2 prior remains signal-conditioned",
+   "hl_grid": "B4 memory fixed; historical summary half-lives16/128 unchanged",
+   "train_features": "priors leave out the whole train episode; no validation target use",
+   "validation_base_max_diff": 3.3306690738754696e-16,
+   "cache": "w4_b4_features_d30d6658f92fba35.npz",
+   "feature_count": 134,
+   "rows": {
+    "tr": 768,
+    "va": 768
+   }
+  },
+  "selection_caveat": "Global DEV hyperparameter/strength selection is optimistic; audit truth never fit or tuned.",
+  "time_cap_seconds": 600,
+  "grid_budget_seconds": 480,
+  "nested_fixed_selected_hyperparameters": {
+   "evaluation": {
+    "scope": "dev",
+    "points": 51.03972743297692,
+    "R": 0.175554867113844,
+    "n_episodes": 72,
+    "condition_ratios": {
+     "stable": 0.10278801152200537,
+     "short_history": 0.21009904815154967,
+     "drift": 0.21003752916208526,
+     "shared_change": 0.17929487961973561
+    },
+    "mean_error": 0.03282500967688878,
+    "ci95": [
+     49.9997299024994,
+     51.98489737025592
+    ],
+    "class_error_shares": {
+     "p_0": 0.4979520850988703,
+     "p_1": 0.24814438504180006,
+     "p_2": 0.18558749003439945,
+     "p_5": 0.06217072977065539,
+     "p_20": 0.006145310054274827
+    }
+   },
+   "vs_B4": {
+    "diff": 0.14926905969429782,
+    "ci95": [
+     0.04512771352039504,
+     0.2518358648637654
+    ]
+   },
+   "outer_weights": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    0.75
+   ],
+   "caveat": "Learner/weight fitting nested; global hyperparameter selection remains optimistic.",
+   "determinism_max_diff": 4.440892098500626e-16
+  },
+  "non_nested_blend_caveat": "OOF member labels cross blend-training folds; use nested diagnostic.",
+  "verification": {
+   "prediction_rows": 768,
+   "unique_ids": true,
+   "probability_bounds_and_sum": true,
+   "saved_scores_and_intervals_reproduced": true,
+   "completed_grid_cells": 320,
+   "unique_feature_configs": 16,
+   "leakage_checks": {
+    "strict_cutoff_invariance": true,
+    "missing_ticks_unknown": true,
+    "base_matches_B4": 3.3306690738754696e-16
+   },
+   "audit_scored": false
+  }
+ }
+}

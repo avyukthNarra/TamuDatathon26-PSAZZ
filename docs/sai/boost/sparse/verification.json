@@ -1,0 +1,185 @@
+{
+  "unit_tests_passed": 6,
+  "baseline_reproduction_max_abs_diff": 1.3322676295501878e-15,
+  "best_two_run_byte_identical": true,
+  "best_saved_prediction_byte_identical": true,
+  "dense_csv_rows_byte_identical_to_reference": true,
+  "dense_rows_per_csv": 576,
+  "files": [
+    {
+      "file": "BOOST_T1_01_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "13abf76a1fb68d4bf80766bf424f592462f0caf4a0ed8234f90a2ab53be52fba"
+    },
+    {
+      "file": "BOOST_T1_02_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "b0e92015e883aed6a28db51382609e7f3d49ecf66e7989bd9bd0f420578e3fec"
+    },
+    {
+      "file": "BOOST_T1_03_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "b9e8db133a7c135771b2386d90ada7de296a25dad26d399f082d610bba7f9e46"
+    },
+    {
+      "file": "BOOST_T1_04_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "ac6aa42403d1369fa7bc4a57e1ebb9c82057a33eb63da080d9bcaa0fbf6b01fc"
+    },
+    {
+      "file": "BOOST_T1_05_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "2d278fa64eb0cb1783d5461953df4146a696077e5510674da66e49603d0c02b6"
+    },
+    {
+      "file": "BOOST_T1_06_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "8b01e86d53b13cb73621cf0c5aed8c8b95160a6c3c07b9ac6bcf963fd878bc44"
+    },
+    {
+      "file": "BOOST_T1_07_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "0d4d88a21d9ed53266451796b6804f98d1336762a21f4cb2c2ca2f29ce7e6a53"
+    },
+    {
+      "file": "BOOST_T1_08_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "3473ef5a36f06734288ae42c9ee6e02cd6b8e82447fd7d6beb05cee7667d5ecf"
+    },
+    {
+      "file": "BOOST_T1_09_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "9bf73dda506be1d2c67367a09d2bacffc1700e4038cba8d35cbeefb69f3b9789"
+    },
+    {
+      "file": "BOOST_T1_10_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "7fe076337f8663398c21e202f50a3ce12b81e29a387733db1c33873f5bd8d11a"
+    },
+    {
+      "file": "BOOST_T1_11_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "0b0e4ea765b39937d331dc48d0d6572d3ffbbb942fe888896c564c87fddaa00e"
+    },
+    {
+      "file": "BOOST_T1_12_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "cd8a0c8e1432566c6c6d654371db0692e42ba14d7853aa08adca1d5893ca1dcc"
+    },
+    {
+      "file": "BOOST_T1_13_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "9d6ef70104b9451ef2157c1a0cf44dbe17c6e37d25aa715e90816dd4b71ccf3a"
+    },
+    {
+      "file": "BOOST_T1_14_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "ae1450d03cda04d25d04c47afc86b9c00a740e2ec1aa42ce867d6c0b8ba5c128"
+    },
+    {
+      "file": "BOOST_T1_15_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "4e3f542822a8860f4394aba982822cc03ca61dcac2646931bae4fcdd85d6d717"
+    },
+    {
+      "file": "BOOST_T1_16_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "1ddbc898e067a41b42e7bf7c5c5af226f7859b3831e43d020ab65bbdaa742fa3"
+    },
+    {
+      "file": "BOOST_T1_17_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "d5403d35a1b4df091db219eedc7eda6f77daff2c0b392b1ce3e418bf4f25f0e5"
+    },
+    {
+      "file": "BOOST_T1_18_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "896dbd5530f18448378027cb3f0a3926e0ba6b48b4b4c1a078ae33eefa9a0090"
+    },
+    {
+      "file": "BOOST_T1_19_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "9bde84b8f5428e584d7a208298890800ee70db29683e95ea925360c848b152c3"
+    },
+    {
+      "file": "BOOST_T1_20_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "740a7ceb8021451dc0be4dbd28ad863ff2ab3c191541b41d606860f4dab96d85"
+    },
+    {
+      "file": "BOOST_T1_21_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "c8a34f37c1abe29328ec38af459d91d2b8468e0acde161af3579f56bf64c672b"
+    },
+    {
+      "file": "BOOST_T1_22_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "2b5706ba41b5d1402fada475385e2c177be502893e57b2e01bb68bd3bdd3a234"
+    },
+    {
+      "file": "BOOST_T1_23_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "00e07a4a894a3c9063451e48d1eb24019f2f577441d0c52716cc3c212fc35c02"
+    },
+    {
+      "file": "BOOST_T1_BEST_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "4e3f542822a8860f4394aba982822cc03ca61dcac2646931bae4fcdd85d6d717"
+    },
+    {
+      "file": "BOOST_T1_GLOBAL_OOF_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "19b91f927d8872020ddf0deea7afd85479e5a00bf5a1aaf1185cc04213fb472f"
+    },
+    {
+      "file": "BOOST_T1_T1a_OOF_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "d0d72ce96e413a453715ff57f61885c52ab731f1cca750c68499e52c1d81f836"
+    },
+    {
+      "file": "BOOST_T1_T1b_OOF_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "d0d72ce96e413a453715ff57f61885c52ab731f1cca750c68499e52c1d81f836"
+    },
+    {
+      "file": "BOOST_T1_T1c_OOF_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "19b91f927d8872020ddf0deea7afd85479e5a00bf5a1aaf1185cc04213fb472f"
+    },
+    {
+      "file": "BOOST_T1_T1d_OOF_validation.csv",
+      "rows": 768,
+      "dense_identical_rows": 576,
+      "sha256": "d0d72ce96e413a453715ff57f61885c52ab731f1cca750c68499e52c1d81f836"
+    }
+  ],
+  "audit_or_all_evaluations": 0
+}

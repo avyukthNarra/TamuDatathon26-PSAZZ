@@ -1,0 +1,39 @@
+{
+ "id": "Q3",
+ "owner": "sai-worker",
+ "description": "BEST win prob composed/gated with Q1 log-odds filter win prob, OOF fit",
+ "params": {
+  "src": "pooled",
+  "cfg": "blend2",
+  "x": [
+   -0.14562934788044657
+  ],
+  "settings_tried": 15
+ },
+ "scope": "dev",
+ "points": 54.954046429338035,
+ "ci95": [
+  53.93348791380918,
+  55.83521358861891
+ ],
+ "condition_ratios": {
+  "stable": 0.06773353864239888,
+  "short_history": 0.1442791830361895,
+  "drift": 0.0670872767847713,
+  "shared_change": 0.08818531707024627
+ },
+ "R": 0.09182132888340147,
+ "class_error_shares": {
+  "p_0": 0.5177954234358146,
+  "p_1": 0.23768481394384153,
+  "p_2": 0.17674959123748446,
+  "p_5": 0.06193979456841688,
+  "p_20": 0.005830376814442574
+ },
+ "runtime_seconds": 3.7165040969848633,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72
+}

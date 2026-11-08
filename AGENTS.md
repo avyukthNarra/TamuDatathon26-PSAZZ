@@ -426,7 +426,17 @@ A task is done only when **all** are true:
 ## 12. Learnings & gotchas (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): what happened → what to do instead -->
 - YYYY-MM-DD (@handle): _example: the shared cluster restarts at 02:00; save work before then._
+- 2026-11-07 (@Saibot913): House Edge win model: lag 7 + pairs (1,3),(2,5),(4,7) at ridge lambda 0.05 beats the starter-style lambda 20 by ~5 points (B3 over-shrank), payout size depends on lags 1,2,4 instead; harness and all verdicts live in docs/sai (RESULTS.md, FINAL.md). Round two: rerun the lag and severity screens first.
+- 2026-11-07 (@Saibot913): Mixer v4 (`39e5757`) fits both payout-size modes and a Beta-mixture win prior from all validation targets; nested blend CV cannot remove that inherited leakage. Frozen combination search, noise-band ties and audit guard are documented in `docs/sai/COMBOS_TOP10.md`.
+- 2026-11-07 (@Saibot913): Mixer v4 is saturated: ~70 add-ons (blends, priors, gap handling, signal, peer forgetting) all within noise; in docs/sai/FINAL.md (UPDATE 5). Perfect win probability would be worth +3.0 dev vs +1.4 for perfect sizes, and true win chances are continuous, so work on the win function, not blending.
 - 2026-11-07 (@Codex): generated `counts_per_condition` metadata maps split names to integer counts; keep synthetic test truth under `_truth` and remove it before mounting data for an entry.
+- 2026-11-08 (@bayes): Fractionally weighted recent-state Laplace pseudo-evidence has a different effective sample size from static evidence; do not compare its raw values as calibrated marginal likelihood without explicit normalization.
+- 2026-11-08 (@short): One next-spin label per short-history machine cannot choose the win filter; score every observed tick. Dropping ticks with a missing lag partner also makes its joint evidence incomparable with a filter that sums over those partners.
+
+- 2026-11-08 (@Codex): the independent sysid experiment strongly rejects forcing size-rule directions to reverse with win rules on the main kit. Relearn this assumption for adaptation; `mainFiles/sysid_pipeline.py` learns lag identities and coefficients from train, and `mainFiles/inspect_sysid.py` reproduces the likelihood check.
+
+- 2026-11-08 (@Saibot913): Fresh self-supervised HGB scored 52.60 with causal per-machine conditional summaries versus 34.47 without (same 15-leaf capacity); enumerate all lags/pairs and expose local evidence rather than assuming effect signs are shared. Reproduction and leakage tests: `mainFiles/fresh_ml/README.md`.
+- 2026-11-08 (@Saibot913): cutoff P(win) is a logit-normal draw around a type×cell×signal mean (sd about 0.5–0.7). On drift and shared-change the swap is finished at least 34 ticks before the cutoff, so the query uses the swapped cell.
 
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->

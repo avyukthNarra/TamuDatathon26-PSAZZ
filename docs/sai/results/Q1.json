@@ -1,0 +1,44 @@
+{
+ "id": "Q1",
+ "owner": "sai-worker",
+ "description": "per-machine logit random-walk grid filter win prob; shares from TM_COMBINED3",
+ "params": {
+  "variant": "machine",
+  "pooled_sigma": 0.12,
+  "sigma_grid": [
+   0.0,
+   0.03,
+   0.06,
+   0.12,
+   0.25,
+   0.5
+  ],
+  "prior_mu": -0.33670743735141945
+ },
+ "scope": "dev",
+ "points": 31.513305338641327,
+ "ci95": [
+  31.019256378112654,
+  32.008600992530994
+ ],
+ "condition_ratios": {
+  "stable": 0.9232865245865813,
+  "short_history": 0.9315022746137919,
+  "drift": 0.9430935267322765,
+  "shared_change": 0.8179484293932346
+ },
+ "R": 0.9039576888314711,
+ "class_error_shares": {
+  "p_0": 0.6867917204473136,
+  "p_1": 0.17393314939216037,
+  "p_2": 0.10502113988462229,
+  "p_5": 0.031656429606123304,
+  "p_20": 0.0025975606697805865
+ },
+ "runtime_seconds": 7.799712896347046,
+ "seed": 0,
+ "stdlib_only": false,
+ "determinism_max_diff": null,
+ "python": "3.13.3",
+ "n_episodes": 72
+}
