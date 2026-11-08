@@ -9,6 +9,19 @@ Experiments stop 11:35 CST; the form closes 12:00. Safe upload is the default `a
   This is likely mostly short-history machines (not yet split by condition). Short history is the worst condition: loss ratio 0.049 vs about 0.031 elsewhere.
 - Your headroom check: true P(win) gives 39.63 vs 38.59, so this is where the points are.
 
+## Newer findings (11:07)
+- Member-alone points by condition (40-point scale): every member is weakest on short history, by about the same amount, so
+  re-weighting members cannot fix it; the short-history win model itself must improve.
+
+  | member | stable | short_history | drift | shared_change |
+  |---|---|---|---|---|
+  | v17-guards (`members/v13_short.py`) | 38.59 | 37.75 | 38.52 | 38.46 |
+  | exact filter | 38.62 | 37.88 | 38.08 | 38.66 |
+  | sysid | 38.88 | 37.86 | 38.61 | 38.83 |
+- Tried and failed (no gain): per-condition blend weights + temperature (38.50, half A -0.22); short-history-only weights chosen on one
+  half (+0.02); mixing exact-filter sizes (worse on both halves). Perfect P(win) = +1.04, perfect sizes = +0.34.
+- `members/v13_short.py` is v17-round2-guards (v17 + v7c at win weight 0.3) plus short/jackpot patches, not plain v13.
+
 ## Already being tried (Sai's Codex workers, do not duplicate)
 - `sai/r2-shortwin`: self-supervised recalibration of short-history P(win) on train histories masked to look short.
 - `sai/r2-blendw`: train-learned prior weights over the three pairs (per machine type) in the exact filter.
