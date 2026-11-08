@@ -9,6 +9,10 @@ blend without it is better on BOTH validation halves (the kit's episode_folds) a
 least --margin points overall; otherwise every member stays. The size member (hooks.SIZE_MEMBER)
 is never dropped, and at least two members are always kept.
 
+Also copies the kit's validation/targets.csv to <entry>/bundled/validation_targets.csv, which
+predict.py (adapted_entry_v17g_rules) reads when /data has no validation answers, so the forecast
+is byte-identical with or without them (checked offline, --network none, read-only, 2 CPUs).
+
 Writes <entry>/gate.json ({"win_members": [...], ...}); predict.py reads it, so the decision is
 made once at build time and the graded rerun (with or without validation targets) uses it.
 Without gate.json the entry runs every member, exactly as before.
@@ -20,6 +24,7 @@ main 55.04 -> 58.00, sim "four" 35.63 -> 36.92 (exact) and 35.70 -> 37.07 (sysid
 import argparse
 import json
 import math
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -117,6 +122,10 @@ def main():
             "all_members_points": round(base[0], 6), "chosen_points": round(best[0], 6),
             "kit_round": round_metadata(kit)["round"]}
     (entry / "gate.json").write_text(json.dumps(gate, indent=2) + "\n")
+    # bundle this round's validation answers (public kit data) so predict.py gives the same
+    # forecast when the rerun mounts /data without them (members use them as priors)
+    (entry / "bundled").mkdir(exist_ok=True)
+    shutil.copyfile(kit / "validation" / "targets.csv", entry / "bundled" / "validation_targets.csv")
     print(f"gate: keep {choice} ({best[0]:.3f} vs all {base[0]:.3f}); wrote {entry / 'gate.json'}")
 
 
