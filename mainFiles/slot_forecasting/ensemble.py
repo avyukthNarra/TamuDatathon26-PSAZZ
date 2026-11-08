@@ -54,6 +54,7 @@ def build_ensemble(queries, history, labels, size_modes, win_prior, log=print, v
     """Fit the pair mixer on train (as adapt() does, without its own HMM blend) and add the other
     members, which need only the lag pairs it found and the win prior.
 
+    variant "strongest": v12 = v11 with payout sizes from the size-rule HMM (strongest.py).
     variant "plateau": v11, the log-odds average of v10, a 0.6 / 0.4 version and per-lag peers.
     variant "peers" (default): the "logodds" model plus the peer correction (peers.py).
     variant "logodds": 0.7 mixer + 0.3 hidden-rule HMM, pooled in log-odds.
@@ -69,9 +70,13 @@ def build_ensemble(queries, history, labels, size_modes, win_prior, log=print, v
         log("ensemble: 1/3 pair mixer + 1/3 hidden-rule HMM + 1/3 change-point regime model (win chance)")
         return Ensemble(mixer, [hmm, RegimeModel(mixer.pairs, win_prior, temper=0.5)], (1 / 3, 1 / 3, 1 / 3))
     log("ensemble: 0.7 pair mixer + 0.3 hidden-rule HMM, pooled in log-odds (win chance)")
-    if variant == "plateau":
+    if variant in ("plateau", "strongest"):
         from .plateau import build_plateau
-        return build_plateau(mixer, hmm, queries, history, log)
+        model = build_plateau(mixer, hmm, queries, history, log)
+        if variant == "strongest":
+            from .strongest import with_size_rules
+            model = with_size_rules(model, queries, history, size_modes, log)
+        return model
     model = Ensemble(mixer, [hmm], (0.7, 0.3), pool="logodds")
     if variant == "logodds":
         return model
