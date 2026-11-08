@@ -431,6 +431,8 @@ A task is done only when **all** are true:
 - 2026-11-07 (@Saibot913): Mixer v4 is saturated: ~70 add-ons (blends, priors, gap handling, signal, peer forgetting) all within noise; in docs/sai/FINAL.md (UPDATE 5). Perfect win probability would be worth +3.0 dev vs +1.4 for perfect sizes, and true win chances are continuous, so work on the win function, not blending.
 - 2026-11-07 (@Codex): generated `counts_per_condition` metadata maps split names to integer counts; keep synthetic test truth under `_truth` and remove it before mounting data for an entry.
 
+- 2026-11-08 (@Codex): the independent sysid experiment strongly rejects forcing size-rule directions to reverse with win rules on the main kit. Relearn this assumption for adaptation; `mainFiles/sysid_pipeline.py` learns lag identities and coefficients from train, and `mainFiles/inspect_sysid.py` reproduces the likelihood check.
+
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->
 - YYYY-MM-DD (@handle): _example: squash-merge only, so `main` history maps 1:1 to changelog lines._

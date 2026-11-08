@@ -20,6 +20,7 @@ How to add an entry (every PR):
 
 ### Added
 - Shared experiment harness, master test plan, and results leaderboard under docs/sai (reproduces pooled 30.00 and pair prototype 46.07)
+- Independent system-identification forecaster with train-only fitting, cross-fitted validation, and reproducible simulator diagnostics
 - Method-agnostic evaluation suite (`python -m eval_suite run --entry DIR`) that checks any entry against all 88 documented requirements and scores it with the official metric (#19)
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 
