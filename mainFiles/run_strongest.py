@@ -31,8 +31,10 @@ MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py", "rule_hmm.py", 
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", default=str(HERE / "public"))
-parser.add_argument("--out", default="runs/strongest-v13")
+parser.add_argument("--out", default="runs/strongest-v14")
 parser.add_argument("--cv-val", action="store_true", help="also score validation halves with opposite-half priors")
+parser.add_argument("--win-weight", type=float, default=0.4, help="share of v7c's win chance (v13: 0.5)")
+parser.add_argument("--extra-peer", type=float, default=0.5, help="extra peer term on the blend (v13: 0)")
 parser.add_argument("--variant", default="strongest", choices=("strongest",),
                     help="ensemble variant (slot_forecasting/ensemble.py); saved into the entry")
 args = parser.parse_args()
@@ -49,10 +51,14 @@ size_modes = size_modes_from_targets(val_targets, val_queries)
 win_prior = win_prior_by_type_from_targets(val_targets, val_queries)
 model = build_ensemble(train_queries, train_history, train_labels, size_modes, win_prior, variant=args.variant)
 v7c = V7C(public, targets_available=True)
+from slot_forecasting.peers import train_center
+center = train_center(train_queries, train_history)
+print(f"blend: win weight on v7c {args.win_weight}, extra peer {args.extra_peer} (centre {center:.4f})")
 files = {"validation": out / "validation_predictions.csv", "test": out / "submission.csv"}
 for split, path in files.items():
     queries, history = load_inputs(public / split)
-    write_submission(path, combine(model.predict(queries, history), v7c.predict_ids(public, split, None)))
+    write_submission(path, combine(model.predict(queries, history), v7c.predict_ids(public, split, None),
+                                   args.win_weight, args.extra_peer, queries, history, center))
 
 # --- validation: official contest score + win-chance vs payout-size error split ---
 event = {"max_points": round_metadata(public)["max_points"], "version": VERSION}
@@ -97,7 +103,8 @@ if args.cv_val:
         fold_history = tuple(p for p in val_history if (p.episode_id, p.machine_id) in fold_keys)
         fold_v7c = V7C(public, targets_available=True, prior_episodes=prior_episode_ids, log=lambda *_: None)
         crossfit.update(combine(fold_model.predict(fold_queries, fold_history),
-                                fold_v7c.predict_ids(public, "validation", {q.query_id for q in fold_queries})))
+                                fold_v7c.predict_ids(public, "validation", {q.query_id for q in fold_queries}),
+                                args.win_weight, args.extra_peer, fold_queries, fold_history, center))
     write_submission(out / "crossfit_validation_predictions.csv", crossfit)
     halves = [subset_score(crossfit, val_targets, val_groups,
                            read_submission(val / "reference.csv"), episodes,
@@ -117,6 +124,8 @@ for name in MODULES:
 for name in ("predict.py", "reproduce.json"):
     shutil.copyfile(HERE / "entry_template_strongest" / name, entry / name)
 shutil.copytree(HERE / "v7c_forecasting", entry / "v7c_forecasting", ignore=shutil.ignore_patterns("__pycache__"))
+(entry / "combo.json").write_text(json.dumps({"win_weight": args.win_weight, "extra_peer": args.extra_peer,
+                                           "center": center}), encoding="utf-8")
 (entry / "v7c_priors.json").write_text(json.dumps({"size_modes": v7c.size_modes, "win_prior": v7c.win_prior}),
                                       encoding="utf-8")  # v7c's fallback if /data lacks validation targets
 (entry / "variant.json").write_text(json.dumps({"variant": args.variant}), encoding="utf-8")
@@ -157,7 +166,7 @@ python predict.py --data /data --out /output/submission.csv
   log-odds average of lag-pair expert mixtures and a hidden-rule HMM, corrected for how the
   episode's other machines just did, with payout sizes from a size-rule HMM. Avyukth's v7c
   (vendored in `v7c_forecasting/`): its own lag-pair mixer with an episode flip swap and a
-  train-learned payout-size rule. Final win chance = 50/50 log-odds blend of the two; payout
+  train-learned payout-size rule. Final win chance = log-odds blend of the two (settings in combo.json) plus an extra peer term; payout
   sizes given a win = v7c's. Only ticks before each cutoff are read.
 - Model files: `priors.json` and `v7c_priors.json` (fallback copies of the validation-derived priors).
 - Seeds/settings: deterministic, no randomness; settings are the defaults in

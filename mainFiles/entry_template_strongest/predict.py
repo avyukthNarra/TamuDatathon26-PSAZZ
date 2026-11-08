@@ -50,5 +50,7 @@ here = Path(__file__).resolve().parent
 v7c = V7C(data, targets_available=targets_path.exists(),
           saved_priors=json.loads((here / "v7c_priors.json").read_text(encoding="utf-8")))
 queries, history = load_inputs(data / args.split)
-write_submission(args.out, combine(model.predict(queries, history), v7c.predict_ids(data, args.split, None)))
+cfg = json.loads((here / "combo.json").read_text(encoding="utf-8"))
+write_submission(args.out, combine(model.predict(queries, history), v7c.predict_ids(data, args.split, None),
+                                   cfg["win_weight"], cfg["extra_peer"], queries, history, cfg["center"]))
 print(f"wrote {args.out}")
