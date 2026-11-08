@@ -71,6 +71,7 @@ rule changes well, which is why drift is the best condition.
 
 **What could still improve it (not yet tried or not yet passing):**
 1. DONE (56.19 -> 56.29): a middle level per type at the type's own median.
+   Round 7 tried jackpot and live/short-history size fixes: none passed (see that section).
 2. Size-mode lags per machine TYPE (the lags that switch the mode may differ by type).
 3. A per-type prior that also depends on the signal column (tried once on a weaker model:
    no gain; worth a re-test with the window score).
@@ -216,6 +217,36 @@ score as the check. Upload runs/combined-v6/submission.csv and runs/combined-v6/
 
 The shortcut, if the branch `COMBINED_SOLUTIONS` is available, is to check it out and
 run the VERIFY commands (current reference: 56.29). The prompt above is for rebuilding without it.
+
+## Round 7 attempt: jackpot win error and live / short_history size error (no change, 56.29)
+
+**Diagnosis (jackpot calibration, validation):** jackpot's non-dead machines are not a "live"
+cluster: their true win chances spread evenly from ~0.3 to ~0.9, and our forecasts squash them
+toward ~0.6 (true 0.37 -> predicted 0.50, true 0.45 -> 0.61, true 0.84 -> 0.65). Dead jackpot
+machines (n=156) are near perfect (0.014 vs 0.019).
+
+Every fix tried (cross-fit validation, halves; base 56.26 (56.13 / 56.43) in this harness):
+
+| Idea | Cross-fit (halves) | Verdict |
+|---|---|---|
+| Size: one 2-cell expert "was ANY discovered lag (1, 2, 4) a 5x+ win" | 56.17 (56.02 / 56.37) | worse |
+| ...plus the same for lags (1, 2) | 56.14 | worse |
+| size_eta 2 | 56.28 (56.17 / 56.42) | audit half down; noise-level |
+| size half-life 120 | 56.28 (56.12 / 56.47) | tuning half down; noise-level |
+| Size-mode sharpness (mode_temp) 0.8 / 1.15 | 56.26 / 56.26 | no change |
+| Win learning rate (eta) per type, jackpot 4 / 10, steady 4 | 56.26-56.27 | no change |
+| Jackpot prior strength 5 / 20 | 56.21 / 56.24 | worse on one half each |
+| Per-type prior at the type's own deciles of true win chance (K 5-20, strength 10-160) | best 56.23 (55.96 / 56.56) | audit +0.13 but tuning -0.17: fits one half's machines |
+
+None improved both halves, so none went to the train check, and their code was removed. The
+remaining jackpot error looks like it needs per-MACHINE information (which level a middle
+jackpot machine sits at), not a better type-level prior. The size error on live /
+short_history machines did not respond to any size-expert change: likely close to what ~15
+wins in 40 spins can tell you.
+
+Prompt used: "Fix the jackpot win error and the size error on live machines and in
+short_history. Diagnose first (calibration by type and true win level), then screen fixes on
+cross-fit validation and keep only what raises both halves and passes the train check."
 
 ## What changed on `COMBINED_SOLUTIONS`, round 6 (56.19 -> 56.29, middle machines)
 
