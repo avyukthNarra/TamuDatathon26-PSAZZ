@@ -27,3 +27,19 @@ Per Sai's suggestion, member 1 is swapped from v13 to Zhill's v17-round2-guards 
 - 10-kit adapt_bench mean 38.388, against 38.371 (+0.017); no kit drops by more than 0.02.
 - Main weak spot for both: K10 (30% of machines on 3-lag XOR or AND rules), ~32/40 against 38.8–39.4 on the other kits.
 Recommended version: adapted_entry_v17g/.
+
+## Update: gated v7c member for mixed-rule rounds (adapted_entry_v17g_gate/)
+A train-only structure statistic (how much of the machines' win signal a single lag pair fails to explain) sets the weight of v7c's win chance as a 4th log-odds member.
+- The weight is 0 on main, K1, K7 and K9; under 0.02 on K2–K6 and K8; 0.97 on K10.
+- K10 (30% AND / 3-lag machines): 32.08 → 32.76. No other kit falls. adapt_bench mean 38.388 → 38.457.
+- On main the forecasts equal adapted_entry_v17g/ (57.971).
+Recommended version: adapted_entry_v17g_gate/.
+
+## Update: exact filter learns 3-lag XOR and AND/OR rules (adapted_entry_v17g_rules/), RECOMMENDED
+The exact Bayesian filter's per-machine hypotheses now include 3-lag XOR and 2-lag AND/OR rules alongside pair parity. The prior mass of each rule family comes from the round's train census, so with no such machines the behaviour is unchanged.
+- Main 57.971 (halves 57.98 / 57.96), identical to adapted_entry_v17g.
+- adapt_bench K1–K9 unchanged (|Δ| ≤ 0.001).
+- K10 (30% AND / 3-lag machines): 32.08 → 35.38 (+3.30); the exact member alone 31.10 → 37.23.
+- Main runtime 179 s (was 145 s).
+This supersedes adapted_entry_v17g_gate/ (the gated v7c member, K10 +0.68; also, its predict.py never produced the v7c member file).
+Recommended version: adapted_entry_v17g_rules/.

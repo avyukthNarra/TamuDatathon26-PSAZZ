@@ -1,0 +1,878 @@
+"""Jackpot-only win probability patched onto v13.
+
+Pair support is whatever set_support() was given (the train vote shared with
+the short-history patch). The active four-cell rate of the MAP pair is shrunk
+toward that pattern's parity pool. Strength is chosen by train-label Brier
+on stable and short jackpots. Short-history queries are left for the other patch.
+"""
+from __future__ import annotations
+
+import csv
+from pathlib import Path
+
+import numpy as np
+from numpy.polynomial.hermite import hermgauss
+
+PAIRS = tuple((a, b) for a in range(1, 8) for b in range(a + 1, 9))
+PAIR_INDEX = {pair: i for i, pair in enumerate(PAIRS)}
+MENU = ("map", "atom4", "atom8", "atom16")
+
+
+def set_support(pairs):
+    global PAIRS, PAIR_INDEX
+    PAIRS = tuple((int(a), int(b)) for a, b in pairs)
+    PAIR_INDEX = {pair: i for i, pair in enumerate(PAIRS)}
+    print("jackpot pair support", PAIRS, flush=True)
+
+
+def sigmoid(x):
+    return 1.0 / (1.0 + np.exp(-np.clip(x, -20.0, 20.0)))
+
+
+def logsumexp(values):
+    values = np.asarray(values, dtype=float)
+    finite = values[np.isfinite(values)]
+    if finite.size == 0:
+        return -np.inf
+    top = finite.max()
+    return float(top + np.log(np.exp(values - top).sum()))
+
+
+def quadrature(n=7):
+    """Nodes and weights for a pair of independent standard normals."""
+    x, w = hermgauss(n)
+    z = np.sqrt(2.0) * x
+    wt = w / np.sqrt(np.pi)
+    z1, z2 = np.meshgrid(z, z, indexing="ij")
+    weight = np.outer(wt, wt).ravel()
+    weight = weight / weight.sum()
+    return z1.ravel(), z2.ravel(), weight
+
+
+def load_split(split):
+    folder = PUB / split
+    queries = list(csv.DictReader(open(folder / "queries.csv")))
+    for query in queries:
+        query["signal"] = int(query["signal"])
+        query["cutoff"] = int(query["cutoff"])
+    history = {}
+    with open(folder / "history.csv") as handle:
+        for row in csv.DictReader(handle):
+            key = (row["episode_id"], row["machine_id"])
+            history.setdefault(key, {})[int(row["tick"])] = int(row["payout"])
+    out = {"Q": queries, "H": history}
+    cond_path = folder / "conditions.csv"
+    if cond_path.exists():
+        out["cond"] = {
+            row["query_id"]: row["condition"]
+            for row in csv.DictReader(open(cond_path))
+        }
+    return out
+
+
+def series_from_history(payouts, cutoff):
+    obs = np.zeros(cutoff, dtype=bool)
+    win = np.zeros(cutoff, dtype=bool)
+    for tick, payout in payouts.items():
+        if 0 <= tick < cutoff:
+            obs[tick] = True
+            win[tick] = payout > 0
+    return obs, win
+
+
+def cell_counts(obs, win, cutoff, a, b, t0, t1):
+    """Wins and visits in the agree cell and the differ cell on ticks [t0, t1)."""
+    if t1 <= b:
+        return (0, 0, 0, 0)
+    idx = np.arange(max(b, t0), min(cutoff, t1))
+    if idx.size == 0:
+        return (0, 0, 0, 0)
+    valid = obs[idx] & obs[idx - a] & obs[idx - b]
+    if not valid.any():
+        return (0, 0, 0, 0)
+    agree = win[idx - a] == win[idx - b]
+    y = win[idx]
+    use_agree = valid & agree
+    use_differ = valid & ~agree
+    return (
+        int(y[use_agree].sum()),
+        int(use_agree.sum()),
+        int(y[use_differ].sum()),
+        int(use_differ.sum()),
+    )
+
+
+def binomial_gain(k0, n0, k1, n1):
+    def ll(k, n):
+        if n <= 0:
+            return 0.0
+        p = min(1.0 - 1e-6, max(1e-6, k / n))
+        return k * np.log(p) + (n - k) * np.log(1.0 - p)
+
+    return ll(k0, n0) + ll(k1, n1) - ll(k0 + k1, n0 + n1)
+
+
+def best_pair(obs, win, cutoff, t0, t1, min_n=10, pairs=None):
+    """Pair with the largest two-cell binomial gain. None if both cells are thin."""
+    if pairs is None:
+        pairs = PAIRS
+    best, best_gain, best_counts = None, 0.0, None
+    for pair in pairs:
+        counts = cell_counts(obs, win, cutoff, pair[0], pair[1], t0, t1)
+        k0, n0, k1, n1 = counts
+        if n0 < min_n or n1 < min_n:
+            continue
+        gain = binomial_gain(k0, n0, k1, n1)
+        if gain > best_gain:
+            best, best_gain, best_counts = pair, gain, counts
+    return best, best_gain, best_counts
+
+
+def fit_pair_prior(train):
+    """How often each of the 28 pairs wins the two-cell score on stable machines."""
+    cond = train["cond"]
+    counts = np.zeros(len(PAIRS))
+    n_scored = 0
+    agree_live = 0
+    for query in train["Q"]:
+        if cond[query["query_id"]] != "stable":
+            continue
+        obs, win = series_from_history(
+            train["H"][(query["episode_id"], query["machine_id"])], query["cutoff"]
+        )
+        pair, gain, counts_ = best_pair(obs, win, query["cutoff"], 0, query["cutoff"])
+        if pair is None:
+            continue
+        counts[PAIR_INDEX[pair]] += 1
+        n_scored += 1
+        k_agree, n_agree, k_differ, n_differ = counts_
+        if n_agree and n_differ and (k_agree / n_agree) >= (k_differ / n_differ):
+            agree_live += 1
+    smoothed = (counts + 0.5) / (counts.sum() + 0.5 * len(PAIRS))
+    return {
+        "counts": counts,
+        "n_scored": n_scored,
+        "smoothed": smoothed,
+        "flat": np.full(len(PAIRS), 1.0 / len(PAIRS)),
+        "p_agree_live": (agree_live / n_scored) if n_scored else 0.5,
+    }
+
+
+def fit_jackpot_levels(train):
+    """Logit-normal levels on jackpot machines, using a window that is still unswapped.
+
+    Stable uses the whole history. Drift uses ticks more than 110 before the
+    cutoff (before a ramp that ends ~30 ticks out). Shared change uses the
+    first 45% (before the typical flip). The live cell is the one with the
+    higher rate; that orientation is per machine and is not a coefficient.
+    """
+    cond = train["cond"]
+    rows = []
+    for query in train["Q"]:
+        if query["machine_type"] != "jackpot":
+            continue
+        kind = cond[query["query_id"]]
+        cutoff = query["cutoff"]
+        if kind == "stable":
+            t0, t1 = 0, cutoff
+        elif kind == "drift":
+            t0, t1 = 0, cutoff - 110
+        elif kind == "shared_change":
+            t0, t1 = 0, int(0.45 * cutoff)
+        else:
+            # Short histories hide ticks; the kernel matches stable, but the
+            # sample is too thin for a level prior. Skip.
+            continue
+        obs, win = series_from_history(
+            train["H"][(query["episode_id"], query["machine_id"])], cutoff
+        )
+        pair, gain, counts = best_pair(obs, win, cutoff, t0, t1, min_n=8)
+        if pair is None:
+            continue
+        k0, n0, k1, n1 = counts
+        r0, r1 = k0 / n0, k1 / n1
+        if r0 >= r1:
+            live, dead, n_live, n_dead = r0, r1, n0, n1
+        else:
+            live, dead, n_live, n_dead = r1, r0, n1, n0
+        rows.append((query["signal"], live, dead, n_live, n_dead))
+
+    if len(rows) < 8:
+        print(f"jackpot levels: only {len(rows)} machines, using a wide prior", flush=True)
+        return {
+            "a": -4.0, "b": 0.3, "c": 4.0, "sigma": 0.7, "rho": 0.0,
+            "n_machines": len(rows), "var_dead": 0.5, "var_live": 0.5,
+            "by_signal": {},
+        }
+
+    # Two rows per machine: dead (live indicator 0) and live (1).
+    signal, y, weight, live_flag, resid_pair = [], [], [], [], []
+    for sig, live, dead, n_live, n_dead in rows:
+        for rate, n, flag in ((dead, n_dead, 0.0), (live, n_live, 1.0)):
+            p = min(1.0 - 0.5 / n, max(0.5 / n, rate))
+            signal.append(sig)
+            y.append(np.log(p / (1.0 - p)))
+            weight.append(n * p * (1.0 - p))
+            live_flag.append(flag)
+        resid_pair.append((sig, live, dead, n_live, n_dead))
+
+    signal = np.asarray(signal, float)
+    y = np.asarray(y, float)
+    weight = np.asarray(weight, float)
+    live_flag = np.asarray(live_flag, float)
+    design = np.column_stack([np.ones(len(y)), signal, live_flag])
+    w_design = design * np.sqrt(weight)[:, None]
+    beta, *_ = np.linalg.lstsq(w_design, y * np.sqrt(weight), rcond=None)
+    fitted = design @ beta
+    # Machine-level residuals after removing a + b*signal + c*live, so the
+    # correlation is the shared shock, not the binomial noise of one cell.
+    machine_resid = []
+    sampling_var = []
+    for sig, live, dead, n_live, n_dead in resid_pair:
+        def _logit_resid(rate, n, flag, sig=sig):
+            p = min(1.0 - 0.5 / n, max(0.5 / n, rate))
+            logit = np.log(p / (1.0 - p))
+            center = beta[0] + beta[1] * sig + beta[2] * flag
+            var = 1.0 / max(n * p * (1.0 - p), 1e-6)
+            return logit - center, var
+
+        e_dead, v_dead = _logit_resid(dead, n_dead, 0.0)
+        e_live, v_live = _logit_resid(live, n_live, 1.0)
+        machine_resid.append((e_dead, e_live))
+        sampling_var.append((v_dead, v_live))
+    machine_resid = np.asarray(machine_resid)
+    sampling_var = np.asarray(sampling_var)
+    # Subtract average binomial logit-variance. Floor so a small sample cannot
+    # collapse the prior to a point mass.
+    var_dead = max(0.05, float(machine_resid[:, 0].var()) - float(sampling_var[:, 0].mean()))
+    var_live = max(0.05, float(machine_resid[:, 1].var()) - float(sampling_var[:, 1].mean()))
+    sigma = float(np.sqrt(0.5 * (var_dead + var_live)))
+    if machine_resid.shape[0] >= 5:
+        rho = float(np.corrcoef(machine_resid[:, 0], machine_resid[:, 1])[0, 1])
+    else:
+        rho = 0.0
+    if not np.isfinite(rho):
+        rho = 0.0
+    rho = float(np.clip(rho, -0.85, 0.85))
+    return {
+        "a": float(beta[0]),
+        "b": float(beta[1]),
+        "c": float(beta[2]),
+        "sigma": sigma,
+        "rho": rho,
+        "n_machines": len(rows),
+        "var_dead": var_dead,
+        "var_live": var_live,
+        "by_signal": _level_table(rows),
+    }
+
+
+def _level_table(rows):
+    table = {}
+    for sig in (-1, 0, 1):
+        live = [r[1] for r in rows if r[0] == sig]
+        dead = [r[2] for r in rows if r[0] == sig]
+        table[str(sig)] = {
+            "n": len(live),
+            "live_mean": float(np.mean(live)) if live else None,
+            "dead_mean": float(np.mean(dead)) if dead else None,
+        }
+    return table
+
+
+def _plugin_orientation(obs, win, cutoff, t0, t1, min_n=12, min_gap=0.2):
+    """Early-window pair, whether agree is the live cell, and the two rates."""
+    best = None
+    for pair in PAIRS:
+        k0, n0, k1, n1 = cell_counts(obs, win, cutoff, pair[0], pair[1], t0, t1)
+        if n0 < min_n or n1 < min_n:
+            continue
+        gap = abs(k0 / n0 - k1 / n1)
+        if best is None or gap > best[0]:
+            best = (gap, pair, k0, n0, k1, n1)
+    if best is None or best[0] < min_gap:
+        return None
+    _, pair, k0, n0, k1, n1 = best
+    r0, r1 = k0 / n0, k1 / n1
+    agree_is_live = r0 >= r1
+    live, dead = (r0, r1) if agree_is_live else (r1, r0)
+    live = min(1.0 - 1e-3, max(1e-3, live))
+    dead = min(live - 1e-3, max(1e-3, dead))
+    return pair, agree_is_live, live, dead
+
+
+def _flip_ll_curve(obs, win, cutoff, pair, agree_is_live, live, dead):
+    """Profile log-likelihood of a single flip at c, levels fixed at the early rates."""
+    a, b = pair
+    idx = np.arange(b, cutoff)
+    valid = obs[idx] & obs[idx - a] & obs[idx - b]
+    agree = win[idx - a] == win[idx - b]
+    early = agree if agree_is_live else ~agree
+    y = win[idx]
+    # p_pre / p_post along idx
+    p_pre = np.where(early, live, dead)
+    p_post = np.where(early, dead, live)
+    def _tick_ll(p):
+        p = np.clip(p, 1e-6, 1.0 - 1e-6)
+        return np.where(valid, np.where(y, np.log(p), np.log(1.0 - p)), 0.0)
+
+    ll_pre = _tick_ll(p_pre)
+    ll_post = _tick_ll(p_post)
+    # Map back to absolute tick. idx[j] = b + j.
+    curve = np.full(cutoff + 1, 0.0)
+    csum_pre = np.cumsum(ll_pre)
+    csum_post = np.cumsum(ll_post)
+    total_post = csum_post[-1] if csum_post.size else 0.0
+    # c is the first flipped tick. Ticks in idx with tick < c use pre.
+    for j, tick in enumerate(idx):
+        # sum of ll_pre over idx ticks < tick, + ll_post over idx ticks >= tick
+        pre = csum_pre[j - 1] if j else 0.0
+        post_before = csum_post[j - 1] if j else 0.0
+        curve[tick] = pre + (total_post - post_before)
+    if idx.size:
+        curve[idx[-1] + 1:] = csum_pre[-1]
+        curve[:idx[0]] = total_post
+    return curve
+
+
+def fit_flip_prior(train):
+    """Mean and sd of the shared flip tick, from train shared_change episodes.
+
+    The search is flat on [0.35, 0.90] of the episode. Machines without a
+    clear early pair are left out, which drops most jackpots and keeps the
+    tick estimate on the machines whose two cells actually separate.
+    """
+    by_episode = {}
+    for query in train["Q"]:
+        if train["cond"][query["query_id"]] != "shared_change":
+            continue
+        by_episode.setdefault(query["episode_id"], []).append(query)
+    fracs = []
+    residuals_ready = []
+    details = []
+    for episode, queries in sorted(by_episode.items()):
+        cutoff = queries[0]["cutoff"]
+        total = np.zeros(cutoff + 1)
+        used = 0
+        lo, hi = int(0.35 * cutoff), int(0.90 * cutoff)
+        for query in queries:
+            obs, win = series_from_history(
+                train["H"][(episode, query["machine_id"])], cutoff
+            )
+            found = _plugin_orientation(obs, win, cutoff, 0, int(0.45 * cutoff))
+            if found is None:
+                continue
+            curve = _flip_ll_curve(obs, win, cutoff, *found)
+            total += curve
+            used += 1
+        if used == 0:
+            continue
+        window = np.full(cutoff + 1, -np.inf)
+        window[lo:hi + 1] = total[lo:hi + 1]
+        c_hat = int(np.argmax(window))
+        fracs.append(c_hat / cutoff)
+        details.append({"episode": episode, "c": c_hat, "cutoff": cutoff, "machines": used})
+    if len(details) == 0:
+        print("jackpot flip: no shared_change episodes, using frac 0.66", flush=True)
+        return {"frac": 0.66, "sd": 12.0, "n_episodes": 0, "fracs": [], "details": []}
+    fracs = np.asarray(fracs)
+    frac = float(fracs.mean())
+    # Residual tick sd around frac * cutoff, not the sd of the fraction.
+    resid = []
+    for row in details:
+        resid.append(row["c"] - frac * row["cutoff"])
+    sd = float(np.std(resid, ddof=1)) if len(resid) > 2 else 15.0
+    sd = float(np.clip(sd, 3.0, 40.0))
+    return {"frac": frac, "sd": sd, "n_episodes": len(details), "fracs": fracs.tolist(), "details": details}
+
+
+def fit_drift(train):
+    """Grid-search the linear swap u = clip((t - (cutoff - anchor)) / duration, 0, 1).
+
+    Early levels and the early-live cell come from ticks more than 110 before
+    the cutoff, and only from non-jackpot machines with a clear gap. Jackpot
+    dead rates are too close to zero to time a ramp.
+    """
+    anchors = np.arange(60, 141, 2)
+    durations = np.arange(24, 101, 2)
+    total = np.zeros((anchors.size, durations.size))
+    used = 0
+    for query in train["Q"]:
+        if train["cond"][query["query_id"]] != "drift":
+            continue
+        if query["machine_type"] == "jackpot":
+            continue
+        cutoff = query["cutoff"]
+        obs, win = series_from_history(
+            train["H"][(query["episode_id"], query["machine_id"])], cutoff
+        )
+        found = _plugin_orientation(obs, win, cutoff, 0, max(8, cutoff - 110), min_n=15, min_gap=0.25)
+        if found is None:
+            continue
+        pair, agree_is_live, live, dead = found
+        a, b = pair
+        idx = np.arange(b, cutoff)
+        valid = obs[idx] & obs[idx - a] & obs[idx - b]
+        if valid.sum() < 40:
+            continue
+        agree = win[idx - a] == win[idx - b]
+        early = agree if agree_is_live else ~agree
+        y = win[idx]
+        ticks = idx.astype(float)
+        # u[anchor, duration, tick]
+        u = np.clip(
+            (ticks[None, None, :] - (cutoff - anchors[:, None, None])) / durations[None, :, None],
+            0.0,
+            1.0,
+        )
+        p = np.where(
+            early[None, None, :],
+            (1.0 - u) * live + u * dead,
+            (1.0 - u) * dead + u * live,
+        )
+        p = np.clip(p, 1e-6, 1.0 - 1e-6)
+        ll = np.where(y, np.log(p), np.log(1.0 - p))
+        ll = np.where(valid, ll, 0.0).sum(axis=-1)
+        total += ll
+        used += 1
+    if used < 10:
+        print(f"jackpot drift: only {used} machines, using anchor 96 duration 62", flush=True)
+        return {
+            "anchor": 96, "duration": 62, "u_at_cutoff": float(min(1.0, 96 / 62)),
+            "n_machines": used, "ll": None, "grid_margin": None,
+        }
+    ia, id_ = np.unravel_index(int(total.argmax()), total.shape)
+    anchor = int(anchors[ia])
+    duration = int(durations[id_])
+    # Binned flip fraction under this fit, for the report. Orient each machine
+    # the same way and average (L - r) / (L - D) by ticks-before-cutoff.
+    return {
+        "anchor": anchor,
+        "duration": duration,
+        "u_at_cutoff": float(np.clip(anchor / duration, 0.0, 1.0)),
+        "n_machines": used,
+        "ll": float(total[ia, id_]),
+        "grid_margin": float(total[ia, id_] - np.partition(total.ravel(), -2)[-2]),
+    }
+
+
+def level_nodes(signal, params):
+    """Quadrature nodes for the two levels.
+
+    A truth-based spec (separate logit-normals for dead and live) takes over
+    when ``a_dead`` is set. Otherwise the train-history regression is used.
+    """
+    if "a_dead" in params:
+        p_dead = sigmoid(params["a_dead"] + params["b_dead"] * signal + params["sd_dead"] * params["z1"])
+        p_live = sigmoid(params["a_live"] + params["b_live"] * signal + params["sd_live"] * params["z2"])
+        return np.clip(p_dead, 1e-4, 1.0 - 1e-4), np.clip(p_live, 1e-4, 1.0 - 1e-4)
+    center = params["a"] + params["b"] * signal
+    e1 = params["sigma"] * params["z1"]
+    scale = np.sqrt(max(0.0, 1.0 - params["rho"] ** 2))
+    e2 = params["sigma"] * (params["rho"] * params["z1"] + scale * params["z2"])
+    p_dead = np.clip(sigmoid(center + e1), 1e-4, 1.0 - 1e-4)
+    p_live = np.clip(sigmoid(center + params["c"] + e2), 1e-4, 1.0 - 1e-4)
+    return p_dead, p_live
+
+
+def canonical_pair_prior():
+    """Uniform on the train-learned support. PAIRS is that support."""
+    if len(PAIRS) == 0:
+        raise RuntimeError("pair support is empty")
+    return np.full(len(PAIRS), 1.0 / len(PAIRS))
+
+
+def truth_level_spec(block):
+    """Fold-specific jackpot logit-normal from validation targets. Dead and live are separate."""
+    jackpot = block["jackpot"]
+    return {
+        "a_dead": jackpot["dead"]["a"],
+        "b_dead": jackpot["dead"]["b"],
+        "sd_dead": jackpot["dead"]["sd"],
+        "a_live": jackpot["live"]["a"],
+        "b_live": jackpot["live"]["b"],
+        "sd_live": jackpot["live"]["sd"],
+    }
+
+
+def _tick_loglik(p, win, valid):
+    p = np.clip(p, 1e-6, 1.0 - 1e-6)
+    return np.where(valid[:, None], np.where(win[:, None], np.log(p), np.log(1.0 - p)), 0.0)
+
+
+def hypothesis_table(obs, win, cutoff, p_dead, p_live, node_w, regime, anchor, duration, c_logprior, pair_mask=None):
+    """Integrated-level evidence and predictive P(win) for every pair and direction.
+
+    Direction 1 means the agree cell is live at the start of the episode.
+    """
+    log_node = np.log(np.clip(node_w, 1e-300, None))
+    ticks = np.arange(cutoff, dtype=float)
+    logevid = np.full((len(PAIRS), 2), -np.inf)
+    pred = np.zeros((len(PAIRS), 2))
+    lags_ok = np.zeros(len(PAIRS), dtype=bool)
+    agree_now = np.zeros(len(PAIRS), dtype=bool)
+    if pair_mask is None:
+        pair_mask = np.ones(len(PAIRS), dtype=bool)
+    for index, (a, b) in enumerate(PAIRS):
+        if not pair_mask[index]:
+            continue
+        valid = np.zeros(cutoff, dtype=bool)
+        agree = np.zeros(cutoff, dtype=bool)
+        if cutoff > b:
+            idx = np.arange(b, cutoff)
+            ok = obs[idx] & obs[idx - a] & obs[idx - b]
+            valid[idx] = ok
+            agree[idx] = win[idx - a] == win[idx - b]
+        lag_a = cutoff - a
+        lag_b = cutoff - b
+        if lag_a >= 0 and lag_b >= 0 and obs[lag_a] and obs[lag_b]:
+            lags_ok[index] = True
+            agree_now[index] = bool(win[lag_a] == win[lag_b])
+        for direction, early in ((1, agree), (0, ~agree)):
+            if regime == "drift":
+                u = np.clip((ticks - (cutoff - anchor)) / duration, 0.0, 1.0)
+                p = np.where(
+                    early[:, None],
+                    (1.0 - u)[:, None] * p_live + u[:, None] * p_dead,
+                    (1.0 - u)[:, None] * p_dead + u[:, None] * p_live,
+                )
+                ll = _tick_loglik(p, win, valid).sum(axis=0)
+                log_post = ll + log_node
+                logevid[index, direction] = logsumexp(log_post)
+                post = np.exp(log_post - log_post.max())
+                post /= post.sum()
+                u_now = float(np.clip(anchor / duration, 0.0, 1.0))
+                if not lags_ok[index]:
+                    p_g = 0.5 * (p_live + p_dead)
+                else:
+                    early_now = agree_now[index] if direction == 1 else not agree_now[index]
+                    if early_now:
+                        p_g = (1.0 - u_now) * p_live + u_now * p_dead
+                    else:
+                        p_g = (1.0 - u_now) * p_dead + u_now * p_live
+                pred[index, direction] = float(post @ p_g)
+            elif regime == "shared":
+                p_pre = np.where(early[:, None], p_live, p_dead)
+                p_post = np.where(early[:, None], p_dead, p_live)
+                ll_pre = _tick_loglik(p_pre, win, valid)
+                ll_post = _tick_loglik(p_post, win, valid)
+                # cs[c] = sum of per-tick contributions with tick < c
+                cs_pre = np.vstack([np.zeros((1, p_live.size)), np.cumsum(ll_pre, axis=0)])
+                cs_post = np.vstack([np.zeros((1, p_live.size)), np.cumsum(ll_post, axis=0)])
+                total_post = cs_post[-1]
+                ll_c = cs_pre + total_post - cs_post  # (cutoff+1, G); c from 0..cutoff
+                joint = ll_c + log_node[None, :] + c_logprior[:, None]
+                logevid[index, direction] = logsumexp(joint)
+                post_g = np.exp(joint - np.nanmax(joint)).sum(axis=0)
+                post_g /= post_g.sum()
+                # The flip tick is always before the cutoff, so the query sees the swapped rule.
+                if not lags_ok[index]:
+                    p_g = 0.5 * (p_live + p_dead)
+                else:
+                    early_now = agree_now[index] if direction == 1 else not agree_now[index]
+                    p_g = p_dead if early_now else p_live
+                pred[index, direction] = float(post_g @ p_g)
+            else:
+                p = np.where(early[:, None], p_live, p_dead)
+                ll = _tick_loglik(p, win, valid).sum(axis=0)
+                log_post = ll + log_node
+                logevid[index, direction] = logsumexp(log_post)
+                post = np.exp(log_post - log_post.max())
+                post /= post.sum()
+                if not lags_ok[index]:
+                    p_g = 0.5 * (p_live + p_dead)
+                else:
+                    early_now = agree_now[index] if direction == 1 else not agree_now[index]
+                    p_g = p_live if early_now else p_dead
+                pred[index, direction] = float(post @ p_g)
+    return logevid, pred
+
+
+def mix_hypotheses(logevid, pred, pair_prior):
+    log_h = logevid + np.log(np.clip(pair_prior, 1e-300, None))[:, None]
+    # Direction prior is 1/2 and cancels in the weights; kept explicit so a
+    # fitted direction prior can drop in without touching the evidence.
+    log_h = log_h + np.log(0.5)
+    flat = log_h - log_h.max()
+    weight = np.exp(flat)
+    weight /= weight.sum()
+    p_post = float((weight * pred).sum())
+    pick = np.unravel_index(int(log_h.argmax()), log_h.shape)
+    p_map = float(pred[pick])
+    return p_post, p_map, {
+        "pair": list(PAIRS[pick[0]]),
+        "direction_agree_early_live": int(pick[1] == 1),
+        "map_weight": float(weight[pick]),
+    }
+
+
+def global_c_logprior(cutoff, frac, sd):
+    c = np.arange(cutoff + 1)
+    logp = -0.5 * ((c - frac * cutoff) / sd) ** 2
+    # Keep the search off the first lags and off the cutoff itself.
+    logp[: max(8, int(0.35 * cutoff))] = -np.inf
+    logp[int(0.90 * cutoff) + 1:] = -np.inf
+    finite = np.isfinite(logp)
+    logp[finite] -= logsumexp(logp[finite])
+    return logp
+
+
+def episode_c_logpriors(queries, history, cond, frac, sd):
+    """For each shared_change machine, log prior of the flip tick from the OTHER machines.
+
+    Other machines contribute a flip profile with levels plugged in from their
+    own early window. Added to the train Gaussian prior and normalised.
+    """
+    by_episode = {}
+    for query in queries:
+        if cond[query["query_id"]] != "shared_change":
+            continue
+        by_episode.setdefault(query["episode_id"], []).append(query)
+    out = {}
+    for episode, group in by_episode.items():
+        cutoff = group[0]["cutoff"]
+        curves = {}
+        for query in group:
+            obs, win = series_from_history(history[(episode, query["machine_id"])], cutoff)
+            found = _plugin_orientation(obs, win, cutoff, 0, int(0.45 * cutoff))
+            if found is None:
+                curves[query["machine_id"]] = np.zeros(cutoff + 1)
+            else:
+                curves[query["machine_id"]] = _flip_ll_curve(obs, win, cutoff, *found)
+        base = global_c_logprior(cutoff, frac, sd)
+        for query in group:
+            others = np.zeros(cutoff + 1)
+            for machine_id, curve in curves.items():
+                if machine_id != query["machine_id"]:
+                    others += curve
+            logp = base.copy()
+            finite = np.isfinite(logp)
+            logp[finite] = logp[finite] + others[finite]
+            logp[finite] -= logsumexp(logp[finite])
+            out[query["query_id"]] = logp
+    return out
+
+
+def predict_jackpot(obs, win, cutoff, signal, regime, params, c_logprior):
+    p_dead, p_live = level_nodes(signal, params)
+    if regime == "shared" and c_logprior is None:
+        c_logprior = global_c_logprior(cutoff, params["flip_frac"], params["flip_sd"])
+    logevid, pred = hypothesis_table(
+        obs, win, cutoff, p_dead, p_live, params["node_w"],
+        regime, params["anchor"], params["duration"], c_logprior,
+        pair_mask=params["pair_prior"] > 0,
+    )
+    post, map_, info = mix_hypotheses(logevid, pred, params["pair_prior"])
+    post_flat, _, _ = mix_hypotheses(logevid, pred, params["pair_prior_flat"])
+    return {"post": post, "map": map_, "flatpair": post_flat, "info": info}
+
+
+def four_cell_counts(obs, win, cutoff, a, b, t0):
+    """Win counts for the four (lag a won, lag b won) patterns on ticks [t0, cutoff)."""
+    cells = {(0, 0): [0, 0], (0, 1): [0, 0], (1, 0): [0, 0], (1, 1): [0, 0]}
+    start = max(int(t0), b)
+    for t in range(start, cutoff):
+        if not (obs[t] and obs[t - a] and obs[t - b]):
+            continue
+        key = (int(win[t - a]), int(win[t - b]))
+        cells[key][0] += int(win[t])
+        cells[key][1] += 1
+    return cells
+
+
+def atomic_win_probability(obs, win, cutoff, pair, t0, strength, p_live, p_dead, parity_strength=8.0):
+    """P(win) from the exact lag pattern, shrunk toward that pattern's parity pool.
+
+    Jackpot's two "agree" patterns (both lags won, both lost) are not the same
+    rate, and the same is true of the two "differ" patterns. Pooling them, which
+    is what a parity model does, pulls a hot pattern down and a cold one up.
+    The atomic count is often small, so it is shrunk toward the parity pool,
+    and the pool is shrunk toward the train live or dead level.
+    """
+    a, b = pair
+    if min(cutoff - a, cutoff - b) < 0 or not (obs[cutoff - a] and obs[cutoff - b]):
+        return None
+    key = (int(win[cutoff - a]), int(win[cutoff - b]))
+    cells = four_cell_counts(obs, win, cutoff, a, b, t0)
+    same = key[0] == key[1]
+    group = ((0, 0), (1, 1)) if same else ((0, 1), (1, 0))
+    other = ((0, 1), (1, 0)) if same else ((0, 0), (1, 1))
+    w_g = sum(cells[k][0] for k in group)
+    n_g = sum(cells[k][1] for k in group)
+    w_o = sum(cells[k][0] for k in other)
+    n_o = sum(cells[k][1] for k in other)
+    rate_g = w_g / n_g if n_g else None
+    rate_o = w_o / n_o if n_o else None
+    group_is_live = rate_o is None or (rate_g is not None and rate_g >= rate_o)
+    prior = p_live if group_is_live else p_dead
+    if n_g == 0:
+        p_par = prior
+    else:
+        p_par = (w_g + parity_strength * prior) / (n_g + parity_strength)
+    w_a, n_a = cells[key]
+    return (w_a + strength * p_par) / (n_a + strength)
+
+
+def clean_window_start(regime, cutoff, params, c_logprior):
+    """First tick of the regime that is actually in force at the cutoff.
+
+    Drift has finished its swap by `anchor - duration` ticks before the cutoff.
+    Shared change flips at the episode tick. Stable and short history use everything.
+    """
+    if regime == "drift":
+        return max(0, cutoff - int(params["anchor"]) + int(params["duration"]))
+    if regime == "shared":
+        if c_logprior is None:
+            return int(round(params["flip_frac"] * cutoff))
+        return int(np.argmax(c_logprior))
+    return 0
+
+
+def regime_of(condition):
+    if condition == "drift":
+        return "drift"
+    if condition == "shared_change":
+        return "shared"
+    return "stable"
+
+
+
+def load_folder(folder):
+    folder = Path(folder)
+    queries = list(csv.DictReader((folder / "queries.csv").open()))
+    for query in queries:
+        query["signal"] = int(query["signal"])
+        query["cutoff"] = int(query["cutoff"])
+    history = {}
+    with (folder / "history.csv").open() as handle:
+        for row in csv.DictReader(handle):
+            key = (row["episode_id"], row["machine_id"])
+            history.setdefault(key, {})[int(row["tick"])] = int(row["payout"])
+    cond_path = folder / "conditions.csv"
+    if cond_path.exists():
+        cond = {row["query_id"]: row["condition"] for row in csv.DictReader(cond_path.open())}
+    else:
+        cond = {}
+        for query in queries:
+            observed = sum(1 for tick in history.get((query["episode_id"], query["machine_id"]), {}) if tick < query["cutoff"])
+            cond[query["query_id"]] = "short_history" if observed < query["cutoff"] * 0.75 else ""
+    labels = {}
+    labels_path = folder / "labels.csv"
+    if labels_path.exists():
+        labels = {row["query_id"]: int(row["outcome"]) > 0 for row in csv.DictReader(labels_path.open())}
+    return {"Q": queries, "H": history, "cond": cond, "labels": labels}
+
+
+def fit_params(train):
+    z1, z2, node_w = quadrature(7)
+    levels = fit_jackpot_levels(train)
+    drift = fit_drift(train)
+    flip = fit_flip_prior(train)
+    prior = canonical_pair_prior()
+    return {
+        **levels,
+        "pair_prior": prior,
+        "pair_prior_flat": prior.copy(),
+        "anchor": drift["anchor"],
+        "duration": drift["duration"],
+        "flip_frac": flip["frac"],
+        "flip_sd": flip["sd"],
+        "z1": z1,
+        "z2": z2,
+        "node_w": node_w,
+    }
+
+
+def _strength_brier(train, params):
+    """Train-label Brier. Pair is the two-cell winner inside the learned support."""
+    brier = {name: [] for name in MENU}
+    for query in train["Q"]:
+        if query["machine_type"] != "jackpot":
+            continue
+        if train["cond"].get(query["query_id"]) not in ("stable", "short_history"):
+            continue
+        if query["query_id"] not in train["labels"]:
+            continue
+        obs, win = series_from_history(train["H"][(query["episode_id"], query["machine_id"])], query["cutoff"])
+        pair, _gain, _counts = best_pair(obs, win, query["cutoff"], 0, query["cutoff"], min_n=8)
+        if pair is None:
+            continue
+        y = float(train["labels"][query["query_id"]])
+        p_dead_n, p_live_n = level_nodes(query["signal"], params)
+        p_live_m = float(params["node_w"] @ p_live_n)
+        p_dead_m = float(params["node_w"] @ p_dead_n)
+        for strength, name in ((0.0, "map"), (4.0, "atom4"), (8.0, "atom8"), (16.0, "atom16")):
+            if name == "map":
+                k0, n0, k1, n1 = cell_counts(obs, win, query["cutoff"], pair[0], pair[1], 0, query["cutoff"])
+                if query["cutoff"] <= pair[1] or not (obs[query["cutoff"] - pair[0]] and obs[query["cutoff"] - pair[1]]):
+                    continue
+                agree = bool(win[query["cutoff"] - pair[0]] == win[query["cutoff"] - pair[1]])
+                w, n = (k0, n0) if agree else (k1, n1)
+                other_w, other_n = (k1, n1) if agree else (k0, n0)
+                rate = w / n if n else 0.0
+                other = other_w / other_n if other_n else 0.0
+                prior = p_live_m if rate >= other else p_dead_m
+                p_hat = (w + 8.0 * prior) / (n + 8.0) if n else prior
+            else:
+                p_hat = atomic_win_probability(obs, win, query["cutoff"], pair, 0, strength, p_live_m, p_dead_m)
+                if p_hat is None:
+                    continue
+            brier[name].append((p_hat - y) ** 2)
+    means = {name: float(np.mean(values)) for name, values in brier.items() if values}
+    if not means:
+        print("jackpot strength: no train labels, using atom8", flush=True)
+        return "atom8", {}
+    choice = min(means, key=means.get)
+    print("jackpot strength", choice, {k: round(v, 5) for k, v in means.items()}, flush=True)
+    return choice, means
+
+
+def _log_evidence(obs, win, cutoff, signal, regime, params, c_log):
+    p_dead, p_live = level_nodes(signal, params)
+    if regime == "shared" and c_log is None:
+        c_log = global_c_logprior(cutoff, params["flip_frac"], params["flip_sd"])
+    logevid, _pred = hypothesis_table(
+        obs, win, cutoff, p_dead, p_live, params["node_w"],
+        regime, params["anchor"], params["duration"], c_log,
+        pair_mask=params["pair_prior"] > 0,
+    )
+    log_h = logevid + np.log(np.clip(params["pair_prior"], 1e-300, None))[:, None] + np.log(0.5)
+    return float(logsumexp(log_h.ravel()))
+
+
+def win_probability(obs, win, cutoff, signal, regime, params, c_log, strength_name):
+    hat = predict_jackpot(obs, win, cutoff, signal, regime, params, c_log)
+    if strength_name == "map":
+        return float(hat["map"])
+    strength = {"atom4": 4.0, "atom8": 8.0, "atom16": 16.0}[strength_name]
+    p_dead, p_live = level_nodes(signal, params)
+    t0 = clean_window_start(regime, cutoff, params, c_log)
+    atomic = atomic_win_probability(
+        obs, win, cutoff, tuple(hat["info"]["pair"]), t0, strength,
+        float(params["node_w"] @ p_live), float(params["node_w"] @ p_dead),
+    )
+    return float(hat["map"] if atomic is None else atomic)
+
+
+def predict_folder(folder, params, strength_name):
+    """query_id -> P(win) for jackpot machines that are not short_history."""
+    c_prior = episode_c_logpriors(folder["Q"], folder["H"], folder["cond"], params["flip_frac"], params["flip_sd"])
+    out = {}
+    for query in folder["Q"]:
+        if query["machine_type"] != "jackpot":
+            continue
+        kind = folder["cond"].get(query["query_id"], "")
+        if kind == "short_history":
+            continue
+        obs, win = series_from_history(folder["H"][(query["episode_id"], query["machine_id"])], query["cutoff"])
+        if kind in ("stable", "drift", "shared_change"):
+            regime = regime_of(kind)
+            c_log = c_prior.get(query["query_id"])
+        else:
+            scored = []
+            for regime_name in ("stable", "drift", "shared"):
+                c_log_try = c_prior.get(query["query_id"]) if regime_name == "shared" else None
+                scored.append((_log_evidence(obs, win, query["cutoff"], query["signal"], regime_name, params, c_log_try), regime_name, c_log_try))
+            _score, regime, c_log = max(scored)
+        out[query["query_id"]] = win_probability(obs, win, query["cutoff"], query["signal"], regime, params, c_log, strength_name)
+    return out
