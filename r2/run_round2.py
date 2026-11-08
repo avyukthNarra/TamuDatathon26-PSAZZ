@@ -6,7 +6,8 @@
 Builds (max 3 at once) v17-guards, v7c (origin/avyukth/v7c-size-flip), plain v6 (its tooling/fallback-v6),
 mixer6, and any --extra entries; scores validation (cross-fitted if present, else in-sample) with the
 official formula, runs paired comparisons vs v17-guards, checks each test CSV, and writes OUT/RANKING.md.
-Sources are read-only: v17g/mixer6 are copied, v7c/v6 are extracted with git archive. Nothing is uploaded.
+Sources are read-only: v17g, v7c, v6 and mixer6 are extracted with git archive (refs at the top of this file;
+--v17g-src / --mixer6-src copy a local mainFiles/ folder instead). Nothing is uploaded.
 """
 import argparse, csv, hashlib, io, itertools, json, shutil, subprocess, sys, tarfile, time
 from collections import Counter
@@ -20,12 +21,11 @@ sys.path.insert(0, str(REPO / "orch"))
 from common import PCOLS, load, points, folds  # noqa: E402
 import paired as pairedmod  # noqa: E402
 
-TM = Path("/Users/saisreed/Desktop/Coding/TamuDatathon26-PSAZZ/worktrees/_tm")
-V17G = TM / "v17g/mainFiles"
-MIXER6 = TM / "mixer6/mainFiles"
+V17G_REF = "origin/zhill/v17-round2-guards"  # mainFiles/ has run_strongest.py and check_submission.py
+MIXER6_REF = "814cb60"  # frozen mixer6 snapshot (see docs/sai/round/jackpot/README.md)
 V7C_REF = "origin/avyukth/v7c-size-flip"
 V6_SUB = "mainFiles/round2/tooling/fallback-v6"
-BLEND_DIR = Path("/Users/saisreed/Desktop/Coding/TamuDatathon26-PSAZZ/adapted_entry")  # untracked in the main checkout
+BLEND_DIR = REPO / "adapted_entry"
 SAFE = "v17-guards"
 ORIG_PAIRS = [(1, 3), (2, 5), (4, 7)]
 BAR = "!" * 78
@@ -180,6 +180,13 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def find_checker(root):
+    """check_submission.py: the candidate's own (root/ or root/mainFiles/), else this repo's mainFiles/."""
+    cands = [root / "check_submission.py", root / "mainFiles" / "check_submission.py"] if root else []
+    cands.append(REPO / "mainFiles" / "check_submission.py")
+    return next((c for c in cands if c.exists()), None)
+
+
 def check_test(checker, csv_path, kit):
     r = subprocess.run([sys.executable, "-B", str(checker), str(csv_path), "--data", str(kit), "--split", "test"],
                        capture_output=True, text=True)
@@ -196,6 +203,11 @@ def main():
     ap.add_argument("--blend", default=str(BLEND_DIR),
                     help="blend entry folder, added as candidate 'blend' unless empty or already given via --extra")
     ap.add_argument("--v7c-ref", default=V7C_REF)
+    ap.add_argument("--v17g-ref", default=V17G_REF)
+    ap.add_argument("--v17g-src", type=Path, help="v17-guards mainFiles/ folder to copy instead of git archive of --v17g-ref")
+    ap.add_argument("--mixer6-ref", default=MIXER6_REF)
+    ap.add_argument("--mixer6-src", type=Path, help="mixer6 mainFiles/ folder to copy instead of git archive of --mixer6-ref "
+                                                    "(if unavailable, mixer6 is skipped with a note)")
     ap.add_argument("--jobs", type=int, default=3)
     args = ap.parse_args()
     t_all = time.monotonic()
@@ -208,17 +220,25 @@ def main():
 
     # 2. sources (read-only: copies or git archive extracts under OUT/_src)
     src_dir = out / "_src"
-    jobs, unavailable = [], {}
-    for name, fn in [(SAFE, lambda: snapshot(V17G, src_dir / "v17g")),
-                     ("v7c", lambda: git_extract(args.v7c_ref, "mainFiles", src_dir / "v7c", drop=("public", "runs"))),
-                     ("v6", lambda: git_extract(args.v7c_ref, V6_SUB, src_dir / "v6")),
-                     ("mixer6", lambda: snapshot(MIXER6, src_dir / "mixer6"))]:
+    jobs, unavailable, roots = [], {}, {}  # roots: candidate name -> its extracted/copied folder
+
+    def mainfiles(local, ref, dirname):
+        if local:
+            return snapshot(Path(local).resolve(), src_dir / dirname)
+        return git_extract(ref, "mainFiles", src_dir / dirname, drop=("public", "runs"))
+
+    for name, dirname, fn in [
+            (SAFE, "v17g", lambda: mainfiles(args.v17g_src, args.v17g_ref, "v17g")),
+            ("v7c", "v7c", lambda: git_extract(args.v7c_ref, "mainFiles", src_dir / "v7c", drop=("public", "runs"))),
+            ("v6", "v6", lambda: git_extract(args.v7c_ref, V6_SUB, src_dir / "v6")),
+            ("mixer6", "mixer6", lambda: mainfiles(args.mixer6_src, args.mixer6_ref, "mixer6"))]:
         try:
             src = fn()
         except Exception as e:  # noqa: BLE001 - record and continue with the others
             unavailable[name] = str(e)
             say(f"candidate {name} unavailable: {e}")
             continue
+        roots[name] = src_dir / dirname
         script = "run_strongest.py" if name == SAFE else "run_pair_mixer.py"
         jobs.append((name, src, script))
     extras = list(args.extra)
@@ -259,9 +279,11 @@ def main():
             row["insample"] = score_val(load_preds(vin), load("validation", pub=kit), mp)["points"]
         test = r["out"] / "submission.csv"
         if test.exists():
-            own = src_dir / name / "check_submission.py"  # each candidate's own checker, else v17g's
-            checker = own if own.exists() else V17G / "check_submission.py"
-            row["test_ok"], row["test_msg"] = check_test(checker, test, kit)
+            checker = find_checker(roots.get(name))
+            if checker is None:
+                row["test_msg"] = "no check_submission.py found"
+            else:
+                row["test_ok"], row["test_msg"] = check_test(checker, test, kit)
             row["sha"] = sha(test)[:16]
         elif r["rc"] == 0:
             row["status"] += "; no submission.csv"

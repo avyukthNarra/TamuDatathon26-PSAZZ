@@ -1,7 +1,9 @@
 import sys, json
-sys.path.insert(0, "/Users/saisreed/Desktop/Coding/TamuDatathon26-PSAZZ/worktrees/r2-transfer/mainFiles")
+from pathlib import Path
+REPO = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO / "mainFiles"))
 from eval_suite.scoring import official_score
-W = "/Users/saisreed/Desktop/Coding/TamuDatathon26-PSAZZ/worktrees/r2-transfer/r2"
+W = str(Path(__file__).resolve().parent)  # the r2/ folder holding the generated round-two data
 T = f"{W}/gen_round2_shift/_truth/test"
 Q = f"{W}/data_round2_shift/test/queries.csv"
 for name in sys.argv[1:]:
