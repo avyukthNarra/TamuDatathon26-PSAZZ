@@ -424,7 +424,9 @@ A task is done only when **all** are true:
 ├── orch/                     ← scoring helpers, paired bootstrap, RESULTS.md
 ├── main-participants-60-40/  ← refreshed main kit (60/40 rules); data = mainFiles/public/
 ├── adaptation-participants/  ← round-two kit (metadata max_points 20 is stale; score at 40)
+├── submissions/              ← exact files submitted in round one (60) and round two (40)
 ├── mainFiles/                ← organizer kit, eval_suite/, adapt_bench/, research code
+├── docs/devpost/             ← Devpost write-up, research reports, team commit log
 └── TODO: docs/DEMO.md
 ```
 

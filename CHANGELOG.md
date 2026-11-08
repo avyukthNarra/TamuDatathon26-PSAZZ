@@ -19,6 +19,7 @@ How to add an entry (every PR):
 ## [Unreleased]
 
 ### Added
+- `submissions/` with the exact files submitted in both rounds (round one 57.97/60, round two 38.59/40) and their hashes; Devpost materials and every round-two research report under `docs/devpost/`; team commit log of all branches (`docs/devpost/research/COMMIT_LOG.md`) (#31)
 - Round-two adapted blend: every member learns its lag pairs from the round's train data (`adapted_entry/`, `adapted_entry_v17g/`, main 57.97) (#22)
 - Exact filter also learns 3-lag XOR and 2-lag AND/OR rules from each round's train census (`adapted_entry_v17g_rules/`; main unchanged, simulated mixed-rule kit +3.3) (#24)
 - One-command round-two build and ranking (`r2/run_round2.py`): structure screen, all candidates, paired comparison, `RANKING.md` (#23)
@@ -58,3 +59,43 @@ How to add an entry (every PR):
 - Local-mode answer-isolation checks are reported as NOT RUN, and omitted mode selects Docker when available (#19)
 
 ### Security
+
+## Team research history (all branches)
+
+How the model was built, by person, condensed from 249 commits across every branch (full list:
+`docs/devpost/research/COMMIT_LOG.md`; Sai's narrative: `docs/devpost/SAI_ITERATIONS.md`). Scores are main-round validation /60
+unless marked /40.
+
+### Pranav (`pranav/*`, 51 commits)
+- Sat: lag-feature forecaster, then the lag-pair mixer (53.35 → 53.75), size experts keyed on earlier payouts (54.21),
+  two-mode payout size switch (54.90), Beta-mixture dead/live win prior (55.34), per-type win prior and learned size lags (56.12).
+- Sat night: 100-spin win memory (56.19), per-type and per-signal win levels (56.32), hidden-rule HMM win blend (56.51),
+  log-odds pooled ensemble (56.54), peer correction from residual analysis (56.59), v11 plateau average (56.61).
+- Sun: v13 strongest build (our win model + size-rule HMM + v7c, 57.52) → v15 (57.55) → v16 episode flip swap (57.59) →
+  v17 jackpot sub-cell correction (57.72) → v19 build-time gates (57.74) → v20 super entry with Sai's blend + v19 (58.00);
+  round two: v21 peer term on the blend (38.67/40, below the pick margin).
+
+### Zhill (`zhill*`, 18 commits)
+- Sat: per-machine lag-pair rule model (52.89), blended with the team pair mixer (54.48), rule weight 0.2 after an independent check,
+  auto-tune of the blend per round, pair mixer v3 in the combined entry (55.58), hidden-rule HMM 50/50 (56.28), mixer6 + rule + HMM (56.59).
+- Sun: size-rule HMM for payout size (57.32), size-rule prior learned per round by EM, v17-round2-guards (v17 with v7c guards,
+  the final blend's first member), v18 backup entry (v17 guards + exact filter, 57.95), round-adaptive member gate (`r2/gate_members.py`).
+
+### Avyukth (`avyukth/*`, `avy`, 38 commits)
+- Sat: research and brainstorming notes (20 papers), experiment summaries and handoffs (E1-E7, E6+E7 blend entry), master research branch.
+- Sun night: v7c (size-atom rule, episode flip swap, round-two guards) and its fix for shifted rounds; adapted Sai's blend so every
+  member learns lag pairs per round (57.96), swapped member 1 to v17-guards, exact filter learns 3-lag XOR and AND/OR rules,
+  10-kit adaptability benchmark, portable `run_round2.py`.
+- Round two: adaptation gate (38.59/40), blend-tweak, per-type, headroom, calibration, peer lag-3 and Docker checks; built and
+  uploaded the round-two files; Devpost write-up, submissions record and research reports.
+
+### Sai (`sai/*`, 142 commits)
+- Sat: team playbook (`AGENTS.md`), shared experiment harness with a once-only audit split, four worker tracks (frequency, lag
+  structure, memory/changepoints, peers/residual learners): B3 → B4 near-OLS lag 7 + pairs (46.8 → 52.3 audit), severity size
+  model, peer-gated changepoints, W5 stack (54.1 audit); re-scored teammates' models and switched to the better team model;
+  blending searches showed saturation (held-out gain ~+0.007); swap-in-truth showed win probability was the lever.
+- Sun night: fresh-start win models: exact Bayesian filter, sysid rule library, short-history 256-state patch, jackpot four-cell patch;
+  equal log-odds blend 57.97 (+0.47 [+0.21, +0.77] over v13); exact filter learns its pair set from the kit; round-two structure screen;
+  one-command `r2/run_round2.py` with paired bootstraps and the > 0.1 both-halves pick rule.
+- Round two: ran the pipeline on the real kit (38.59/40), orchestrated Codex workers and Avyukth's bots on short-history ideas
+  (all below the bar), diagnosed short history's size gap and the small ceilings, cross-checked the upload (3.2e-14).

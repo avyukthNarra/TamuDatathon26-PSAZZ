@@ -22,6 +22,15 @@ scored against the organizers' reference (`mainFiles/RULES.md`).
   (census 733/675/655; no 3-lag or AND/OR rules; Walsh-screen triples are artefacts); the default learns these from train.
   Headroom (Avyukth, `origin/avyukth/r2-adaptation`): true P(win) would give 39.63, true sizes 38.93, so P(win) is the gap.
 
+## Submissions and research
+- **What we submitted:** `submissions/round1_main_60/` (57.97 / 60) and `submissions/round2_adaptation_40/` (38.59 / 40), the exact
+  files with SHA-256 hashes and how each was verified.
+- **How we got there:** `CHANGELOG.md` → "Team research history" (each person's path with scores), the full team commit log of every
+  branch (`docs/devpost/research/COMMIT_LOG.md`), and Sai's narrative (`docs/devpost/SAI_ITERATIONS.md`).
+- **Research reports:** `docs/devpost/research/` (main-round forensics and methods; every round-two experiment) plus the raw research
+  in `docs/sai/`, `orch/RESULTS.md` and `adapted_entry/ADAPTED.md`. Experiment code stays on each person's branches, linked from these pages.
+- **Devpost:** `docs/devpost/WRITEUP.md` (project text) and `docs/devpost/CHECKLIST.md`.
+
 ## Round two in four commands
 See `r2/README.md` ("Kit-day steps") for the full version.
 ```bash
@@ -53,6 +62,8 @@ copy of `adaptation-participants/public/` with `max_points` set to 40, and use `
 | `orch/` | scoring helpers, paired bootstrap, `RESULTS.md` |
 | `main-participants-60-40/` | refreshed main-round organizer kit (60/40 rules), same data as `mainFiles/public/` |
 | `adaptation-participants/` | round-two (adaptation) organizer kit (`public/` = train, validation, test) |
+| `submissions/` | the exact files submitted in each round |
+| `docs/devpost/` | Devpost write-up, research reports, team commit log |
 | `mainFiles/` | organizer kit (`public/`, rules, checker, ZIP builder), eval suite, adapt_bench, research code |
 | `docs/sai/` | research harness, experiment reports and results |
 | `AGENTS.md` | team playbook (branches, commits, PRs, changelog) |
