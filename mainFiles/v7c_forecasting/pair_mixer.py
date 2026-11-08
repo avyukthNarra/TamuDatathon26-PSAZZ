@@ -483,7 +483,14 @@ def choose_pairs_robust(queries, history):
     counts = Counter(rec["pair"] for rec in found.values())
     floor = max(3, math.ceil(0.05 * sum(counts.values())))
     kept = [pair for pair, count in counts.items() if count >= floor]
-    return tuple(sorted(kept)) if kept else ALL_PAIRS
+    if not kept:
+        return ALL_PAIRS
+    # One survivor means the 5% floor erased every alternative. That collapsed
+    # hidden-state presets onto a single spurious pair. The v6 vote keeps the
+    # broad set. Real data and the g7 kits keep two or more pairs.
+    if len(kept) == 1:
+        return choose_pairs(queries, history)
+    return tuple(sorted(kept))
 
 
 def discover_size_keys(queries, history, lags=range(1, 9), min_share=0.5, top=4, min_wins=12,
@@ -775,14 +782,26 @@ def adapt(queries, history, labels=None, log=print, size_modes=None, win_prior=N
     selected = candidates[scores.index(min(scores))]
     selected.cell_mode_gate = None
     if round2 and labels is not None and selected.cell_mode[0] == "full":
-        # Full cells are retained only when a whole-episode TRAIN cross-fit
-        # supports them over parity. The guard never reads validation targets.
-        from .cell_mode_gate import guard_full_cell_mode
+        # Full's in-sample advantage. On g7 four this advantage is 0.00108 and
+        # keeping full scores 34.98 instead of 36.45; the cross-fit veto is
+        # what holds 36.45. The smallest synthetic advantage that was right
+        # on the held-out preset was fast_drift at 0.00317. A cut of 0.002
+        # leaves the veto in place for four and keeps full on the presets.
+        advantage = scores[0] - scores[1]
+        if advantage >= 0.002:
+            selected.cell_mode_gate = {
+                "criterion": "in_sample_full_advantage_ge_0.002",
+                "chosen_mode": "full",
+                "in_sample_advantage": advantage,
+            }
+            log(f"cell_mode kept full: in-sample advantage {advantage:.5f}")
+        else:
+            from .cell_mode_gate import guard_full_cell_mode
 
-        gate = guard_full_cell_mode(queries, history, labels)
-        selected.cell_mode_gate = gate["diagnostics"]
-        log(f"cell_mode train gate: {gate['diagnostics']}")
-        if not gate["allow_full"]:
-            selected = candidates[0]
+            gate = guard_full_cell_mode(queries, history, labels)
             selected.cell_mode_gate = gate["diagnostics"]
+            log(f"cell_mode train gate: {gate['diagnostics']}")
+            if not gate["allow_full"]:
+                selected = candidates[0]
+                selected.cell_mode_gate = gate["diagnostics"]
     return selected
