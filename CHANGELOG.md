@@ -19,6 +19,7 @@ How to add an entry (every PR):
 ## [Unreleased]
 
 ### Added
+- v21 round-two entry: v20 plus a peer term (other machines' recent wins) on the blend; adaptation validation 38.67 / 40, both cross-fit halves above v20 (`run_super.py --extra-peer 0.75`, built by `round_two.py`)
 - Lag-pair mixer forecaster with a verified, reproducible entry ZIP (`mainFiles/run_pair_mixer.py`); validation 53.75 / 60
 - eval_suite: --jobs N runs independent entry executions in parallel (identical results)
 - Method-agnostic evaluation suite (`python -m eval_suite run --entry DIR`) that checks any entry against all 88 documented requirements and scores it with the official metric (#19)

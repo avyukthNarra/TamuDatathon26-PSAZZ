@@ -29,6 +29,7 @@ from pathlib import Path
 
 from blend import blend, read_predictions, write_predictions
 from members.hooks import REGISTRY, SIZE_MEMBER
+import peer_term
 
 ENTRY = Path(__file__).resolve().parent
 
@@ -93,6 +94,7 @@ def main():
             raise SystemExit(f"{spec['name']} failed with exit {code}")
         rows[spec["name"]] = read_predictions(out)
     blended = blend([rows[spec["name"]] for spec in REGISTRY], rows[SIZE_MEMBER], floor=True)
+    blended = peer_term.apply(blended, Path(data) / args.split, peer_term.load_coef())  # v21; off without peer.json
     write_predictions(out_path, blended)
     print(f"wrote {out_path} ({len(blended)} rows) in {time.perf_counter() - started:.1f}s", flush=True)
 

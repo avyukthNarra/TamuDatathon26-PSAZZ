@@ -3,13 +3,14 @@
 Usage (from mainFiles/), after unzipping the new kit somewhere:
 
     python round_two.py --data /path/to/new-kit/public
-    python round_two.py --data /path/to/new-kit/public --quick     # v19 + v20 only
+    python round_two.py --data /path/to/new-kit/public --quick     # v19, v20, v21 only
 
 Steps:
   1. Check public/metadata.json (warns unless round == "adaptation").
   2. Build up to three candidates on the NEW data; each refits everything (lag pairs, size lags,
      size modes, win priors, peer centre) from that data:
        v20  Sai's blend (v13+short+jackpot, exact filter, sysid; learns rules per round) + v19 as a 4th member
+       v21  v20 + peer term on the blend (other machines' recent wins; Sai's members ignore them)
        v19  v12 + Avyukth's v7c (in a 2nd process) + add-ons gated on the new round's validation at build time
        v12  v11 with the size-rule HMM sizes (zhill branch)
        v11  log-odds average of v10, a 0.6 / 0.4 version and per-lag peers
@@ -37,7 +38,7 @@ HERE = Path(__file__).resolve().parent
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", required=True, help="the NEW kit's public/ folder")
 parser.add_argument("--tag", default="round2")
-parser.add_argument("--quick", action="store_true", help="build v19 and v20 only")
+parser.add_argument("--quick", action="store_true", help="build v19, v20 and v21 only")
 parser.add_argument("--downloads", default=str(Path.home() / "Downloads" / "HouseEdge_ADAPTATION_submission"))
 args = parser.parse_args()
 data = Path(args.data).expanduser().resolve()
@@ -53,6 +54,8 @@ CANDIDATES = {
     # v20 vendors the v19 just rebuilt on THIS round's data; needs numpy/scipy, so run round_two.py with
     # runs/.venv-sai/bin/python (the stdlib candidates run there too)
     "v20": [sys.executable, "run_super.py", "--v19", str(HERE / "runs" / f"{args.tag}-v19" / "entry")],
+    # v21 = v20 + the peer term on the blend (peer_term.py); see docs/SUPER_BRANCH.md for the evidence
+    "v21": [sys.executable, "run_super.py", "--extra-peer", "0.75", "--v19", str(HERE / "runs" / f"{args.tag}-v19" / "entry")],
     "v12": [sys.executable, "run_ensemble.py", "--variant", "strongest"],
     "v11": [sys.executable, "run_ensemble.py", "--variant", "plateau"],
     "v10": [sys.executable, "run_ensemble.py", "--variant", "peers"],
@@ -60,7 +63,7 @@ CANDIDATES = {
     "v8": [sys.executable, "run_pair_mixer.py"],
 }
 if args.quick:
-    CANDIDATES = {"v19": CANDIDATES["v19"], "v20": CANDIDATES["v20"]}
+    CANDIDATES = {k: CANDIDATES[k] for k in ("v19", "v20", "v21")}
 results = {}
 for name, cmd in CANDIDATES.items():
     out = HERE / "runs" / f"{args.tag}-{name}"
@@ -83,7 +86,7 @@ if not results:
 print("\n=== candidates (validation points; cross-fit = mean of the two halves)")
 for name, r in results.items():
     print(f"  {name}: full {r['full']:.2f}  cross-fit {r['cross']:.2f}  halves {r['halves'][0]:.2f} / {r['halves'][1]:.2f}")
-order = ["v8", "v9", "v10", "v11", "v12", "v19", "v20"]  # simplest first
+order = ["v8", "v9", "v10", "v11", "v12", "v19", "v20", "v21"]  # simplest first
 best = max(results, key=lambda n: results[n]["cross"])
 for name in order:  # prefer a simpler model within 0.02
     if name in results and results[name]["cross"] >= results[best]["cross"] - 0.02:

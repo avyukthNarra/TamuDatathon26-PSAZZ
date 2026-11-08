@@ -33,6 +33,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--data", default=str(HERE / "public"))
 parser.add_argument("--out", default="runs/super-v20")
 parser.add_argument("--cv-val", action="store_true", help="accepted for round_two.py; cross-fit always runs")
+parser.add_argument("--extra-peer", type=float, default=0.0,
+                    help="v21: add this x (peer win share - mean share) to the blended win log-odds (peer_term.py)")
 parser.add_argument("--v19", default=str(HERE / "runs/strongest-v19/entry"), help="built v19 entry folder")
 args = parser.parse_args()
 public = Path(args.data).resolve()
@@ -45,6 +47,8 @@ if entry.exists():
     shutil.rmtree(entry)
 shutil.copytree(HERE / "entry_template_super", entry, ignore=shutil.ignore_patterns("__pycache__"))
 shutil.copytree(Path(args.v19), entry / "vendor" / "v19", ignore=shutil.ignore_patterns("__pycache__"))
+if args.extra_peer:
+    (entry / "peer.json").write_text(json.dumps({"coef": args.extra_peer}), encoding="utf-8")
 shutil.copytree(public / "validation", entry / "bundled_validation")  # this round's public validation folder; see predict.py
 for name in EVAL_MODULES:
     shutil.copyfile(HERE / "slot_forecasting" / name, entry / "vendor" / "v19" / "slot_forecasting" / name)
@@ -93,6 +97,7 @@ A 4th equal win member, `members/pranav_v19.py`, runs Pranav's v19 entry (vendor
 `vendor/v19/`): pair mixer + hidden-rule HMM + peer / signal / plateau terms blended with Avyukth's
 v7c (flip-swap transfer, jackpot sub-cell), standard library only. The blend is the mean logit of
 four members; sizes stay with `v13_short`. Built by `mainFiles/run_super.py` on pranav/super.
+Peer term (v21, `peer_term.py`): coefficient {args.extra_peer:g} (0 = off, i.e. v20).
 - Validation {report['technical_points']:.2f} / {report['max_points']:g} (R = {report['mean_loss_ratio']:.4f});
   cross-fitted halves {halves[0]['technical_points']:.2f} / {halves[1]['technical_points']:.2f}
 - Forecast SHA-256: {sha}

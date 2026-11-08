@@ -122,3 +122,28 @@ Entry: 168-169 s on this machine (members run as parallel processes). Test SHA-2
 8a5a1f18a55a8d2684cfc269545ad8e596c264689f7637cdc87a5d918f761e82.
 Round two: `runs/.venv-sai/bin/python round_two.py --data <kit>/public` builds v19 first, then v20
 vendoring that new-round v19, and picks by cross-fit (v20's members re-learn their rules per round).
+
+## v21: round two (adaptation) - v20 plus a peer term on the blend (38.67 / 40)
+None of Sai's three members look at other machines; in v20 the peer effect reaches the blend only
+inside the v19 member at 1/4 weight. `entry_template_super/peer_term.py` adds
+0.75 x (other machines' win share over the last 5 ticks - the forecast split's mean share) to the
+blended win log-odds. It uses history only; `peer.json` (written by `run_super.py --extra-peer`)
+switches it on, so v20 builds are unchanged.
+
+Evidence (round-two kit, 40-point scale):
+| Check | Result |
+|---|---|
+| Peer coefficient in each split's own history (logistic vs a lag-pair cell baseline, episode bootstrap) | test 1.14 [0.65, 1.58], validation 0.54 [0.00, 1.13], train 0.27 [-0.53, 0.76]; main-round train 1.03 [0.35, 1.73] |
+| Coefficient sweep on v20's saved cross-fit members (centre = split mean) | 0.5: 38.37 / 38.86, **0.75: 38.38 / 38.87**, 1.0: 38.38 / 38.88, 1.5: 38.37 / 38.88 (v20 38.34 / 38.81) |
+| Signal term on the blend | lowers the audit half - not used |
+| Built v21 | full 38.67 (R 0.0345; v20 38.62, R 0.0358), halves 38.38 / 38.87; ratios stable 0.031, short 0.050, drift 0.031, shared 0.027 |
+
+Train-history support is weak (CI spans 0); the term is kept because the scored test split's own
+history shows the effect clearly and it lifts both validation halves. 0.75 sits below the
+validation optimum. The team rules blend's cross-fit is 38.53 / 38.63 (mean 38.59): v21 has the higher mean
+(38.63) and the higher second half, but not the higher first half.
+Build: `runs/.venv-sai/bin/python run_super.py --data <kit>/public --out runs/r2-v21 --extra-peer 0.75
+--v19 runs/r2-v19/entry` (the scoring step needs the kit's rounds.py because its metadata still says
+20 points; forecasts are written before that). Fresh read-only rerun without validation answers:
+byte-identical, 173 s. Kit checker: valid. Test SHA-256
+14099d37298a3b44d7285c09e007936b70bac2d438199d1ca4ad24bd93f42b29.
