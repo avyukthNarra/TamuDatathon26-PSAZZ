@@ -45,7 +45,7 @@ if entry.exists():
     shutil.rmtree(entry)
 shutil.copytree(HERE / "entry_template_super", entry, ignore=shutil.ignore_patterns("__pycache__"))
 shutil.copytree(Path(args.v19), entry / "vendor" / "v19", ignore=shutil.ignore_patterns("__pycache__"))
-shutil.copyfile(public / "validation" / "targets.csv", entry / "bundled_validation_targets.csv")  # see predict.py
+shutil.copytree(public / "validation", entry / "bundled_validation")  # this round's public validation folder; see predict.py
 for name in EVAL_MODULES:
     shutil.copyfile(HERE / "slot_forecasting" / name, entry / "vendor" / "v19" / "slot_forecasting" / name)
 

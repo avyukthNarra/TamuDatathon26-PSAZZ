@@ -111,9 +111,12 @@ NumPy 2.3.4 / SciPy 1.16.3. v20 adds `members/pranav_v19.py`, which runs my v19 
 
 Flaw found and fixed: without validation answers mounted, Sai's members fall back to train-only
 priors and the forecast changed by up to 0.047 (a reproduction mismatch if the runner hides them,
-as main's eval suite does). v20 bundles this round's public validation answers
-(`bundled_validation_targets.csv`) and, if /data lacks them, builds a scratch view in the temp folder;
-output is now identical with and without them (max diff 0). Build:
+as main's eval suite does). v20 bundles this round's public validation folder
+(`bundled_validation/`, 8 MB) and, if /data lacks validation answers or the whole folder, builds a
+scratch view in the temp folder; output is identical with full /data, without the answers, and with no
+validation folder at all (max diff 0 each). main's eval suite (quick, local, no answers mounted): 0
+FAIL, 31 PASS, 2 WARN (the future-ticks probe is refused by the schema's leak guard); its honest
+4-fold validation is 57.91 [57.54, 58.25] (v19: 57.51). Build:
 `runs/.venv-sai/bin/python run_super.py --out runs/super-v20` (venv with the pinned packages, git-ignored).
 Entry: 168-169 s on this machine (members run as parallel processes). Test SHA-256
 8a5a1f18a55a8d2684cfc269545ad8e596c264689f7637cdc87a5d918f761e82.
