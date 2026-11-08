@@ -43,7 +43,8 @@ class V7C:
             self.win_prior = win_prior_by_type_from_targets(targets, vq, two_means=USE_ROUND2)
         else:
             if saved_priors:
-                self.size_modes, self.win_prior = saved_priors["size_modes"], saved_priors["win_prior"]
+                sp = saved_priors or {}  # no targets and no saved priors: train-only (None), like the v17 member
+            self.size_modes, self.win_prior = sp.get("size_modes"), sp.get("win_prior")
             else:
                 # No validation targets and no packaged prior. Train-only frequencies.
                 self.size_modes, self.win_prior = None, None

@@ -42,7 +42,8 @@ class V7C:
             self.size_modes = size_modes_from_targets(targets, vq)
             self.win_prior = win_prior_by_type_from_targets(targets, vq, two_means=USE_ROUND2)
         else:
-            self.size_modes, self.win_prior = saved_priors["size_modes"], saved_priors["win_prior"]
+            sp = saved_priors or {}  # no targets and no saved priors: train-only (None), like the v17 member
+            self.size_modes, self.win_prior = sp.get("size_modes"), sp.get("win_prior")
         quiet = (lambda *_: None)
         self.model = adapt(tq, th, labels, log=quiet, size_modes=self.size_modes, win_prior=self.win_prior, round2=USE_ROUND2)
         self.size_rule = fit_size(tq, th, USE_SIZE, labels, USE_SIZE_GATE)
