@@ -68,3 +68,6 @@ blend .00385. Jackpot win remains the largest gap for every member.
   {2,3,5,7}) and scores 25.22/40 vs pooled 20.00. But it also scores only 38.97/60 (R 0.54) on the generator's
   main_like preset, against R 0.043 on real main validation, so the eval-suite generator is a poor proxy for scores:
   use it to check structure discovery, not to rank models. Rank on the real round-two validation answers.
+- Pranav's v16 (`origin/pranav/v15-evalsuite`, 57.59, halves 57.62/57.52) as the blend's first member, with our short and
+  jackpot patches: 57.98, paired +0.011 [-0.002, +0.025] vs the 57.97 blend; four members (v13 and v16) 58.00,
+  +0.029 [-0.008, +0.065]. Noise-level, so the 57.97 blend is kept; v16 is an equal-strength drop-in for the v13 member.
