@@ -27,3 +27,10 @@ Per Sai's suggestion, member 1 is swapped from v13 to Zhill's v17-round2-guards 
 - 10-kit adapt_bench mean 38.388, against 38.371 (+0.017); no kit drops by more than 0.02.
 - Main weak spot for both: K10 (30% of machines on 3-lag XOR or AND rules), ~32/40 against 38.8–39.4 on the other kits.
 Recommended version: adapted_entry_v17g/.
+
+## Update: gated v7c member for mixed-rule rounds (adapted_entry_v17g_gate/)
+A train-only structure statistic (how much of the machines' win signal a single lag pair fails to explain) sets the weight of v7c's win chance as a 4th log-odds member.
+- The weight is 0 on main, K1, K7 and K9; under 0.02 on K2–K6 and K8; 0.97 on K10.
+- K10 (30% AND / 3-lag machines): 32.08 → 32.76. No other kit falls. adapt_bench mean 38.388 → 38.457.
+- On main the forecasts equal adapted_entry_v17g/ (57.971).
+Recommended version: adapted_entry_v17g_gate/.
