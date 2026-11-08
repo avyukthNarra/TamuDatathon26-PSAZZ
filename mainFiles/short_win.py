@@ -356,11 +356,49 @@ def score_variants(out_dir):
     return report
 
 
+def write_selected(out_dir, model="grid_marginal"):
+    """Write the fold-selected patch. Both folds selected grid_marginal."""
+    import csv
+    load, points, _, _, validation = load_environment()
+    v13_path = Path("/Users/saisreed/Desktop/Coding/TamuDatathon26-PSAZZ/worktrees/_tm/v13/mainFiles/runs/v13/crossfit_validation_predictions.csv")
+    v13_rows = list(csv.DictReader(v13_path.open()))
+    v13 = {
+        row["query_id"]: np.array([float(row[column]) for column in ("p_0", "p_1", "p_2", "p_5", "p_20")])
+        for row in v13_rows
+    }
+    grid = model.startswith("grid")
+    marginalize = model.endswith("marginal")
+    probabilities, _, _ = predict_short(validation, grid=grid, marginalize=marginalize)
+    patched = patch(v13, probabilities)
+    score, ratios = points(patched, validation)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    with (out_dir / "validation_crossfit_patched.csv").open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=("query_id", "p_0", "p_1", "p_2", "p_5", "p_20"), lineterminator="\n")
+        writer.writeheader()
+        for row in v13_rows:
+            values = patched[row["query_id"]]
+            writer.writerow({
+                "query_id": row["query_id"],
+                **{column: format(float(value), ".17g") for column, value in zip(("p_0", "p_1", "p_2", "p_5", "p_20"), values)},
+            })
+    with (out_dir / "short_win_probs.csv").open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=("query_id", "p_win"), lineterminator="\n")
+        writer.writeheader()
+        for query_id in sorted(probabilities):
+            writer.writerow({"query_id": query_id, "p_win": format(probabilities[query_id], ".17g")})
+    print(model, score, {key: float(value) for key, value in ratios.items()})
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", default="mainFiles/runs/short-win")
+    parser.add_argument("--export", action="store_true")
     args = parser.parse_args()
-    score_variants(Path(args.out))
+    out = Path(args.out)
+    if args.export:
+        write_selected(out)
+    else:
+        score_variants(out)
 
 
 if __name__ == "__main__":
