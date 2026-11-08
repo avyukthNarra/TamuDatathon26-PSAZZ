@@ -72,3 +72,14 @@ Built entry: validation 57.55 (cross-fit halves 57.58 / 57.47), R 0.0426 (stable
 0.070, drift 0.029, shared 0.036); settings in combo.json; byte-identical on Python 3.13 read-only
 without validation targets. Test SHA-256 2c4a968b1580fcdceaa16f8c5041a537705d46eb22b5e1500a278279a13cb2d1.
 `run_strongest.py` and round two (candidate "v14" = the run_strongest default) now build v15.
+
+## After v15 (branch `pranav/v15-plus`, no change)
+- Short-history-specific blend weights / peer strength (`research/v15_gates.py`): validation flat
+  (+-0.01), held-out train at most -0.0006: a plateau.
+- Regime model as a third win member (`research/v15_regime.py`): validation +0.04-0.06 but held-out
+  train worse (window +0.0005 to +0.0013): its settings were chosen on validation. Rejected.
+- Payout size in shared_change: 8.8% of machines have the size mode confidently wrong (2-3% in
+  stable / drift), clustered in a few episodes (3 of 7, 2 of 6) - an episode-wide size-rule flip.
+  Detecting it from each machine's last K wins vs its own inverted rule (`research/size_flip.py`)
+  misfires (mostly on short histories) and lowers both checks (validation down to 57.01-57.50).
+v15 (57.55) stays the best verified build.
