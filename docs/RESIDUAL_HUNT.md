@@ -40,3 +40,22 @@ SHA-256 256bf174f26601318a5f2c741c02486b22c71964f54d9913b87a67f3177e2960.
 Only two leftovers pass |z| > 2 on both splits: win vs the signal column (+0.010 per step; a
 logit term adds +0.03 validation, train within noise, not adopted) and size vs "own lag 7 won"
 (weak). Everything else is clean.
+
+## Round 3: per-machine hunts, calibration, tempering (no further gain)
+- **Per-machine win hunt** (`research/per_machine_hunt.py`): residual of the pair mixer at every
+  history tick >= 60 vs 28 lag-pair parities and 8 single lags, max |z| per machine vs a
+  23-tick-shifted null. 14.8% of machines exceed the null's 95th percentile (5% = chance); the
+  strongest patterns are the machines' OWN pairs (1,3)/(2,5)/(4,7). By condition: stable 3.6%
+  (nothing), drift 24%, shared_change 17%, where the mixer is over-confident (residual -0.04 where
+  it forecasts > 0.5, +0.02 where <= 0.5): it lags machines whose rule fades or changes.
+- **Recent-surprise tempering** (pull the forecast toward 0.5 when the mixer's last 10-40
+  forecasts were surprising): worse on BOTH splits at every strength (e.g. W 40 g 1: validation
+  56.54 vs 56.55, train window +0.0008 [+0.0005, +0.0012]). The final model (HMM + peers) already
+  handles what the mixer alone gets wrong at the cutoff.
+- **Per-machine size hunt** (`research/per_machine_size.py`): 6.9% above the null's 95th percentile
+  (5% = chance); pooled differences <= 0.01. Payout size is data-limited, not mis-specified.
+- **Calibration** (`research/calibration.py`): good overall; forecasts above 0.95 run ~0.015 high on
+  both splits, but a ceiling at 0.95-0.97 changes validation by +0.01 and train within noise.
+
+Conclusion: after the peer effect, every residual test (population, per machine, win, size,
+calibration) is at chance level. v10 (56.59) is the best verified model.
