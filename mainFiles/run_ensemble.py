@@ -26,7 +26,7 @@ from slot_forecasting.starter import public_directory
 from slot_forecasting.submission_contract import package_code
 
 HERE = Path(__file__).resolve().parent
-MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py", "rule_hmm.py", "changepoint.py", "ensemble.py")
+MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py", "rule_hmm.py", "changepoint.py", "ensemble.py", "peers.py")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", default=str(HERE / "public"))
@@ -145,7 +145,8 @@ python predict.py --data /data --out /output/submission.csv
 - Prediction: the win chance is the equal-weight average of three models of each machine:
   an online mixture of lag-pair experts (which also gives payout sizes), a hidden-rule HMM
   that tracks rule switches, and a Bayesian change-point model that learns each regime's
-  win levels exactly. Only ticks before each cutoff are read.
+  win levels exactly. The win chance is then nudged up when the episode's other machines
+  just won (and down when they lost). Only ticks before each cutoff are read.
 - Model files: `priors.json` (fallback copy of the validation-derived priors).
 - Seeds/settings: deterministic, no randomness; settings are the defaults in
   `slot_forecasting/pair_mixer.py`, `rule_hmm.py`, `changepoint.py` and `ensemble.py`.

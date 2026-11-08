@@ -50,11 +50,12 @@ class Ensemble:
         return out
 
 
-def build_ensemble(queries, history, labels, size_modes, win_prior, log=print, variant="logodds"):
+def build_ensemble(queries, history, labels, size_modes, win_prior, log=print, variant="peers"):
     """Fit the pair mixer on train (as adapt() does, without its own HMM blend) and add the other
     members, which need only the lag pairs it found and the win prior.
 
-    variant "logodds" (default): 0.7 mixer + 0.3 hidden-rule HMM, pooled in log-odds.
+    variant "peers" (default): the "logodds" model plus the peer correction (peers.py).
+    variant "logodds": 0.7 mixer + 0.3 hidden-rule HMM, pooled in log-odds.
     variant "three-way": 1/3 mixer + 1/3 HMM + 1/3 regime model, linear (better on validation,
     not confirmed on train).
     """
@@ -67,4 +68,10 @@ def build_ensemble(queries, history, labels, size_modes, win_prior, log=print, v
         log("ensemble: 1/3 pair mixer + 1/3 hidden-rule HMM + 1/3 change-point regime model (win chance)")
         return Ensemble(mixer, [hmm, RegimeModel(mixer.pairs, win_prior, temper=0.5)], (1 / 3, 1 / 3, 1 / 3))
     log("ensemble: 0.7 pair mixer + 0.3 hidden-rule HMM, pooled in log-odds (win chance)")
-    return Ensemble(mixer, [hmm], (0.7, 0.3), pool="logodds")
+    model = Ensemble(mixer, [hmm], (0.7, 0.3), pool="logodds")
+    if variant == "logodds":
+        return model
+    from .peers import PEER_COEF, PeerAdjusted, train_center
+    center = train_center(queries, history)
+    log(f"peer correction: logit += {PEER_COEF} x (peers' lag 1-5 win share - {center:.4f})")
+    return PeerAdjusted(model, center)
