@@ -20,3 +20,10 @@ Dependencies: requirements.txt pins numpy==2.3.4 and scipy==1.16.3 (allowed by t
 Run it from adapted_entry/: `python predict.py --data <public dir> --out submission.csv`.
 
 Details: RESEARCH/s1-adapt_REPORT.md (pair learning), s2-package_REPORT.md (packaging), s3-final_REPORT.md (final integration and scores).
+
+## Update: member 1 = v17-guards (adapted_entry_v17g/)
+Per Sai's suggestion, member 1 is swapped from v13 to Zhill's v17-round2-guards (Pranav's v17 plus the v7c guard fix), with the same short-history and jackpot patches; the pairs are still learned.
+- Main 57.971 (halves 57.98 / 57.96), against 57.961.
+- 10-kit adapt_bench mean 38.388, against 38.371 (+0.017); no kit drops by more than 0.02.
+- Main weak spot for both: K10 (30% of machines on 3-lag XOR or AND rules), ~32/40 against 38.8–39.4 on the other kits.
+Recommended version: adapted_entry_v17g/.
