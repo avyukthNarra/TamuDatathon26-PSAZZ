@@ -1,4 +1,4 @@
-# Fresh-start win-probability research: 57.91 cross-fitted (v13: 57.50)
+# Fresh-start win-probability research: 57.97 cross-fitted (v13: 57.50)
 
 All numbers: main-round validation, official formula (`common.points`, matches check_submission), cross-fitted =
 any fitted choice made on the other half of the episodes (halves: episodes sorted by id within condition, alternating).
@@ -10,7 +10,9 @@ Reproduce the table: `python blend_final.py` (from this folder; reads `results/*
 | v13 + short-history win patch | 57.676 | 57.71 / 57.65 | .0380 | .0591 | .0291 | .0349 |
 | exact Bayesian filter | 57.488 | 57.41 / 57.56 | .0340 | .0713 | .0352 | .0343 |
 | sysid rule library (train-only selection) | 57.445 | 57.37 / 57.49 | .0299 | .0922 | .0241 | .0317 |
-| **blend: v13+short, exact, sysid** | **57.909** | **57.98 / 57.84** | .0285 | .0601 | .0250 | .0307 |
+| blend: v13+short, exact, sysid | 57.909 | 57.98 / 57.84 | .0285 | .0601 | .0250 | .0307 |
+| v13 + jackpot win patch | 57.685 | 57.65 / 57.73 | | | | |
+| **blend: v13+short+jackpot, exact, sysid** | **57.973** | **58.01 / 57.94** | | | | |
 
 **The blend:** P(win) = sigmoid(mean of the three members' logit P(win)), with equal 1/3 weights (not tuned), and v13's
 size split given a win. Weights chosen on one half and scored on the other come out at 0.2-0.4 each and score slightly
@@ -30,6 +32,10 @@ blend .00385. Jackpot win remains the largest gap for every member.
 - `sai/fresh-bayes`: short-history win patch on top of v13 (`mainFiles/short_win.py`): 256-state distribution over the
   last eight win bits so the 24 scattered older ticks still count; level grid from the type x signal prior.
 - v13 itself: `origin/pranav/strongest-build`, `run_strongest.py --cv-val`.
+
+- jackpot patch (`jackpot/` from `sai/fresh-sbi`, report `worktrees/_coord/fresh/jackpot.md`): jackpot win prob from
+  the active FOUR-cell rate of the machine's pair (not the pooled parity cell), shrunk toward the parity pool; jackpot
+  queries only. +0.19 on v13, +0.06 inside the blend (both halves up); train-only version gives 57.97 too.
 
 ## Supporting facts (this branch)
 - `priors/pairs_all_histories.py`: 2058 confident long-history machines in train, validation AND test all use

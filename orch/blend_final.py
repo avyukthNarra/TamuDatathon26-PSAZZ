@@ -16,9 +16,13 @@ def blend(win_members, size_member):
     return out
 V, VS = rd("results/v13_crossfit.csv"), rd("results/v13_shortpatch_crossfit.csv")
 E, S = rd("results/exact_crossfit.csv"), rd("results/sysid_train_only.csv")
+J = rd("results/v13_jackpotpatch_crossfit.csv")
+jack = {q for q in T if Qd[q]["machine_type"] == "jackpot"}; short = {q for q in T if v["cond"][q] == "short_history"}
+VSJ = {q: VS[q] if q in short else (J[q] if q in jack else V[q]) for q in T}  # both patches on the v13 member
 qa = [q for q in T if Qd[q]["episode_id"] in A]; qb = [q for q in T if Qd[q]["episode_id"] in B]
 rows = [("v13", V), ("v13 + short patch", VS), ("exact filter", E), ("sysid rule library", S),
-        ("blend v13, exact, sysid", blend([V, E, S], V)), ("blend v13+short, exact, sysid", blend([VS, E, S], V))]
+        ("blend v13, exact, sysid", blend([V, E, S], V)), ("blend v13+short, exact, sysid", blend([VS, E, S], V)),
+        ("v13 + short + jackpot patches", VSJ), ("blend v13+short+jackpot, exact, sysid", blend([VSJ, E, S], V))]
 for name, P in rows:
     pts, r = points(P, v)
     print(f"{name:32s} {pts:.3f}  halves A {points(P, v, qa)[0]:.2f} B {points(P, v, qb)[0]:.2f}  "
