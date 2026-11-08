@@ -60,6 +60,16 @@ logit term adds +0.03 validation, train within noise, not adopted) and size vs "
 Conclusion: after the peer effect, every residual test (population, per machine, win, size,
 calibration) is at chance level. v10 (56.59) is the best verified model.
 
+## Round 4: refining the peer correction (branch `pranav/peer-plus`, no change)
+`research/peer_plus.py`, fitted on train, validation untouched, compared with v10:
+| Variant | Validation (halves) | Train window dR vs v10 |
+|---|---|---|
+| v10 (peers lags 1-5 x 1.0) | 56.56 (56.53 / 56.61) | 0 |
+| per-lag weights (train: 2-4 ~0.6, 7 0.25, others ~0) x0.55 | 56.58 (56.51 / 56.66) | -0.0014 [-0.0026, -0.0003] |
+| per-lag weights x0.7 | 56.55 (56.47 / 56.66) | -0.0022 |
+| + short-history interaction (train fits -0.05) | 56.48-56.57 | ~0 |
+| forced short x 0.75 (+ signal) | 56.30-56.33 | +0.002 to +0.004 |
+Per-lag weights help train but lower the validation tuning half: not adopted. v10 stays.
 ## Round 5 (branch `pranav/deep-hunt`, no change)
 - New residual families on v10 (`research/residuals3.py`): peer payout size, peer 5x/20x shares,
   same- vs other-type peers, peers at lags 9-20 and 21-60, own win/loss streaks, spins since the
