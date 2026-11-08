@@ -58,3 +58,13 @@ blend .00385. Jackpot win remains the largest gap for every member.
 - A submittable v14 entry for this blend is being packaged (branch `sai/v14-blend`), then the eval suite.
 - Not yet verified on a shifted round: the exact filter currently restricts pairs to the three main-round pairs and must
   re-learn them for round two.
+
+## Round-two checks (2026-11-08)
+- `orch/r2screen/`: sign-invariant structure screen (single lags, pairs, triples) recovers the simulated round2_shift
+  lags {2,3,5,7}; run it first on the real round-two kit.
+- `research_exact/` now learns its pair prior from the kit's histories (all 28 pairs, census + floor): main cross-fit
+  57.478 vs 57.49 hard-coded.
+- `r2/R2_TRANSFER.md` (from sai/r2-transfer): v13 re-learns the round2_shift structure (pairs and size keys within
+  {2,3,5,7}) and scores 25.22/40 vs pooled 20.00. But it also scores only 38.97/60 (R 0.54) on the generator's
+  main_like preset, against R 0.043 on real main validation, so the eval-suite generator is a poor proxy for scores:
+  use it to check structure discovery, not to rank models. Rank on the real round-two validation answers.
