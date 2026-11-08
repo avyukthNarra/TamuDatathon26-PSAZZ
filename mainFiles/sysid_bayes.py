@@ -151,12 +151,22 @@ def train_win(machines,labels,conditions,out,shared_features=True):
     return report
 
 
+
+def physical_values(model,m):
+    ti=TYPES.index(m.query.machine_type)
+    mu=model['mu'][ti] if np.ndim(model['mu']) else model['mu']
+    beta=model.get('signal_by_type',[model['signal']]*len(TYPES))[ti]
+    sigma=model.get('sigma_by_type',[model['sigma']]*len(TYPES))[ti]
+    amplitude=model.get('amplitude_by_type',[model['amplitude']]*len(TYPES))[ti]
+    return float(mu),float(beta),float(sigma),float(amplitude)
+
 def win_states(model,m,nquad=21):
     nodes,qw=quadrature(nquad)
     R=len(model['ruleids'])
     rid=np.repeat(np.arange(R),2*nquad)
     signs=np.tile(np.repeat([-1.,1.],nquad),R)
-    intercept=np.tile(model['mu'][TYPES.index(m.query.machine_type)]+model['signal']*m.query.signal+model['sigma']*np.tile(nodes,2),R)
+    mu,beta,sigma,amplitude=physical_values(model,m)
+    intercept=np.tile(mu+beta*m.query.signal+sigma*np.tile(nodes,2),R)
     prior=np.repeat(model['ruleweights'],2*nquad)*np.tile(qw/2,2*R)
     return rid,signs,intercept,prior
 
@@ -165,19 +175,20 @@ def static_predict(model,m,half_life=None,labels=None,nquad=21):
     F,pay,ticks=complete_data(m,labels)
     rid,signs,intercept,prior=win_states(model,m,nquad)
     X=F[:,np.array(model['ruleids'])[rid]]*signs[None,:]
+    amplitude=physical_values(model,m)[3]
     C=np.nan_to_num(F[:,model['commonids']])
     offset=C@model['common_coefficients']
-    z=intercept[None,:]+model['amplitude']*X+offset[:,None]
+    z=intercept[None,:]+amplitude*X+offset[:,None]
     w=np.ones(len(ticks)) if half_life is None else 2**(-(m.query.cutoff-1-ticks)/half_life)
     ll=np.sum(w[:,None]*((pay>0)[:,None]*z-np.logaddexp(0,z)),axis=0)
     post=np.exp(ll+np.log(prior)-logsumexp(ll+np.log(prior)))
     f=m.features[m.query.cutoff]
     off=np.nan_to_num(f[model['commonids']])@model['common_coefficients']
     feature=f[np.array(model['ruleids'])[rid]]
-    nextz=intercept+model['amplitude']*signs*np.nan_to_num(feature)+off
+    nextz=intercept+amplitude*signs*np.nan_to_num(feature)+off
     probabilities=expit(nextz)
     unknown=~np.isfinite(feature)
-    probabilities[unknown]=.5*(expit(intercept[unknown]+off+model['amplitude'])+expit(intercept[unknown]+off-model['amplitude']))
+    probabilities[unknown]=.5*(expit(intercept[unknown]+off+amplitude)+expit(intercept[unknown]+off-amplitude))
     return float(post@probabilities),float(logsumexp(ll+np.log(prior)))
 
 

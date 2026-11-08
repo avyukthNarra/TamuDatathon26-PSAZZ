@@ -25,11 +25,17 @@ def design(ms,hist_lp,model):
     ep_mean=np.array([np.mean([hist_lp[j] for j in range(n) if ep_ids[j]==ep_ids[i]]) for i in range(n)])[:,None]
     peer_mean=np.array([np.mean([hist_lp[j] for j in range(n) if ep_ids[j]==ep_ids[i] and j!=i]) for i in range(n)])[:,None]
     peer_lag=f[:,74:75]
+    mu=np.asarray(model['mu']);signal_coef=float(model['signal'])
+    baseline=np.array([mu[TYPES.index(x.machine_type)]+signal_coef*x.signal for x in q])[:,None]
+    delta=lp-baseline
+    level_terms=np.column_stack([np.array([x.machine_type==t for x in q],dtype=float)*np.maximum(delta[:,0],0) for t in TYPES]+[np.array([x.machine_type==t for x in q],dtype=float)*np.maximum(-delta[:,0],0) for t in TYPES])
+    level_names=[f'{t}_live_excess' for t in TYPES]+[f'{t}_dead_excess' for t in TYPES]
     candidates={
       'type_signal':(base,names),
       'type_signal_history_lp':(np.column_stack([base,lp]),names+['history_logit']),
       'type_signal_history_lp_by_type':(np.column_stack([base,lp,typ*lp]),names+['history_logit']+[f'{t}_history' for t in TYPES]),
       'type_signal_history_lp_by_type_signal':(np.column_stack([base,lp,typ*lp,sig*lp]),names+['history_logit']+[f'{t}_history' for t in TYPES]+['signal_history']),
+      'type_signal_piecewise_levels':(np.column_stack([base,lp,level_terms]),names+['history_logit']+level_names),
       'type_signal_history_episode':(np.column_stack([base,lp,ep_mean]),names+['history_logit','episode_mean_history_logit']),
       'type_signal_history_peer':(np.column_stack([base,lp,peer_mean]),names+['history_logit','peer_mean_history_logit']),
       'type_signal_history_peer_lag':(np.column_stack([base,lp,peer_lag]),names+['history_logit','mean_peer_win_lag3']),

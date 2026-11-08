@@ -276,3 +276,21 @@ OPENBLAS_NUM_THREADS=2 VECLIB_MAXIMUM_THREADS=2 python3 mainFiles/sysid_win_form
 ```
 
 It writes `mainFiles/runs/sysid-win/win_form.json`. Candidate definitions are frozen in `mainFiles/sysid_win_form.py`; each one is trained on one validation fold and scored only on the other. Ranking the fixed candidates uses both held-out scores, so the top-ranked candidate is reported as a screen result. The calibrated-history line and its interval use a single fixed form. All oracle-size values remain confined to win-only ceiling scoring.
+
+## Fold-specific level-prior follow-up (new orchestrator measurement)
+
+The new `PRIORS_FACTS.md` result is consistent with a binary parity state plus a continuous per-machine level: fitted pair amplitudes from validation truth are about 2.38–2.45 logits, while residual level SD is wider than the train model's 0.337 (`.47–.71` by fold/type). Signal slopes vary by type: balanced is about `.46–.48`, while jackpot is about `.36–.37`. Jackpot live intercepts fit to A/B are `.274/.367`, giving signal-zero live probabilities `.568/.591` before integrating the fitted residual SD. This corrects the earlier approximate `.50` history-based center, though it does not alone explain the largest jackpot misses.
+
+I fit two-component logit levels separately by type on each tune fold, regressed dead/live centers on signal, and used the resulting type-specific midpoint, half-gap, signal slope, and pooled residual SD inside the finite parity/reversal likelihood. The other fold was scored with official validation targets and exact conditional sizes only for the win-only ceiling. Fold A/B level estimates were independent; no held-out target entered its model.
+
+| Candidate win estimate | Cross-fitted win-only ceiling / 60 | 95% episode CI | Stable | Short | Drift | Shared |
+|---|---:|---:|---:|---:|---:|---:|
+| Train-selected history posterior, fixed-form target calibration | 58.105 | 57.513–58.545 | 0.0258 | 0.0595 | 0.0218 | 0.0233 |
+| Fold-specific truth level priors in history likelihood | 58.107 | 57.513–58.574 | 0.0263 | 0.0587 | 0.0229 | 0.0224 |
+| Screened history + recent-32 target fit (selection-set diagnostic) | 58.126 | 57.590–58.553 | 0.0214 | 0.0600 | 0.0214 | 0.0234 |
+| Direct level-prior remap of history probability (failed) | 57.871 | 57.298–58.285 | 0.0268 | 0.0593 | 0.0290 | 0.0320 |
+| Exact P(win), exact conditional size | 60.000 | oracle | 0 | 0 | 0 | 0 |
+
+The fixed history calibration's fold scores are 57.927 on A and 58.247 on B; the direct type-specific likelihood candidate scores 57.927 on A and 58.255 on B. Its win RMSE is .0467/.0690/.0820 for steady/balanced/jackpot and .0563/.0584/.0877/.0620 for drift/shared/short/stable. The new level centers validate the generator decomposition but do not give a meaningful score gain over the existing posterior; direct probability remapping is worse. The largest measured remaining errors are jackpot (win RMSE .082) and short history (.088 under the earlier fixed form).
+
+For reference, the complete train-only forecaster scores 57.445/60 (95% episode CI 56.882–57.895), versus pooled starter 30.000. Those scores include payout-size error and are not comparable to win-only ceilings above. Fold-prior fitting uses validation truth by design as a cross-fit system-identification diagnostic, not as a deployable train-only method. The executable is `mainFiles/sysid_level_prior.py`; run `OPENBLAS_NUM_THREADS=2 VECLIB_MAXIMUM_THREADS=2 python3 mainFiles/sysid_level_prior.py` after generating `mainFiles/runs/sysid-final/`. Results are written to ignored `mainFiles/runs/sysid-win/level_prior.json`.

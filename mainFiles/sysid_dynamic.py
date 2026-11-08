@@ -7,7 +7,7 @@ import time
 
 import numpy as np
 from scipy.special import expit,logsumexp
-from sysid_bayes import ROOT,complete_data,win_states,load_machines,condition_map
+from sysid_bayes import ROOT,complete_data,win_states,load_machines,condition_map,physical_values
 from slot_forecasting.io import write_json,read_labels
 
 
@@ -23,6 +23,7 @@ def machine_grid(model,m,width=0.,fractions=None,nquad=15,labels=None,end_tick=N
         ok=ticks<end_tick;F,pay,ticks=F[ok],pay[ok],ticks[ok]
     cutoff=m.query.cutoff if end_tick is None else end_tick
     rid,signs,intercept,prior=win_states(model,m,nquad)
+    amplitude=physical_values(model,m)[3]
     X=F[:,np.array(model['ruleids'])[rid]]*signs[None,:]
     offset=np.nan_to_num(F[:,model['commonids']])@model['common_coefficients']
     cp,span=change_grid(cutoff,width,fractions)
@@ -34,16 +35,16 @@ def machine_grid(model,m,width=0.,fractions=None,nquad=15,labels=None,end_tick=N
         gn=np.clip((cp-cutoff)/(span/2),-1,1)
     # First branch is the unchanged rule. Remaining branches share a cp grid.
     gs=np.vstack([np.ones((1,len(ticks))),gs]);gn=np.r_[1.,gn]
-    z=intercept[None,None,:]+model['amplitude']*X[None,:,:]*gs[:,:,None]+offset[None,:,None]
+    z=intercept[None,None,:]+amplitude*X[None,:,:]*gs[:,:,None]+offset[None,:,None]
     ll=np.sum((pay>0)[None,:,None]*z-np.logaddexp(0,z),axis=1)+np.log(prior)[None,:]
     evidence=logsumexp(ll,axis=1)
     f=m.features[cutoff]
     off=np.nan_to_num(f[model['commonids']])@model['common_coefficients']
     feature=f[np.array(model['ruleids'])[rid]]
-    nz=intercept[None,:]+model['amplitude']*signs[None,:]*np.nan_to_num(feature)[None,:]*gn[:,None]+off
+    nz=intercept[None,:]+amplitude*signs[None,:]*np.nan_to_num(feature)[None,:]*gn[:,None]+off
     probabilities=expit(nz)
     unknown=~np.isfinite(feature)
-    probabilities[:,unknown]=.5*(expit(intercept[None,unknown]+off+model['amplitude']*gn[:,None])+expit(intercept[None,unknown]+off-model['amplitude']*gn[:,None]))
+    probabilities[:,unknown]=.5*(expit(intercept[None,unknown]+off+amplitude*gn[:,None])+expit(intercept[None,unknown]+off-amplitude*gn[:,None]))
     conditional=np.sum(np.exp(ll-evidence[:,None])*probabilities,axis=1)
     return evidence,conditional
 
