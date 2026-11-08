@@ -4,7 +4,7 @@ A running log of the requests (to Claude Code or any coding agent) that led to
 real score gains, and the ones that didn't. Use it to steer the next agent fast,
 especially in round two. Validation points are out of 60; the pooled baseline is 30.
 
-## At a glance: everything that lowered the error (30 -> 56.32)
+## At a glance: everything that lowered the error (30 -> 56.51)
 
 Each step was kept only because it helped; from step 9 on, it also had to help out of fold on
 train AND on both cross-fitted validation halves. Details and prompts are in the round sections.
@@ -25,7 +25,8 @@ train AND on both cross-fitted validation halves. Details and prompts are in the
 | 11 | Dead / live levels per machine TYPE | win: jackpot is almost never live | 56.12 |
 | 12 | Third win memory (half-life 100) + slower size re-weighting (size_eta 4) | short_history size error | 56.19 |
 | 13 | Middle prior level per type at the type's own median (steady 0.24, jackpot 0.55, balanced 0.75) | win: middle machines (0.2-0.8) | 56.29 |
-| 14 | Prior levels also by the signal column (shrunk halfway to the type's) | win: signal shifts the active level ~+0.05 per step | **56.32** |
+| 14 | Prior levels also by the signal column (shrunk halfway to the type's) | win: signal shifts the active level ~+0.05 per step | 56.32 |
+| 15 | Blend 30% of a hidden-rule HMM's win chance (from the zhill-56.28-hmm branch), levels from our type/signal prior | win: rule switches (HMM jumps instead of slowly forgetting) | **56.51** |
 
 Honest evaluation (round 4) is what made steps 10-12 trustworthy: cross-fitted validation (each
 half's priors from the other half), 8-fold episode-grouped train scoring, and a late-window
@@ -79,7 +80,7 @@ rule changes well, which is why drift is the best condition.
 4. Ceiling check: a perfect win chance alone would score 58.40, perfect sizes alone 57.57
    (round-4 model), so 57+ needs a new discovery, not tuning.
 
-## Paste-ready prompt (rebuilds the 56.32 model from the starter kit)
+## Paste-ready prompt (rebuilds the 56.51 model from the starter kit)
 
 Copy everything inside the box into a fresh coding agent opened in the repo root.
 It describes the finished model exactly, so the agent doesn't have to rediscover it.
@@ -92,7 +93,7 @@ submission_contract.py), and the organizers' baseline in run_starter.py (it alwa
 scores ~30/60 because "pooled" IS the reference model; points = 60/(1+R)).
 Read AGENTS.md first and follow it: work on a feature branch, never commit to main.
 
-GOAL: build a forecaster that scores ~56.32/60 on validation (~56.31 cross-fitted,
+GOAL: build a forecaster that scores ~56.51/60 on validation (~56.48 cross-fitted,
 see VERIFY), plus a verified entry ZIP.
 
 HARD CONSTRAINTS
@@ -181,6 +182,16 @@ BUILD mainFiles/slot_forecasting/pair_mixer.py with:
    (),(1,),(2,),(3,),(4,). Main round scores: lag1 1.25, lag2 1.04, lag4 0.95, all others
    <= 0.44.
 
+8. slot_forecasting/rule_hmm.py: HiddenRuleHMM. Hidden state = (pair from choose_pairs,
+   "match" | "differ") plus a "no rule" state (prior 0.1) paying the machine's smoothed base rate
+   (wins + 4*0.45) / (observed + 4). Emission P(win) = live if the state says live given spins
+   a and b back, else dead; live / dead = components 1 and 0 of the win prior's "type|signal"
+   entry (else the type's). Each tick keep the state with prob 1 - 0.001, else redraw from the
+   prior; forward-filter observed spins; win chance at the cutoff = posterior-weighted emission.
+   WithRuleHMM: final win = 0.7 x mixer win + 0.3 x HMM win, payout sizes from the mixer, floor
+   1e-4 and renormalise. adapt() wraps the chosen mixer in it whenever the win prior is per type.
+   Add rule_hmm.py to the entry's slot_forecasting modules.
+
 ALSO CREATE
 - mainFiles/entry_template/predict.py: loads train, reads size modes AND the win prior from
   <data>/validation/targets.csv (else from priors.json saved next to it), calls adapt(),
@@ -207,19 +218,51 @@ ALSO CREATE
 
 VERIFY (and report the actual output)
   cd mainFiles && python -m unittest discover -s tests
-  python run_pair_mixer.py --out runs/combined-v7 --cv-val
-  python check_submission.py runs/combined-v7/submission.csv
-  python check_submission.py runs/combined-v7/validation_predictions.csv --split validation
-Expect validation ~56.32/60 (R ~0.065: stable ~0.054, short_history ~0.104,
-drift ~0.047, shared_change ~0.056) and cross-fitted halves (each half's priors read
-from the OTHER half's targets) ~56.14 / 56.47. The reference build's test submission
-SHA-256 is e9552839e4722c41afd33927db3994d830cbf86aba068a3a6bb558ac711b25d1. A rebuild
+  python run_pair_mixer.py --out runs/combined-v8 --cv-val
+  python check_submission.py runs/combined-v8/submission.csv
+  python check_submission.py runs/combined-v8/validation_predictions.csv --split validation
+Expect validation ~56.51/60 (R ~0.062: stable ~0.048, short_history ~0.103,
+drift ~0.043, shared_change ~0.053) and cross-fitted halves (each half's priors read
+from the OTHER half's targets) ~56.47 / 56.50. The reference build's test submission
+SHA-256 is 7f1dafaca919db259868f3ba5aa9a42b93de7d5a0fbf91e150b20e696e9d049d. A rebuild
 will only match it byte for byte if the arithmetic order is identical, so treat the
-score as the check. Upload runs/combined-v7/submission.csv and runs/combined-v7/entry.zip.
+score as the check. Upload runs/combined-v8/submission.csv and runs/combined-v8/entry.zip.
 ````
 
 The shortcut, if the branch `COMBINED_SOLUTIONS` is available, is to check it out and
-run the VERIFY commands (current reference: 56.32). The prompt above is for rebuilding without it.
+run the VERIFY commands (current reference: 56.51). The prompt above is for rebuilding without it.
+
+## Round 9: the hidden-rule HMM from zhill-56.28-hmm (56.32 -> 56.51)
+
+A teammate's branch added a hidden-rule HMM: each machine's win rule is a hidden state (lag
+pair x match/differ, plus "no rule") that can JUMP (prob 0.001 per tick), filtered forward over
+the machine's spins. Our mixer forgets old evidence gradually instead, so it lags a machine that
+switches rules. Their entry (50% HMM + 50% of rule model + our old v4 mixer) scored 56.28; our
+v7 alone was already 56.32, so we took only the HMM and blended its win chance into ours.
+
+What was better / not on that branch:
+
+| Part | vs ours | Taken? |
+|---|---|---|
+| Hidden-rule HMM | new, complementary (rule switches) | **yes**, 30% of the win chance |
+| Their base (20% rule model + 80% our old mixer v4) | 55.58 vs our 56.32 | no |
+| Rule-model live/dead prior, mixer sweeps, neighbour rules | flat in their own notes | no |
+
+Results (cross-fit validation (halves); OOF train dR vs v7, window = cutoff + last 10 spins):
+
+| Variant | Cross-fit | OOF cutoff dR | OOF window dR |
+|---|---|---|---|
+| v7 alone | 56.29 (56.14 / 56.47) | | |
+| + their HMM (type levels) 20% / 30% / 40% | 56.42 / 56.44 / 56.44 | -0.0018 / -0.0019 / -0.0015 | -0.0024 / **-0.0028 [-0.0047, -0.0009]** / -0.0027 |
+| **+ HMM with our type/signal levels, 30%** | **56.48 (56.47 / 56.50)** | -0.0030 [-0.009, +0.004] | **-0.0039 [-0.0057, -0.0021]** |
+| ...40% / 50% | 56.49 (56.53 / 56.47) / 56.48 (56.55 / 56.42) | -0.0031 | -0.0043 |
+| ...switch 0.0005 / 0.002 | 56.49 / 56.46 | | |
+
+30% is the largest weight that raises BOTH halves. Built entry: validation 56.51, R 0.062
+(stable 0.048, short_history 0.103, drift 0.043, shared_change 0.053).
+
+Prompt used: "Look at the new branch zhill-56.28-hmm, see what is better and not, take what is
+better and improve our model as much as you can (same honest checks)."
 
 ## Round 8: all-branch review and the signal prior (56.29 -> 56.32)
 
@@ -696,6 +739,7 @@ run the tests and check_submission.py, and commit and push.
 | 15 | **"Diagnose short_history (win vs size, sparse cells, wins in the window), test four targeted fixes one at a time, keep only what passes OOF train and both cross-fit halves"** | Its extra error is payout size, not sparse win cells. A third win memory (half-life 100) plus slower size-expert re-weighting (size_eta 4) passed; leave-one-out scoring, gap decay, coarse/pooled size cells did not. OOF window dR -0.0012 [-0.0024, -0.0001]; cross-fit halves 56.00 / 56.40 | **56.19** |
 | 16 | **"Middle machines have the worst ratio; give the per-type prior a middle level learned from each type's targets"** | Middle component at each type's own median (steady 0.24, jackpot 0.55, balanced 0.75), strength 10. OOF window dR -0.0022 [-0.0029, -0.0014], all four conditions better; cross-fit halves 56.13 / 56.43 | **56.29** |
 | 17 | **"Review every branch and online resource for anything that beats this; test it honestly"** | No branch beats it; the signal column shifts the active win level, so the prior is now per (type, signal), shrunk halfway to the type. OOF window dR -0.0012 [-0.0021, -0.0004]; cross-fit halves 56.14 / 56.47 | **56.32** |
+| 18 | **"Look at the teammate's new HMM branch, take what is better, improve ours"** | Their hidden-rule HMM catches rule switches our decaying tables lag on; 30% of its win chance (with our type/signal levels) blended in. OOF window dR -0.0039 [-0.0057, -0.0021]; cross-fit halves 56.47 / 56.50 | **56.51** |
 
 ## Prompt patterns that work
 

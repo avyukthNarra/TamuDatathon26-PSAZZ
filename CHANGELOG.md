@@ -23,6 +23,7 @@ How to add an entry (every PR):
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 
 ### Changed
+- Win chance blends in 30% of a hidden-rule HMM (adapted from the zhill-56.28-hmm branch) that tracks rule switches; validation 56.32 -> 56.51 / 60 (cross-fitted 56.48)
 - Pair mixer's win prior levels also depend on the machine's signal column; validation 56.29 -> 56.32 / 60 (cross-fitted 56.31)
 - Pair mixer's win prior gets a middle level per machine type, read from that type's in-between win chances; validation 56.19 -> 56.29 / 60 (cross-fitted 56.28)
 - Pair mixer adds a slow 100-spin win memory and re-weights its payout-size experts more slowly; validation 56.12 -> 56.19 / 60 (cross-fitted 56.18), short_history error ratio 0.112 -> 0.107

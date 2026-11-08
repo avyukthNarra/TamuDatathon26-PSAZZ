@@ -611,7 +611,7 @@ def cutoff_brier(model, queries, history, labels):
                                for k, p in enumerate(predictions[q])) for q in labels) / len(labels)
 
 
-def adapt(queries, history, labels=None, log=print, size_modes=None, win_prior=None):
+def adapt(queries, history, labels=None, log=print, size_modes=None, win_prior=None, hmm_weight=None):
     """Round-two helper: rediscover the lag pairs and pick the cell mode on this round's train data.
 
     size_modes: from size_modes_from_targets on this round's validation targets, if available.
@@ -629,8 +629,18 @@ def adapt(queries, history, labels=None, log=print, size_modes=None, win_prior=N
                             **extra).fit(queries, history)
                   for mode in ("parity", "full")]
     if labels is None:
-        return candidates[0]
+        return _with_hmm(candidates[0], pairs, win_prior, hmm_weight, log)
     scores = [cutoff_brier(model, queries, history, labels) for model in candidates]
     for model, score in zip(candidates, scores):
         log(f"cell_mode={model.cell_mode[0]}: train cutoff Brier {score:.5f}")
-    return candidates[scores.index(min(scores))]
+    return _with_hmm(candidates[scores.index(min(scores))], pairs, win_prior, hmm_weight, log)
+
+
+def _with_hmm(model, pairs, win_prior, hmm_weight, log):
+    """Blend in the hidden-rule HMM's win chance (rule_hmm.py) when a per-type win prior is given."""
+    from .rule_hmm import HMM_WEIGHT, HiddenRuleHMM, WithRuleHMM, levels_from_prior
+    weight = HMM_WEIGHT if hmm_weight is None else hmm_weight
+    if not weight or not isinstance(win_prior, dict):
+        return model
+    log(f"hidden-rule HMM blended into the win chance at {weight}")
+    return WithRuleHMM(model, HiddenRuleHMM(pairs, levels_from_prior(win_prior)), weight)

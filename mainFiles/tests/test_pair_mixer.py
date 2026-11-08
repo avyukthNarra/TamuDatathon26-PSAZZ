@@ -7,7 +7,8 @@ from slot_forecasting.pair_mixer import (CLASS_INDEX, MODE_SIZE_KEYS, PairMixer,
                                          discover_size_keys, size_mode_mixture, size_modes_from_targets,
                                          win_prior_by_type_from_targets,
                                          win_prior_from_targets)
-from slot_forecasting.schema import PAYOUTS, Play, Query, Target
+from slot_forecasting.rule_hmm import HiddenRuleHMM, WithRuleHMM, levels_from_prior
+from slot_forecasting.schema import PAYOUTS, Play, Query, Target, ValidationError
 
 MACHINES = ("e1-m0", "e1-m1", "e1-m2")
 
@@ -278,6 +279,34 @@ class PairMixerTest(unittest.TestCase):
         self.assertLess(low, high)
         model = PairMixer(win_prior=prior)
         self.assertLess(model._cell_rate(3.0, 3.0, "balanced|-1"), model._cell_rate(3.0, 3.0, "balanced|1"))
+
+    def test_rule_hmm_follows_a_rule_switch_and_never_looks_ahead(self):
+        """Wins follow lags (1,3) MATCH, then switch to (2,5) MATCH: the HMM must end on (2,5)."""
+        rng = random.Random(4)
+        won = [rng.random() < 0.5 for _ in range(5)]
+        for t in range(5, 300):
+            a, b = (1, 3) if t < 150 else (2, 5)
+            won.append((won[t - a] == won[t - b]) if rng.random() < 0.97 else rng.random() < 0.5)
+        query = Query("q", "e1", "m", "steady", 0, 300)
+        history = tuple(Play("e1", "m", t, 1 if w else 0) for t, w in enumerate(won))
+        hmm = HiddenRuleHMM(((1, 3), (2, 5)), {"steady": (0.95, 0.03)})
+        p = hmm.win_chances((query,), history)["q"]
+        self.assertAlmostEqual(p, 0.95 if won[298] == won[295] else 0.03, delta=0.1)
+        later = history + tuple(Play("e1", "m", t, 1) for t in range(300, 310))
+        with self.assertRaises(ValidationError):  # rows at/after the cutoff are refused outright
+            hmm.win_chances((query,), later)
+
+    def test_rule_hmm_blend_keeps_the_mixer_sizes(self):
+        queries, history = make_data(seed=3, cutoff=80, rule=True)
+        mixer = PairMixer().fit(queries, history)
+        prior = {"steady": [(0.45, 0.03, 10), (0.45, 0.9, 10), (0.1, 0.5, 2)]}
+        self.assertEqual(levels_from_prior(prior), {"steady": (0.9, 0.03)})
+        blended = WithRuleHMM(mixer, HiddenRuleHMM(((1, 3),), levels_from_prior(prior)), 0.3).predict(queries, history)
+        base = mixer.predict(queries, history)
+        for qid, probs in blended.items():
+            self.assertAlmostEqual(sum(probs), 1.0, places=9)
+            for k in range(1, 5):
+                self.assertAlmostEqual(probs[k] / (1 - probs[0]), base[qid][k] / (1 - base[qid][0]), places=3)
 
     def test_adapts_to_new_lag_pairs(self):
         """Round two may use different pairs: rediscovery must find them and the mixer must use them."""

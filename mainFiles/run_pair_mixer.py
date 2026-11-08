@@ -25,7 +25,7 @@ from slot_forecasting.starter import public_directory
 from slot_forecasting.submission_contract import package_code
 
 HERE = Path(__file__).resolve().parent
-MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py")
+MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py", "rule_hmm.py")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", default=str(HERE / "public"))
