@@ -9,7 +9,7 @@ Steps:
   1. Check public/metadata.json (warns unless round == "adaptation").
   2. Build up to three candidates on the NEW data; each refits everything (lag pairs, size lags,
      size modes, win priors, peer centre) from that data:
-       v14  v12 blended with Avyukth's v7c (win 0.6 / 0.4 in log-odds + extra peer term, v7c sizes)
+       v14  v12 blended with Avyukth's v7c (win 0.6 / 0.4 in log-odds + extra peer + signal terms, v7c sizes) = v15 settings
        v12  v11 with the size-rule HMM sizes (zhill branch)
        v11  log-odds average of v10, a 0.6 / 0.4 version and per-lag peers
        v10  log-odds pool of pair mixer + hidden-rule HMM, plus the peer correction

@@ -63,12 +63,16 @@ WIN_WEIGHT = 0.4    # v14: share of v7c's win chance in the log-odds blend (v13 
 EXTRA_PEER = 0.5    # v14: extra peer term (v7c ignores other machines, so the blend halved it)
 
 
-def combine(ours, theirs, win_weight=0.5, extra_peer=0.0, queries=None, history=None, center=0.5):
+def combine(ours, theirs, win_weight=0.5, extra_peer=0.0, queries=None, history=None, center=0.5, signal_coef=0.0):
     """Blend ours and v7c. With extra_peer > 0 (and queries / history), add
     extra_peer x (peers' lag 1-5 win share - center) to the blended log-odds (peers.py).
     v14 research (research/v13_variants.py, v13_eval.py): win 0.4 + extra peer 0.5 vs v13 -
     validation 57.50 (57.56 / 57.44) vs 57.50 (57.55 / 57.44); held-out train window dR
-    -0.0019 [-0.0031, -0.0007], cutoff -0.0020 [-0.0049, +0.0007] (v7c refit per fold)."""
+    -0.0019 [-0.0031, -0.0007], cutoff -0.0020 [-0.0049, +0.0007] (v7c refit per fold).
+    signal_coef (v15: 0.05): the residual of v14's win chance rises with the signal column on both
+    validation (z +3.4) and train (z +3.1); 0.05 (half the validation optimum) lifts both
+    validation halves (57.56 / 57.44 -> 57.58 / 57.47), train dR -0.0004 window, -0.0008 cutoff."""
+    signals = {q.query_id: q.signal for q in queries} if queries is not None else {}
     shares = {}
     if extra_peer and queries is not None:
         from .peers import _by_machine, peer_share
@@ -80,6 +84,7 @@ def combine(ours, theirs, win_weight=0.5, extra_peer=0.0, queries=None, history=
         wa, wb = 1.0 - a[0], 1.0 - b[0]
         share = shares.get(qid)
         bump = 0.0 if share is None else extra_peer * (share - center)
+        bump += signal_coef * signals.get(qid, 0)
         win = 1.0 / (1.0 + math.exp(-((1 - win_weight) * _logit(wa) + win_weight * _logit(wb) + bump)))
         sizes = [x / wb for x in b[1:]]
         raw = [max(p, MIN_PROBABILITY) for p in [1.0 - win] + [win * s for s in sizes]]

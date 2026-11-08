@@ -58,3 +58,17 @@ v7c ignores other machines, so v13's 50/50 blend halved the peer effect; v14 res
 validation (built entry 57.52, 57.519755; halves 57.56 / 57.44) and better held-out train.
 Entry 106 s, byte-identical on Python 3.13 read-only without validation targets. Test SHA-256
 996be60fb51f4e76b0e9423a0ff659fb31317c246cbd2e10fa782876e1283a19. `round_two.py` builds v14.
+
+## v15 (branch `pranav/v14-plus`): signal term (57.52 -> 57.55)
+Residual hunt on v14 (`research/v14_residuals.py`): payout size is clean (no signal at |z| > 2 on
+both splits); the win chance still rises with the signal column on BOTH validation (z +3.4) and
+train (z +3.1). `research/v14_signal.py` (vs v14):
+| Signal coefficient (log-odds per step) | Validation (halves) | Train cutoff / window dR |
+|---|---|---|
+| 0 (v14) | 57.50 (57.56 / 57.44) | 0 / 0 |
+| **0.05 (chosen: half the validation optimum)** | **57.52 (57.58 / 57.47)** | -0.0008 / -0.0004 [-0.0010, +0.0001] |
+| 0.1 | 57.53 (57.58 / 57.48) | -0.0012 / -0.0006 |
+Built entry: validation 57.55 (cross-fit halves 57.58 / 57.47), R 0.0426 (stable 0.036, short
+0.070, drift 0.029, shared 0.036); settings in combo.json; byte-identical on Python 3.13 read-only
+without validation targets. Test SHA-256 2c4a968b1580fcdceaa16f8c5041a537705d46eb22b5e1500a278279a13cb2d1.
+`run_strongest.py` and round two (candidate "v14" = the run_strongest default) now build v15.

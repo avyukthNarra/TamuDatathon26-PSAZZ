@@ -52,5 +52,6 @@ v7c = V7C(data, targets_available=targets_path.exists(),
 queries, history = load_inputs(data / args.split)
 cfg = json.loads((here / "combo.json").read_text(encoding="utf-8"))
 write_submission(args.out, combine(model.predict(queries, history), v7c.predict_ids(data, args.split, None),
-                                   cfg["win_weight"], cfg["extra_peer"], queries, history, cfg["center"]))
+                                   cfg["win_weight"], cfg["extra_peer"], queries, history, cfg["center"],
+                                   cfg.get("signal_coef", 0.0)))
 print(f"wrote {args.out}")
