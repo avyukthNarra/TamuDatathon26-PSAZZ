@@ -27,6 +27,15 @@ Fold A/B scores for the cross-fitted choice are 52.5130/53.2642; pooled is
 are not averaged to form the headline: opposite-fold predictions are combined
 and passed to the official scorer, preserving condition normalization.
 
+The complete clean fit of all candidates and answer-free prediction took
+**430.999 seconds** (7 min 11 sec), with **2110.48 MiB** peak process memory.
+The configured two-thread budget is below the 30-minute/16-GiB entry limits.
+An independent refit reproduced all 16 learned candidate probability arrays
+and the three shared final CSVs with maximum absolute difference **0.0**.
+Seven targeted tests passed; official checks accepted both validation files
+(768 queries each) and both test forecasts (1536 each). Compilation and
+`git diff --check` passed; this branch adds no lint configuration or CI.
+
 The two heads are scikit-learn histogram gradient boosting classifiers:
 win versus loss, followed by four positive payout classes. Machine-specific
 conditional frequencies, counts, and changes let a global classifier learn
@@ -45,7 +54,7 @@ Run from `mainFiles/` with Python 3.13 and the already installed packages:
 OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 VECLIB_MAXIMUM_THREADS=2 \
   python3 -m fresh_ml.run --out runs/fresh-ml-repro --iterations 160 \
     --include-mlp --extend-boosting --predict-only
-python3 -m fresh_ml.run --out runs/fresh-ml-repro --evaluate-only
+python3 -m fresh_ml.run --out runs/fresh-ml-repro --iterations 160 --evaluate-only
 python3 -m unittest fresh_ml.test_features -v
 python3 check_submission.py runs/fresh-ml-repro/validation_crossfit.csv --split validation
 python3 check_submission.py runs/fresh-ml-repro/validation_predictions.csv --split validation
