@@ -32,6 +32,11 @@ succeeds and falls back to local with a warning otherwise), `--seed` (default 0)
 `--keep-work` (keep mounted dataset copies for debugging). Exit status is 0 for no FAIL,
 1 for any FAIL, 2 for a suite error with no FAIL.
 
+`--jobs N` (default 1) runs independent entry executions in parallel (the k-fold folds, the causality
+probes, the generator presets and the `--compare` runs). It is concurrency only: results and report content
+are identical to `--jobs 1`, and runs are still recorded in the original order. Per-container limits (CPUs,
+memory, tmpfs quotas, no network) are unchanged. With Docker on an 8 GB VM keep `--jobs` at 4 or below.
+
 Tests: `python3 -m unittest discover -s eval_suite/tests -t . -v` (about two minutes on the
 development host; runtime and test count may change as checks are added).
 

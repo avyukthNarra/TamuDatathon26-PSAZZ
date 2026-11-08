@@ -345,6 +345,9 @@ def _run_local(entry, data, main_data, out, tmp, command, *, timeout_s):
     return exit_code, stdout, stderr, wall, None
 
 
+_IMAGE_LOCK = threading.Lock()
+
+
 def run_entry(entry_dir, data_root, *, main_data_root=None, mode="docker", timeout_s=1800,
               cpus=2, memory_gb=16) -> RunResult:
     """Run an entry's reproduce.json command and report what it produced.
@@ -369,7 +372,8 @@ def run_entry(entry_dir, data_root, *, main_data_root=None, mode="docker", timeo
             raise EntryError(f"docker mode needs a running Docker daemon ({message}). "
                              "Use mode='local' for a non-authoritative run.")
         docker = _docker_bin()
-        image = _ensure_image(entry, docker)
+        with _IMAGE_LOCK:  # concurrent --jobs runs must not build or pull the same tag twice at once
+            image = _ensure_image(entry, docker)
 
     out = Path(tempfile.mkdtemp(prefix="eval-out-"))
     limits: dict = {}
