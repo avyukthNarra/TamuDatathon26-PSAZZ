@@ -243,3 +243,36 @@ a README, dependency manifest, .env.example, lint configuration, and CI.
 Branch protection is documented as absent. Those infrastructure gaps were left
 outside this research task. The added forecaster has a MINOR semver impact if
 shipped; no release version or tag is created.
+
+## Win-model follow-up: continuous latent levels and ceiling
+
+The next analysis isolates `P(win)` after the team model identified the winning-size rule. It uses the train-selected history posterior from `strongest_peer/dyn01/constrained`. Every candidate input is built from validation histories; target logits are fitted on A and evaluated on B, then fitted on B and evaluated on A. The 4000-resample episode bootstrap is paired with the official pooled reference. The size vector is set to each held-out query's true conditional size distribution to report a win-only ceiling; this is an oracle diagnostic, not a deployable model.
+
+The six size profiles are independently present in all validation targets: exactly two per type after rounding conditional probabilities to eight decimals. This agrees with the earlier train-only size fit and its large-payout indicators at lags 1, 2 and 4. That result does not make `P(win)` a two-level variable.
+
+The all-validation `P(win)` deciles at 10%, ..., 90% are 0.0104, 0.0234, 0.0576, 0.1319, 0.3145, 0.6638, 0.8228, 0.9117, 0.9553. Type-specific distributions are more revealing: steady ranges from 0.073 at p5 to 0.976 at p95, balanced from 0.015 to 0.939, and jackpot from 0.004 to 0.792. The data contain a low and high band, but each band has continuous within-band spread. A target-derived two-cluster diagnostic leaves within-cluster logit RMSE 0.562 (steady), 0.712 (balanced), and 0.707 (jackpot). Type, signal, and a two-mode label alone leave target-logit RMSE 0.597. Adding episode offsets and observed lag/peer features reduces it to 0.420. Since the mode labels are computed from true targets, these figures diagnose the hidden structure and do not represent an available predictor.
+
+The train-fitted posterior expresses this structure as a per-machine continuous intercept (Gaussian prior SD 0.337), a signed parity term of amplitude 2.367, signal coefficient 0.381, peer lag-three coefficient 0.486, and a posterior over static, independent reversal, and episode-shared reversal. Its reversal width is 0.1 of cutoff, selected by train history likelihood. Thus a machine's level shifts the baseline logit continuously; the pair parity moves it between bands, while signal, peers, and time change the resulting logit or its sign. Direct Fold-A fits support this decomposition: raw type/signal logit RMSE is 2.459, while the target-derived mode fit is 0.597. A global fit over 96 ordinary lag/size/peer terms still has RMSE 1.966. The latent state and continuous intercept matter together.
+
+The fixed-form candidate ceilings, cross-fitted over folds, are:
+
+| Candidate P(win) form | Win-only ceiling / 60 | Stable ratio | Short ratio | Drift ratio | Shared ratio |
+|---|---:|---:|---:|---:|---:|
+| Type + signal | 27.963 | 1.0780 | 1.2776 | 1.1034 | 1.1238 |
+| Type + signal + history-posterior logit | 58.105 | 0.0258 | 0.0595 | 0.0218 | 0.0233 |
+| Above + raw learned pair parities | 58.112 | 0.0258 | 0.0595 | 0.0215 | 0.0232 |
+| Above + recent 32-tick win rate | 58.123 | 0.0252 | 0.0601 | 0.0210 | 0.0229 |
+| Above + episode mean history logit | 58.116 | 0.0255 | 0.0584 | 0.0225 | 0.0233 |
+| Exact P(win) targets + exact size | 60.000 | 0 | 0 | 0 | 0 |
+
+The calibrated history-logit candidate scores 57.927 on A and 58.247 on B, with 95% episode-bootstrap CI 57.513–58.545. The history plus recent-32 variant's 58.123 cross-fit score is the best among the screened set and should be read as a selection-set diagnostic. Its larger ceiling does not establish that recent frequency is the hidden generator: adding recent frequency to the history posterior changes the score by only 0.018. The direct pair features add only 0.006, because the history posterior already integrates machine-specific rule and direction evidence.
+
+Win RMSE for the calibrated history-logit model is 0.045 for steady, 0.070 for balanced, and **0.082 for jackpot**; by contest condition it is 0.055 drift, 0.059 shared change, 0.088 **short history**, and 0.062 stable. The screened history+recent model has RMSE 0.047 / 0.069 / 0.081 by type and 0.055 / 0.060 / 0.088 / 0.059 by condition. Short-history predictions and jackpot machines remain the largest misses. Direct A/B target calibration does not by itself recover every machine level; the remaining jackpot and short-history errors leave room for improved level inference.
+
+Reproduce this analysis after the train-only pipeline with:
+
+```sh
+OPENBLAS_NUM_THREADS=2 VECLIB_MAXIMUM_THREADS=2 python3 mainFiles/sysid_win_form.py
+```
+
+It writes `mainFiles/runs/sysid-win/win_form.json`. Candidate definitions are frozen in `mainFiles/sysid_win_form.py`; each one is trained on one validation fold and scored only on the other. Ranking the fixed candidates uses both held-out scores, so the top-ranked candidate is reported as a screen result. The calibrated-history line and its interval use a single fixed form. All oracle-size values remain confined to win-only ceiling scoring.
