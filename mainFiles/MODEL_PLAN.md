@@ -487,3 +487,6 @@ Why Sai's notes say ~56: Sai scores on a 24-episode audit split (our 20/80 + mix
 The blend is saturated at ~55.6 on all 96 episodes: improvements to either member land where the other
 is already strong. 57 would need R ≈ 0.053 (now 0.080), a third less error, which needs a new kind of
 information rather than more tuning or mixing.
+| Rules that use a NEIGHBOUR's past spin (own lag × neighbour lag, 4-cell match/differ) | Real 0.700 vs time-shifted null 0.702 → no such rules | ❌ |
+| Why 46% of machines fit no pair well | Stable machines fit at 0.899; weak ones are drift/shared machines whose rule changes (a rule per half: +0.10 vs +0.03 null) | finding |
+| Extrapolate the fast-minus-slow trend (for "gradually reverse") | Helps only drift (corr +0.14), hurts others (−0.20); 55.58 → 55.46 at λ=0.1 | ❌ |
