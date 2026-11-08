@@ -46,6 +46,26 @@ See `_coord/fresh/runbook.md`.
   `blend_v13` = `adapted_entry/` is added as a challenger automatically.
 - Upload the default first. Switch to a challenger only if it beats the default by more than 0.1 on the mean AND on both
   cross-fit halves. Paired deltas in RANKING.md are measured against the default.
-- Fallback order if the default's test CSV is invalid: blend -> v17-guards -> v7c -> v6 -> mixer6 (add zhill's v18 with --extra).
+- Fallback order if the default's test CSV is invalid: blend -> blend_v17g -> v17-guards -> v7c -> v6 -> mixer6 (add zhill's v18 with --extra).
 - Main-kit rehearsal (8.9 min): blend 57.97 (57.98/57.96), blend_v13 57.96, v17-guards 57.69, v7c 57.34, v6 56.26,
   mixer6 56.18; all test CSVs valid; pick = blend, keep it.
+
+## Kit-day steps (2026-11-08, after PR #27)
+Run in order; the gate must finish before run_round2.py starts, because the blend reads `gate.json` at startup.
+```bash
+KIT=/ABS/PATH/kit/public; OUT=/ABS/PATH/out
+python3 r2/gate_members.py --entry adapted_entry_v17g_rules --kit $KIT   # ~4.5 min: writes gate.json + bundled/validation/
+python3 r2/run_round2.py --kit $KIT --out $OUT --jobs 6                  # ~8 min: OUT/RANKING.md, OUT/blend/submission.csv
+# code ZIP from a clean copy (no __pycache__) plus the two generated files
+mkdir -p $OUT/zip && git archive HEAD adapted_entry_v17g_rules | tar -x -C $OUT/zip
+cp adapted_entry_v17g_rules/gate.json $OUT/zip/adapted_entry_v17g_rules/
+cp -R adapted_entry_v17g_rules/bundled $OUT/zip/adapted_entry_v17g_rules/
+python3 mainFiles/build_entry.py --source $OUT/zip/adapted_entry_v17g_rules --out $OUT/entry.zip
+python3 mainFiles/check_submission.py $OUT/blend/submission.csv
+```
+- `bundled/validation/` makes the rerun identical with or without `/data/validation/targets.csv`, or with no `/data/validation/` at all
+  (checked on main: all three byte-identical).
+- If the gate drops a member, the blend CSV from run_round2.py already uses it (same `gate.json`).
+- After uploading, commit `gate.json` and `bundled/` so the repo reproduces the uploaded CSV.
+- Main-kit check of this path (Docker eval suite, quick): PASS WITH WARNINGS, 0 FAIL, k-fold 57.86; the 2 WARNs are the
+  known future-dated-rows refusal.
