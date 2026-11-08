@@ -25,7 +25,7 @@ def main():
     else:
         params = fit(ROOT/'mainFiles/public', size=25)
         parpath.write_text(json.dumps(params, indent=2))
-    candidates = {m: {} for m in ('merged','static','independent','shared','exact')}
+    candidates = {m: {} for m in ('merged','static','independent','shared','exact','robust_eps003')}
     diagnostics = {}
     cachepath=out/'win_predictions.json'
     cached=json.loads(cachepath.read_text()) if cachepath.exists() else {}
@@ -44,18 +44,27 @@ def main():
             if 'exact' not in wins:
                 wins['exact'], _ = model.predict_win(fold_machines, verbose=False)
                 cached[str(fold)]['wins']=wins; cachepath.write_text(json.dumps(cached))
+            if 'wins_eps003' not in cached[str(fold)]:
+                wr, dr = merged_predict(model, fold_machines, mode='all', hypothesis_eps=.003)
+                cached[str(fold)]['wins_eps003']=wr; cached[str(fold)]['diagnostics_eps003']=dr
+                cachepath.write_text(json.dumps(cached))
             sizes, _ = size_predict(ev.machines, ev.atoms(fold), params['size_prior'], 'all')
-            for mode in candidates: candidates[mode].update(combine(wins[mode], sizes))
+            for mode in ('merged','static','independent','shared','exact'):
+                candidates[mode].update(combine(wins[mode], sizes))
+            candidates['robust_eps003'].update(combine(cached[str(fold)]['wins_eps003']['merged'], sizes))
             continue
         wins, d = merged_predict(model, fold_machines, mode='all')
+        robust_wins, robust_diagnostics = merged_predict(model, fold_machines, mode='all', hypothesis_eps=.003)
         exact_win, _ = model.predict_win(fold_machines, verbose=False)
         wins['exact'] = exact_win
         diagnostics[str(fold)] = d
-        cached[str(fold)]={'wins':wins,'diagnostics':d}
+        cached[str(fold)]={'wins':wins,'diagnostics':d,'wins_eps003':robust_wins,
+                           'diagnostics_eps003':robust_diagnostics}
         cachepath.write_text(json.dumps(cached))
         sizes, _ = size_predict(ev.machines, ev.atoms(fold), params['size_prior'], 'all')
-        for mode in candidates:
+        for mode in ('merged','static','independent','shared','exact'):
             candidates[mode].update(combine(wins[mode], sizes))
+        candidates['robust_eps003'].update(combine(robust_wins['merged'], sizes))
     # Tune conditional-size source on the opposite fold as the exact protocol does.
     for mode, pred in candidates.items():
         cross = {}
@@ -123,6 +132,7 @@ def main():
     results['selected_exact_plus_independent_mix']=ev.score(exact_independent)
     results['selected_independent_weight_by_fold']=selected_mix
     results['merged_ci95']=ev.ci(merged)
+    results['robust_eps003']=ev.score(candidates['robust_eps003'])
     results['v13']=ev.score(v13)
     results['merged_v13_equal_logodds_blend']=ev.score(blend)
     results['exact_plus_train_peer_lag3_diagnostic']=ev.score(peer_exact)
@@ -137,6 +147,18 @@ def main():
         ids=[i for i in ev.ids if ev.kind[i]==kind]
         bytype[kind]['all']=float(np.mean([(1-merged[i][0]-(1-tm[i][0]))**2 for i in ids]))
     results['win_mse_by_type_condition']=bytype
+    def win_mse(pred, ids):
+        return float(np.mean([(1-pred[i][0]-(1-tm[i][0]))**2 for i in ids]))
+    jackpot_ids=[i for i in ev.ids if ev.kind[i]=='jackpot']
+    results['robust_win_mse']={
+        'overall_all_types':win_mse(candidates['robust_eps003'],ev.ids),
+        'baseline_overall_all_types':win_mse(merged,ev.ids),
+        'jackpot_all':win_mse(candidates['robust_eps003'],jackpot_ids),
+        'jackpot_by_condition':{c:win_mse(candidates['robust_eps003'],[i for i in jackpot_ids if ev.conditions[i]==c])
+                                for c in ('stable','short_history','drift','shared_change')},
+        'baseline_jackpot_all':win_mse(merged,jackpot_ids),
+        'baseline_jackpot_by_condition':{c:win_mse(merged,[i for i in jackpot_ids if ev.conditions[i]==c])
+                                          for c in ('stable','short_history','drift','shared_change')}}
     ptype={}
     for kind in ('steady','balanced','jackpot'):
         ptype[kind]={}
@@ -157,6 +179,7 @@ def main():
                            'drift_cutoff_swap':float(np.clip(params['schedule']['anchor']/params['schedule']['duration'],0,1))}
     results['diagnostics']=diagnostics
     (out/'results.json').write_text(json.dumps(results,indent=2))
+    write_submission(out/'validation_crossfit_robust_eps003.csv', candidates['robust_eps003'])
     print(json.dumps({k:v for k,v in results.items() if k!='diagnostics'},indent=2))
 
 if __name__=='__main__': main()

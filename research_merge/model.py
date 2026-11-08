@@ -8,9 +8,16 @@ from scipy.special import logsumexp, expit
 from research_exact.model import ExactModel, PAIRS, pair_alpha, softmax, stable_masked_exact
 
 
-def reversal_grid(model, m, width=.1, fractions=None):
+def reversal_grid(model, m, width=.1, fractions=None, hypothesis_eps=0.):
     """Return evidence and next-win probability for each smooth reversal center."""
     z, p, lw = model.grids[m.kind, m.signal]
+    if hypothesis_eps:
+        ph = p.copy()
+        ph[:,0] = (1-hypothesis_eps)*ph[:,0] + hypothesis_eps*.5
+        zh = z.copy()
+        zh[:,0] = np.log(ph[:,0]/(1-ph[:,0]))
+    else:
+        zh = z
     alpha = pair_alpha(m)
     y = m.seq[:m.cutoff]
     centers = np.asarray(fractions if fractions is not None else np.arange(.25, .951, .05)) * m.cutoff
@@ -24,7 +31,7 @@ def reversal_grid(model, m, width=.1, fractions=None):
                 parity = 2*alpha[k]-1
                 if d: parity = -parity
                 parity = np.where(alpha[k] < 0, 0., parity)
-                zz = z.mean(1)[:, None] + ((z[:, 1]-z[:, 0])/2)[:, None] * parity[None, :] * g[None, :]
+                zz = zh.mean(1)[:, None] + ((zh[:, 1]-zh[:, 0])/2)[:, None] * parity[None, :] * g[None, :]
                 pp = np.clip(expit(zz), 1e-12, 1-1e-12)
                 observed = y >= 0
                 yy = y[observed] > 0
@@ -51,7 +58,7 @@ def reversal_grid(model, m, width=.1, fractions=None):
     return np.asarray(out_e), np.asarray(out_p)
 
 
-def merged_predict(model, machines, mode='merged', width=.1):
+def merged_predict(model, machines, mode='merged', width=.1, hypothesis_eps=0.):
     """Modes: static, independent, shared, all, or posterior mixture over all three."""
     by_episode = defaultdict(list)
     for m in machines:
@@ -61,12 +68,12 @@ def merged_predict(model, machines, mode='merged', width=.1):
     for eid, ms in sorted(by_episode.items()):
         if ms[0].short:
             for m in ms:
-                value = stable_masked_exact(model, m)[1]
+                value = stable_masked_exact(model, m, hypothesis_eps)[1]
                 for k in predictions: predictions[k][m.query_id] = value
             diag[eid] = {'short': True}
             continue
-        stat = [model.stable(m)[:2] for m in ms]
-        rev = [reversal_grid(model, m, width, centers) for m in ms]
+        stat = [model.stable(m, hypothesis_eps)[:2] for m in ms]
+        rev = [reversal_grid(model, m, width, centers, hypothesis_eps) for m in ms]
         # Per-machine reversal integrates its own center and latent pair/direction/level.
         inde = [logsumexp(e)-np.log(len(e)) for e, _ in rev]
         indep = [float(softmax(e) @ p) for e, p in rev]

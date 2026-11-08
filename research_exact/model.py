@@ -23,6 +23,15 @@ def softmax(x, axis=None):
     return np.exp(x - logsumexp(x, axis=axis, keepdims=True))
 
 
+def robust_dead_probabilities(p, eps=0.):
+    """Guard hypothesis likelihoods against isolated wins in near-zero dead cells."""
+    if eps <= 0:
+        return p
+    out = np.array(p, copy=True)
+    out[:, 0] = (1-eps)*out[:, 0] + eps*.5
+    return out
+
+
 @dataclass
 class Machine:
     query_id: str
@@ -334,14 +343,15 @@ class ExactModel:
                       for kind in TYPES for sig in (-1, 0, 1)}
         self.pair_prior = np.array(params['pair_prior'])
 
-    def stable(self, m):
+    def stable(self, m, hypothesis_eps=0.):
         z, p, lw = self.grids[m.kind, m.signal]
-        lp = count_likelihood(cell_counts(m), p) + lw + np.log(self.pair_prior)[:, None, None] - np.log(2)
+        ph = robust_dead_probabilities(p, hypothesis_eps)
+        lp = count_likelihood(cell_counts(m), ph) + lw + np.log(self.pair_prior)[:, None, None] - np.log(2)
         # Unknown contexts contribute a marginal likelihood, never a fabricated loss.
         alpha = pair_alpha(m)
         y = m.seq[:m.cutoff]
         unknown = np.stack([np.sum((alpha < 0) & ((y > 0) == k) & (y >= 0), axis=1) for k in (0, 1)], axis=1)
-        pmid = p.mean(1)
+        pmid = ph.mean(1)
         lp += (unknown[:, 1, None]*np.log(pmid)+unknown[:, 0, None]*np.log1p(-pmid))[:, None, :]
         pred = self.pred_for(m, p, flip=False)
         return float(logsumexp(lp)), np.sum(softmax(lp)*pred), lp
@@ -490,9 +500,10 @@ def masked_pair_likelihood(m, pair, p):
     return ll.reshape(2, ngrid)
 
 
-def stable_masked_exact(model, m):
+def stable_masked_exact(model, m, hypothesis_eps=0.):
     z, p, lw = model.grids[m.kind, m.signal]
-    lp = np.stack([masked_pair_likelihood(m, pair, p) for pair in PAIRS])
+    ph = robust_dead_probabilities(p, hypothesis_eps)
+    lp = np.stack([masked_pair_likelihood(m, pair, ph) for pair in PAIRS])
     lp += lw + np.log(model.pair_prior)[:, None, None]-np.log(2)
     pred = model.pred_for(m, p)
     return float(logsumexp(lp)), float(np.sum(softmax(lp)*pred)), lp
