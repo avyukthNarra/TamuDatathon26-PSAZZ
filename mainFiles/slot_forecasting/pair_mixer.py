@@ -515,7 +515,7 @@ def win_prior_from_train(queries, history, pairs=None, min_spins=10):
     return _u_shaped_prior(rates, 6.0)
 
 
-def win_prior_by_type_from_targets(targets, queries, strength=10.0, global_shrink=0.0):
+def win_prior_by_type_from_targets(targets, queries, strength=10.0, global_shrink=0.0, middle_strength=10.0):
     """Beta-mixture win prior per machine type: {type: components}, levels read per type.
 
     Types differ a lot (main round: jackpot is rarely live, only 10 of 265 targets above 0.8,
@@ -525,6 +525,9 @@ def win_prior_by_type_from_targets(targets, queries, strength=10.0, global_shrin
     too few targets on either side uses the round-wide prior. None if that is missing too.
     Out of fold on train vs the round-wide prior: late-window dR -0.011 [-0.015, -0.008];
     cross-fitted validation 55.47 -> 56.12.
+    middle_strength: the weight-0.1 middle component sits at the type's own median win chance
+    among targets in 0.2-0.8 (main round: steady 0.24, jackpot 0.55, balanced 0.75) instead of a
+    flat 0.5; None keeps it flat. OOF window dR -0.0022 [-0.0029, -0.0014]; cross-fit 56.18 -> 56.26.
     """
     global_prior = win_prior_from_targets(targets, strength)
     if global_prior is None or not 0.0 <= global_shrink <= 1.0:
@@ -543,6 +546,12 @@ def win_prior_by_type_from_targets(targets, queries, strength=10.0, global_shrin
             continue
         priors[kind] = [(w, round((1.0 - global_shrink) * m + global_shrink * g[1], 4), k)
                         for (w, m, k), g in zip(own, global_prior)]
+        if middle_strength:
+            # middle component at this type's own median of in-between win chances (0.2-0.8)
+            middle = sorted(w for w in (1.0 - t.probabilities[0] for t in by_type[kind]) if 0.2 <= w <= 0.8)
+            if len(middle) >= 10:
+                weight = priors[kind][2][0]
+                priors[kind][2] = (weight, round(middle[len(middle) // 2], 4), middle_strength)
     return priors
 
 

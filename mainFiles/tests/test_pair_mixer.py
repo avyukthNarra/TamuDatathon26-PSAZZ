@@ -255,6 +255,16 @@ class PairMixerTest(unittest.TestCase):
         b = adapt(fit, fit_history, {k: flipped[k] for k in (q.query_id for q in fit)}, log=quiet)
         self.assertEqual(a.predict(queries, history), b.predict(queries, history))
 
+    def test_type_prior_middle_level_sits_at_the_type_median(self):
+        queries, targets = [], []
+        for i, win in enumerate((0.03,) * 25 + (0.9,) * 25 + (0.3, 0.35, 0.4) * 5):
+            queries.append(Query(f"q{i}", "e1", f"m{i}", "jackpot", 0, 1))
+            targets.append(Target(f"q{i}", "e1", (1 - win, win, 0, 0, 0), 0))
+        middle = win_prior_by_type_from_targets(targets, queries)["jackpot"][2]
+        self.assertEqual(middle[1:], (0.35, 10.0))
+        flat = win_prior_by_type_from_targets(targets, queries, middle_strength=None)["jackpot"][2]
+        self.assertEqual(flat[1:], (0.5, 2.0))
+
     def test_adapts_to_new_lag_pairs(self):
         """Round two may use different pairs: rediscovery must find them and the mixer must use them."""
         queries, history = make_data(seed=7, cutoff=220, rule=True, lags=(2, 6))

@@ -4,7 +4,7 @@ A running log of the requests (to Claude Code or any coding agent) that led to
 real score gains, and the ones that didn't. Use it to steer the next agent fast,
 especially in round two. Validation points are out of 60; the pooled baseline is 30.
 
-## At a glance: everything that lowered the error (30 -> 56.19)
+## At a glance: everything that lowered the error (30 -> 56.29)
 
 Each step was kept only because it helped; from step 9 on, it also had to help out of fold on
 train AND on both cross-fitted validation halves. Details and prompts are in the round sections.
@@ -23,7 +23,8 @@ train AND on both cross-fitted validation halves. Details and prompts are in the
 | 9 | Win cells pulled toward "dead" / "live" levels (Beta-mixture prior) | win: true chances are U-shaped | 55.34 |
 | 10 | Size lags found from train (1, 2, 4; lag 3 was noise) | size: a noisy expert | 55.45 |
 | 11 | Dead / live levels per machine TYPE | win: jackpot is almost never live | 56.12 |
-| 12 | Third win memory (half-life 100) + slower size re-weighting (size_eta 4) | short_history size error | **56.19** |
+| 12 | Third win memory (half-life 100) + slower size re-weighting (size_eta 4) | short_history size error | 56.19 |
+| 13 | Middle prior level per type at the type's own median (steady 0.24, jackpot 0.55, balanced 0.75) | win: middle machines (0.2-0.8) | **56.29** |
 
 Honest evaluation (round 4) is what made steps 10-12 trustworthy: cross-fitted validation (each
 half's priors from the other half), 8-fold episode-grouped train scoring, and a late-window
@@ -31,7 +32,7 @@ train score (cutoff + last 10 spins) for ~4x tighter intervals. Ideas rejected u
 data-driven prior weights, a train-history prior, blending another team's rule model,
 leave-one-out expert scoring, gap decay, coarse or pooled size cells (see the round sections).
 
-## Where the 56.19 model is strong and where it is weak
+## Where the model is strong and where it is weak (measured on the 56.19 model)
 
 Cross-fitted validation, 768 queries. Error = 5-class squared error per query, split into the
 part from the win chance and the part from payout size (error left if the win chance were
@@ -69,15 +70,14 @@ rule changes well, which is why drift is the best condition.
   Too few wins in 40 spins to tell the size mode apart.
 
 **What could still improve it (not yet tried or not yet passing):**
-1. A middle-level component per type (the per-type prior only has dead/live levels; a
-   jackpot-specific middle may fit its 0.2-0.8 machines better).
+1. DONE (56.19 -> 56.29): a middle level per type at the type's own median.
 2. Size-mode lags per machine TYPE (the lags that switch the mode may differ by type).
 3. A per-type prior that also depends on the signal column (tried once on a weaker model:
    no gain; worth a re-test with the window score).
 4. Ceiling check: a perfect win chance alone would score 58.40, perfect sizes alone 57.57
    (round-4 model), so 57+ needs a new discovery, not tuning.
 
-## Paste-ready prompt (rebuilds the 56.19 model from the starter kit)
+## Paste-ready prompt (rebuilds the 56.29 model from the starter kit)
 
 Copy everything inside the box into a fresh coding agent opened in the repo root.
 It describes the finished model exactly, so the agent doesn't have to rediscover it.
@@ -90,7 +90,7 @@ submission_contract.py), and the organizers' baseline in run_starter.py (it alwa
 scores ~30/60 because "pooled" IS the reference model; points = 60/(1+R)).
 Read AGENTS.md first and follow it: work on a feature branch, never commit to main.
 
-GOAL: build a forecaster that scores ~56.19/60 on validation (~56.18 cross-fitted,
+GOAL: build a forecaster that scores ~56.29/60 on validation (~56.28 cross-fitted,
 see VERIFY), plus a verified entry ZIP.
 
 HARD CONSTRAINTS
@@ -126,7 +126,9 @@ BUILD mainFiles/slot_forecasting/pair_mixer.py with:
      (lags agree / disagree); also support "full" = 4 cells (won/lost at a x at b).
      Expert prediction for a cell with decayed (w wins, n spins) = posterior mean under a
      Beta-MIXTURE prior PER MACHINE TYPE: components (weight, mean, strength) =
-     (0.45, dead_type, 10), (0.45, live_type, 10), (0.1, 0.5, 2),
+     (0.45, dead_type, 10), (0.45, live_type, 10), (0.1, middle_type, 10), where
+     middle_type = the type's median true win chance among its targets in 0.2-0.8
+     (flat (0.5, 2) if fewer than 10),
      Beta(a = mean*strength, b = (1-mean)*strength).
      post_k ∝ weight_k * B(a_k + w, b_k + n - w) / B(a_k, b_k) (use math.lgamma);
      rate = sum_k post_k * (a_k + w) / (a_k + b_k + n). dead_type / live_type = median true
@@ -201,19 +203,41 @@ ALSO CREATE
 
 VERIFY (and report the actual output)
   cd mainFiles && python -m unittest discover -s tests
-  python run_pair_mixer.py --out runs/combined-v5 --cv-val
-  python check_submission.py runs/combined-v5/submission.csv
-  python check_submission.py runs/combined-v5/validation_predictions.csv --split validation
-Expect validation ~56.19/60 (R ~0.068: stable ~0.055, short_history ~0.107,
-drift ~0.050, shared_change ~0.059) and cross-fitted halves (each half's priors read
-from the OTHER half's targets) ~56.00 / 56.40. The reference build's test submission
-SHA-256 is ae3159d123b6b10d398291de98e35452110042e8cbfcbeecb5a5c31dc88ff6e3. A rebuild
+  python run_pair_mixer.py --out runs/combined-v6 --cv-val
+  python check_submission.py runs/combined-v6/submission.csv
+  python check_submission.py runs/combined-v6/validation_predictions.csv --split validation
+Expect validation ~56.29/60 (R ~0.066: stable ~0.054, short_history ~0.105,
+drift ~0.049, shared_change ~0.056) and cross-fitted halves (each half's priors read
+from the OTHER half's targets) ~56.13 / 56.43. The reference build's test submission
+SHA-256 is cb9aaa7761c821afed0f4c6febe7c6d0adc1f522f5d206a44090dc25d3c50ba3. A rebuild
 will only match it byte for byte if the arithmetic order is identical, so treat the
-score as the check. Upload runs/combined-v5/submission.csv and runs/combined-v5/entry.zip.
+score as the check. Upload runs/combined-v6/submission.csv and runs/combined-v6/entry.zip.
 ````
 
 The shortcut, if the branch `COMBINED_SOLUTIONS` is available, is to check it out and
-run the VERIFY commands (current reference: 56.19). The prompt above is for rebuilding without it.
+run the VERIFY commands (current reference: 56.29). The prompt above is for rebuilding without it.
+
+## What changed on `COMBINED_SOLUTIONS`, round 6 (56.19 -> 56.29, middle machines)
+
+The error map showed machines with true win chance 0.2-0.8 have the worst ratio (0.137), 81% of
+it win error: the per-type prior's middle component was a flat Beta(1, 1) at 0.5, but the
+in-between machines cluster at a type-specific level (steady 0.24, jackpot 0.55, balanced 0.75).
+Fix: put each type's middle component (weight 0.1) at that type's median, with the same
+strength (10) as the dead / live levels.
+
+| Variant (cross-fit validation, halves) | Result |
+|---|---|
+| Flat middle (the 56.19 model) | 56.18 (56.00 / 56.40) |
+| Type-median middle, strength 2 / 4 / 6 / 8 | 56.22 / 56.23 / 56.25 / 56.26 |
+| Type-median middle, weight 0.05 / 0.2 (strength 4) | 56.25 / 56.19 |
+| Weight = the type's share of middle targets (strength 4 / 6) | 56.17 / 56.19 (no) |
+| Keep a small flat component too | 56.12-56.18 (no) |
+| **Type-median middle, strength 10, weight 0.1** | **56.28 (56.13 / 56.43)**; OOF window dR **-0.0022 [-0.0029, -0.0014]** (better in all four conditions), cutoff -0.0009 [-0.004, +0.002] |
+
+Prompt used: "Middle machines (true win 0.2-0.8) have the worst ratio. Give the per-type prior a
+middle level learned from each type's own targets instead of a flat 0.5; screen strengths and
+weights on cross-fit validation, then run the OOF train check on the best; keep it only if
+both pass."
 
 ## What changed on `COMBINED_SOLUTIONS`, round 5 (56.12 -> 56.19, short_history)
 
@@ -608,6 +632,7 @@ run the tests and check_submission.py, and commit and push.
 | 13 | **"Read RULES.md; compute oracle bounds (perfect size vs perfect win); test the neighbour hint per machine pair; histogram the true win chances"** | Win chance had more headroom; neighbour links were small-sample noise; true win chances are U-shaped, so each win cell now uses a dead/live Beta-mixture prior read from validation targets (eta 16 -> 8). Both validation halves up | **55.34** |
 | 14 | **"Make the evaluation honest (cross-fit validation, out-of-fold train, a late-window train score), replace hard-coded assumptions with learned ones, keep only what passes both"** | Size lags now discovered from train (1, 2, 4; lag 3 was noise); data-driven prior weights and a train-history prior REJECTED (worse on train); the win prior is per machine type (jackpot is almost never live). OOF window dR -0.0113 [-0.015, -0.008]; cross-fit halves 55.90 / 56.37 | **56.12** |
 | 15 | **"Diagnose short_history (win vs size, sparse cells, wins in the window), test four targeted fixes one at a time, keep only what passes OOF train and both cross-fit halves"** | Its extra error is payout size, not sparse win cells. A third win memory (half-life 100) plus slower size-expert re-weighting (size_eta 4) passed; leave-one-out scoring, gap decay, coarse/pooled size cells did not. OOF window dR -0.0012 [-0.0024, -0.0001]; cross-fit halves 56.00 / 56.40 | **56.19** |
+| 16 | **"Middle machines have the worst ratio; give the per-type prior a middle level learned from each type's targets"** | Middle component at each type's own median (steady 0.24, jackpot 0.55, balanced 0.75), strength 10. OOF window dR -0.0022 [-0.0029, -0.0014], all four conditions better; cross-fit halves 56.13 / 56.43 | **56.29** |
 
 ## Prompt patterns that work
 

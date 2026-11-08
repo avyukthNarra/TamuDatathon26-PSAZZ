@@ -23,6 +23,7 @@ How to add an entry (every PR):
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 
 ### Changed
+- Pair mixer's win prior gets a middle level per machine type, read from that type's in-between win chances; validation 56.19 -> 56.29 / 60 (cross-fitted 56.28)
 - Pair mixer adds a slow 100-spin win memory and re-weights its payout-size experts more slowly; validation 56.12 -> 56.19 / 60 (cross-fitted 56.18), short_history error ratio 0.112 -> 0.107
 - Pair mixer reads typical win levels per machine type, finds which earlier spins drive payout size from train history (main round: 1, 2 and 4 back), and supports any number of size modes per type; validation 55.34 -> 56.12 / 60 (cross-fitted 56.12)
 - Model tuning scores train out of fold (8 episode folds, plus a late-window score) and validation cross-fitted (each half's priors from the other half); `run_pair_mixer.py --cv-val` reports the cross-fitted score

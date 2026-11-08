@@ -69,6 +69,7 @@ def resolve_settings(settings, prior_targets):
     settings = dict(settings)
     win_prior_strength = settings.pop("win_prior_strength", 6.0)
     win_prior_shrink = settings.pop("win_prior_shrink", 0.0)
+    win_prior_middle = settings.pop("win_prior_middle_strength", None)
     if settings.get("size_modes") == "val":
         settings["size_modes"] = size_modes_from_targets(prior_targets, val_queries)
     if settings.get("win_prior") == "val-v3":  # combined-v3: fixed 0.45/0.45/0.1 weights, 0.5 split
@@ -80,7 +81,8 @@ def resolve_settings(settings, prior_targets):
         settings["win_prior"] = win_prior_from_targets(prior_targets, strength=win_prior_strength)
     elif settings.get("win_prior") == "val-by-type":
         settings["win_prior"] = win_prior_by_type_from_targets(
-            prior_targets, val_queries, strength=win_prior_strength, global_shrink=win_prior_shrink)
+            prior_targets, val_queries, strength=win_prior_strength, global_shrink=win_prior_shrink,
+            middle_strength=win_prior_middle)
     return settings
 
 
