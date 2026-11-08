@@ -31,3 +31,9 @@ Verdict: no change. Script `tweak.py`, output `tweak_out.txt`.
 - v20 (pre-fix, `research_pf/r2-v20`): 38.582 (A 38.633 / B 38.561). Pranav's 7b89c64 fix reports 38.62 (his halves 38.3 / 38.8).
 - Docker (python:3.13, pinned numpy/scipy, offline, 2 CPUs, real 20-point kit): matches ADAPTATION_submission.csv, max diff 9.7e-15.
 - Running: size-channel pair evidence (Codex), episode pair sharing (Grok), peer residuals (Grok), web research (Grok).
+
+## 11:30 peer signal (Grok r2-peers + check on orch/common.folds halves)
+Correction P(win) = sigmoid(logit(p) + a + b * peer_win_lag3), peer_win_lag3 = share of the episode's other 7 machines that won at cutoff-3.
+Condition-balanced halves (base 38.5879, A 38.5306 / B 38.6328): fit A -> B +0.062 (a -0.30, b 0.90); fit B -> A +0.107 (a -0.15, b 0.60).
+Other lags 1-8 are noise (|delta| < 0.05, inconsistent). Grok's permutation test 0/200. Real but below the 0.1 rule (~+0.085 mean);
+lag 3 was picked after looking at all 8 lags. Size-channel pair evidence (Codex): +0.0006. Episode pair sharing: null.
