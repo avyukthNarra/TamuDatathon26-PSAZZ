@@ -6,6 +6,8 @@ from slot_forecasting.schema import Play, Query
 
 
 class Flat:
+    pairs, cell_mode = ((1, 3),), ("parity",)
+
     def predict(self, queries, history):
         return {q.query_id: (0.5, 0.2, 0.15, 0.1, 0.05) for q in queries}
 
