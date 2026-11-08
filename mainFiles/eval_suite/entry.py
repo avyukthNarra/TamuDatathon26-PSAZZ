@@ -3,7 +3,11 @@
 Docker mode: the image named in reproduce.json (`python`) maps to PYTHON_BASE_TAG.
 A pinned requirements.txt is installed at image BUILD time into a derived image
 cached by the hash of its contents. The run itself uses --network none, read-only
-code/data mounts, and writable /output and /tmp.
+code/data mounts, a 128 MiB /tmp tmpfs and a 32 MiB /output tmpfs. The container is
+started detached (`sleep infinity`), the command runs via `docker exec` under
+`timeout`, the CSV is read out with `docker exec cat` while the container is up
+(a stopped container loses its tmpfs), and RunResult.limits records what
+`docker inspect` reports as applied.
 
 Local mode: the same argv with the container path prefixes (/data, /submission,
 /output, /tmp, /main_data) rewritten to host paths. Nothing is copied and
@@ -27,16 +31,18 @@ import tempfile
 import threading
 import time
 import uuid
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
-PYTHON_BASE_TAG = "python:3.12-slim"
+PYTHON_BASE_TAG = "python:3.13-slim"
 DERIVED_REPOSITORY = "eval-suite/deps"
 TIMEOUT_EXIT_CODE = 124
 TAIL_CHARS = 4000
 BUILD_TIMEOUT_S = 1800
 PULL_TIMEOUT_S = 1800
 DOCKER_FALLBACK = "/usr/local/bin/docker"
+TMP_TMPFS_BYTES = 128 * 2**20      # ROB-TMP-QUOTA: /tmp is a 128 MiB tmpfs
+OUTPUT_TMPFS_BYTES = 32 * 2**20   # ROB-OUTPUT-QUOTA: /output is a 32 MiB tmpfs
 _MEM_UNITS = {"B": 1, "kB": 1e3, "KB": 1e3, "KiB": 2**10, "MB": 1e6, "MiB": 2**20,
               "GB": 1e9, "GiB": 2**30, "TB": 1e12, "TiB": 2**40}
 
@@ -54,6 +60,7 @@ class RunResult:
     stderr_tail: str
     peak_mem_mb: float | None
     mode: str
+    limits: dict = field(default_factory=dict)  # docker: what docker inspect reports as applied; local: {}
 
 
 def _tail(data) -> str:
@@ -207,36 +214,101 @@ class _MemorySampler:
         return self._peak
 
 
-def _kill_container(docker: str, name: str) -> None:
-    for args in (["kill", name], ["rm", "-f", name]):
-        try:
-            subprocess.run([docker, *args], capture_output=True, timeout=60, stdin=subprocess.DEVNULL)
-        except (OSError, subprocess.TimeoutExpired):
-            pass
+def _docker_quiet(docker: str, args: list, timeout: int = 60):
+    try:
+        return subprocess.run([docker, *args], capture_output=True, text=True, timeout=timeout,
+                              stdin=subprocess.DEVNULL)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
 
 
-def _run_docker(entry, data, main_data, out, tmp, command, image, *, docker, timeout_s, cpus, memory_gb):
+def _applied_limits(docker: str, name: str, requested: dict) -> dict:
+    """What docker reports for the container: the limits and mounts that were actually applied."""
+    proc = _docker_quiet(docker, ["inspect", name])
+    try:
+        info = json.loads(proc.stdout)[0]
+    except (AttributeError, IndexError, KeyError, TypeError, ValueError):
+        return {**requested, "source": "requested (docker inspect failed)"}
+    host = info.get("HostConfig") or {}
+    nano = host.get("NanoCpus") or 0
+    return {
+        "source": "docker inspect",
+        "cpus": nano / 1e9 if nano else None,
+        "memory_bytes": host.get("Memory"),
+        "memory_swap_bytes": host.get("MemorySwap"),
+        "network": host.get("NetworkMode"),
+        "working_dir": (info.get("Config") or {}).get("WorkingDir"),
+        "tmpfs": host.get("Tmpfs") or {},
+        "tmpfs_size_bytes": {m.get("Target"): (m.get("TmpfsOptions") or {}).get("SizeBytes")
+                             for m in host.get("Mounts") or [] if m.get("Type") == "tmpfs"},
+        "mounts": [{"destination": m.get("Destination"), "type": m.get("Type"), "rw": m.get("RW")}
+                   for m in info.get("Mounts") or []],
+    }
+
+
+def _copy_output(docker: str, name: str, out: Path) -> None:
+    """Stream /output/submission.csv out of the running container, if the run wrote one.
+
+    docker cp cannot see a --mount tmpfs and a stopped container loses its tmpfs, so the
+    file is read with exec while the container is still up.
+    """
+    try:
+        proc = subprocess.run([docker, "exec", name, "cat", "/output/submission.csv"],
+                              capture_output=True, timeout=300, stdin=subprocess.DEVNULL)
+    except (OSError, subprocess.TimeoutExpired):
+        return
+    if proc.returncode == 0:
+        (out / "submission.csv").write_bytes(proc.stdout)
+
+
+def _run_docker(entry, data, main_data, out, command, image, *, docker, timeout_s, cpus, memory_gb):
+    """Run the command in a detached container with the organizer's limits, then remove it.
+
+    The container starts with `sleep infinity`; the reproduce command runs through `docker exec`
+    under `timeout`, so the CSV can be read out and the applied limits inspected while the
+    container is still up. /tmp (128 MiB) and /output (32 MiB) are tmpfs mounts that start empty.
+    """
     name = f"eval-{uuid.uuid4().hex[:12]}"
-    argv = [docker, "run", "--rm", "--name", name, "--network", "none",
-            "--cpus", str(cpus), "--memory", f"{memory_gb:g}g",
+    memory = f"{memory_gb:g}g"
+    requested = {"cpus": cpus, "memory_bytes": int(memory_gb * 2**30), "memory_swap_bytes": int(memory_gb * 2**30),
+                 "network": "none", "tmpfs": {"/tmp": TMP_TMPFS_BYTES}, "output_tmpfs_bytes": OUTPUT_TMPFS_BYTES,
+                 "working_dir": "/submission"}
+    argv = [docker, "run", "-d", "--name", name, "--network", "none",
+            "--cpus", str(cpus), "--memory", memory, "--memory-swap", memory,
+            "--tmpfs", f"/tmp:rw,size={TMP_TMPFS_BYTES}",
+            "--mount", f"type=tmpfs,destination=/output,tmpfs-size={OUTPUT_TMPFS_BYTES}",
             "-v", f"{entry}:/submission:ro", "-v", f"{data}:/data:ro"]
     if main_data is not None:
         argv += ["-v", f"{main_data}:/main_data:ro"]
-    argv += ["-v", f"{out}:/output", "-v", f"{tmp}:/tmp", "-w", "/submission", image, *command]
-    sampler = _MemorySampler(docker, name)
-    sampler.start()
-    started = time.monotonic()
+    argv += ["-w", "/submission", image, "sleep", "infinity"]
     try:
-        proc = subprocess.run(argv, capture_output=True, timeout=timeout_s, stdin=subprocess.DEVNULL)
-        exit_code, stdout, stderr = proc.returncode, proc.stdout, proc.stderr
-    except subprocess.TimeoutExpired as exc:
-        _kill_container(docker, name)
-        exit_code = TIMEOUT_EXIT_CODE
-        stdout = exc.stdout or b""
-        stderr = (exc.stderr or b"") + f"\n[killed after {timeout_s}s timeout]".encode()
-    wall = time.monotonic() - started
-    peak = sampler.stop()
-    return exit_code, stdout, stderr, wall, peak
+        started_proc = subprocess.run(argv, capture_output=True, text=True, timeout=300, stdin=subprocess.DEVNULL)
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise EntryError(f"could not start the container: {exc}") from exc
+    if started_proc.returncode != 0:
+        raise EntryError("could not start the container: " + _tail(started_proc.stderr).strip())
+    sampler = _MemorySampler(docker, name)
+    try:
+        sampler.start()
+        exec_argv = [docker, "exec", "-w", "/submission", name,
+                     "timeout", "--kill-after=10", str(timeout_s), *command]
+        started = time.monotonic()
+        try:
+            proc = subprocess.run(exec_argv, capture_output=True, timeout=timeout_s + 60, stdin=subprocess.DEVNULL)
+            exit_code, stdout, stderr = proc.returncode, proc.stdout, proc.stderr
+        except subprocess.TimeoutExpired as exc:
+            _docker_quiet(docker, ["kill", name])
+            exit_code = TIMEOUT_EXIT_CODE
+            stdout = exc.stdout or b""
+            stderr = (exc.stderr or b"") + f"\n[killed after {timeout_s}s timeout]".encode()
+        wall = time.monotonic() - started
+        peak = sampler.stop()
+        limits = _applied_limits(docker, name, requested)
+        _copy_output(docker, name, out)
+    finally:
+        sampler.stop()
+        _docker_quiet(docker, ["rm", "-f", name])
+    return exit_code, stdout, stderr, wall, peak, limits
 
 
 def _rewrite(arg: str, mapping) -> str:
@@ -300,12 +372,13 @@ def run_entry(entry_dir, data_root, *, main_data_root=None, mode="docker", timeo
         image = _ensure_image(entry, docker)
 
     out = Path(tempfile.mkdtemp(prefix="eval-out-"))
-    tmp = Path(tempfile.mkdtemp(prefix="eval-tmp-"))
+    limits: dict = {}
     if mode == "docker":
-        exit_code, stdout, stderr, wall, peak = _run_docker(
-            entry, data, main, out, tmp, command, image,
+        exit_code, stdout, stderr, wall, peak, limits = _run_docker(
+            entry, data, main, out, command, image,
             docker=docker, timeout_s=timeout_s, cpus=cpus, memory_gb=memory_gb)
     else:
+        tmp = Path(tempfile.mkdtemp(prefix="eval-tmp-"))
         exit_code, stdout, stderr, wall, peak = _run_local(
             entry, data, main, out, tmp, command, timeout_s=timeout_s)
     csv = out / "submission.csv"
@@ -317,4 +390,5 @@ def run_entry(entry_dir, data_root, *, main_data_root=None, mode="docker", timeo
         stderr_tail=_tail(stderr),
         peak_mem_mb=peak,
         mode=mode,
+        limits=limits,
     )

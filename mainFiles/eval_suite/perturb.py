@@ -8,6 +8,8 @@ relation the variant declares:
 - "identical": predictions must match the base within tol, keyed by query_id.
 - "identical_after_map": as above, after mapping variant query_ids back to
   base query_ids through Variant.id_map.
+- "identical_subset": as "identical", but only the queries in Variant.subset
+  (the chosen episode of CAU-CROSS-EPISODE) are compared.
 - "info": not a pass/fail requirement. compare() reports how far predictions
   move; compare_missing_vs_zero() compares the two INFO-MISSING-VS-ZERO
   variants with each other.
@@ -50,10 +52,11 @@ ID_COLUMNS = ("query_id", "episode_id", "machine_id")
 FUTURE_TICKS = 8
 PROBE_LOOKBACK = 8
 PROBE_MACHINES = 16
-RELATIONS = ("identical", "identical_after_map", "info")
+RELATIONS = ("identical", "identical_after_map", "identical_subset", "info")
 EPISODE_NUMBER_OFFSET = 50000
 MACHINE_NUMBER_OFFSET = 100
 MISSING_VS_ZERO_ID = "INFO-MISSING-VS-ZERO"
+CROSS_EPISODE_ID = "CAU-CROSS-EPISODE"
 
 
 @dataclass(frozen=True)
@@ -64,12 +67,17 @@ class Variant:
     id_map: dict[str, str] | None = None
     requirement_ids: list[str] = field(default_factory=list)
     description: str = ""
+    subset: tuple[str, ...] | None = None  # query_ids compared under "identical_subset"
 
     def __post_init__(self):
         if self.relation not in RELATIONS:
             raise ValueError(f"relation must be one of {RELATIONS}, got {self.relation!r}")
         if self.relation == "identical_after_map" and self.id_map is None:
             raise ValueError(f"{self.name}: identical_after_map needs an id_map")
+        if self.relation == "identical_subset" and not self.subset:
+            raise ValueError(f"{self.name}: identical_subset needs a non-empty subset")
+        if self.relation != "identical_subset" and self.subset is not None:
+            raise ValueError(f"{self.name}: subset is only used by identical_subset")
         object.__setattr__(self, "data_root", Path(self.data_root))
 
 
@@ -213,6 +221,34 @@ def _rename_maps(queries, rng):
     return episode_map, machine_map, query_map
 
 
+def _randomize_other_episodes(dst, split, rng):
+    """Replace history payouts (and labels, when the split has them) of every episode but one.
+
+    Ticks and cutoffs are kept. Returns (description, query_ids of the kept episode).
+    """
+    scored = dst / split
+    _, queries = _read_csv(scored / "queries.csv")
+    episodes = sorted({q["episode_id"] for q in queries})
+    kept = rng.choice(episodes)
+    header, history = _read_csv(scored / "history.csv")
+    for row in history:
+        if row["episode_id"] != kept:
+            row["payout"] = str(rng.choice(PAYOUTS))
+    _write_csv(scored / "history.csv", header, history)
+    labels_path = scored / "labels.csv"
+    if labels_path.exists():
+        episode_of = {q["query_id"]: q["episode_id"] for q in queries}
+        header, labels = _read_csv(labels_path)
+        for row in labels:
+            if episode_of[row["query_id"]] != kept:
+                row["outcome"] = str(rng.choice(PAYOUTS))
+        _write_csv(labels_path, header, labels)
+    subset = tuple(sorted(q["query_id"] for q in queries if q["episode_id"] == kept))
+    description = (f"keeps episode {kept} and replaces the history payouts of the other "
+                   f"{len(episodes) - 1} episodes with random payouts (ticks kept)")
+    return description, subset
+
+
 def _rename_ids(dst, split, rng):
     scored = dst / split
     _, queries = _read_csv(scored / "queries.csv")
@@ -308,6 +344,15 @@ def make_variants(data_root, out_root, split="test", seed=0) -> list[Variant]:
         requirement_ids = [MISSING_VS_ZERO_ID] if relation == "info" else [name]
         variants.append(Variant(name=name, data_root=dst, relation=relation, id_map=id_map,
                                 requirement_ids=requirement_ids, description=description))
+
+    cross_dst = out_root / CROSS_EPISODE_ID
+    if cross_dst.resolve().is_relative_to(data_root.resolve()):
+        raise ValueError(f"out_root must not be inside data_root: {out_root}")
+    _fresh_copy(data_root, cross_dst)
+    description, subset = _randomize_other_episodes(
+        cross_dst, split, random.Random(f"{seed}:{CROSS_EPISODE_ID}"))
+    variants.append(Variant(name=CROSS_EPISODE_ID, data_root=cross_dst, relation="identical_subset",
+                            subset=subset, requirement_ids=[CROSS_EPISODE_ID], description=description))
     return variants
 
 
@@ -381,21 +426,30 @@ def compare(base_csv, variant_csv, variant, tol=1e-9) -> CheckResult:
     if error:
         return CheckResult(variant.name, False, "fail", error, {})
 
-    max_abs, differing = _differences(base, actual, tol)
-    details = _details(max_abs, differing, len(base), tol)
+    scope = base
+    if variant.relation == "identical_subset":
+        unknown = sorted(set(variant.subset) - set(base))
+        if unknown:
+            return CheckResult(variant.name, False, "fail",
+                               f"subset query_ids not in the predictions: {unknown[:5]}", {})
+        scope = {query: base[query] for query in variant.subset}
+    total = len(scope)
+    max_abs, differing = _differences(scope, actual, tol)
+    details = _details(max_abs, differing, total, tol)
     if variant.relation == "info":
         return CheckResult(
             variant.name, True, "info",
-            f"info: {len(differing)} of {len(base)} queries move (max abs diff {max_abs:.3g}) "
+            f"info: {len(differing)} of {total} queries move (max abs diff {max_abs:.3g}) "
             "when the variant changes the data",
             details)
     if differing:
         return CheckResult(
             variant.name, False, "fail",
-            f"{len(differing)} of {len(base)} queries changed (max abs diff {max_abs:.3g} > tol {tol:g})",
+            f"{len(differing)} of {total} queries changed (max abs diff {max_abs:.3g} > tol {tol:g})",
             details)
     return CheckResult(variant.name, True, "fail",
-                       f"predictions identical within tol (max abs diff {max_abs:.3g})", details)
+                       f"predictions identical within tol (max abs diff {max_abs:.3g}) over {total} queries",
+                       details)
 
 
 def compare_missing_vs_zero(missing_csv, zero_csv, tol=1e-9) -> CheckResult:

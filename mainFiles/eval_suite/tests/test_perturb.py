@@ -17,6 +17,7 @@ PUBLIC = REPO / "public"
 EXPECTED_NAMES = [
     "CAU-FUTURE-TICKS", "CAU-SAME-TICK-OTHERS", "CAU-CONDITIONS-HIDDEN", "CAU-ANSWERS-HIDDEN",
     "ROB-ROW-ORDER", "ROB-ID-RENAME", "INFO-MISSING-VS-ZERO-missing", "INFO-MISSING-VS-ZERO-zero",
+    "CAU-CROSS-EPISODE",
 ]
 
 
@@ -93,7 +94,7 @@ class VariantsMixin:
             if name.startswith("INFO-"):
                 self.assertEqual(self.variants[name].relation, "info")
             else:
-                self.assertIn(self.variants[name].relation, ("identical", "identical_after_map"))
+                self.assertIn(self.variants[name].relation, ("identical", "identical_after_map", "identical_subset"))
 
     def test_other_splits_are_byte_identical(self):
         for name in EXPECTED_NAMES:
