@@ -1,0 +1,572 @@
+{
+  "base_rates_validation_targets": {
+    "balanced/-1": {
+      "n": 80,
+      "p0": 0.586727311338098,
+      "p_win": 0.4132726886619021,
+      "positive_size": [
+        0.3783936499065931,
+        0.4324218087606311,
+        0.16215817828523665,
+        0.027026363047539453
+      ]
+    },
+    "balanced/0": {
+      "n": 71,
+      "p0": 0.4946644678645146,
+      "p_win": 0.5053355321354854,
+      "positive_size": [
+        0.38312322285806794,
+        0.4291316710552571,
+        0.16092437664572146,
+        0.026820729440953588
+      ]
+    },
+    "balanced/1": {
+      "n": 83,
+      "p0": 0.49435109131120986,
+      "p_win": 0.5056489086887902,
+      "positive_size": [
+        0.3621244524095814,
+        0.4437395113672478,
+        0.16640231676271794,
+        0.027733719460453006
+      ]
+    },
+    "jackpot/-1": {
+      "n": 75,
+      "p0": 0.8275286623697163,
+      "p_win": 0.17247133763028366,
+      "positive_size": [
+        0.23796981508928022,
+        0.2807479628618449,
+        0.36096166653665773,
+        0.12032055551221923
+      ]
+    },
+    "jackpot/0": {
+      "n": 102,
+      "p0": 0.7567758778895901,
+      "p_win": 0.24322412211040992,
+      "positive_size": [
+        0.23427106635248995,
+        0.28211065976487254,
+        0.362713705411979,
+        0.12090456847065961
+      ]
+    },
+    "jackpot/1": {
+      "n": 88,
+      "p0": 0.6876235811554476,
+      "p_win": 0.3123764188445523,
+      "positive_size": [
+        0.24745359025943706,
+        0.2772539404307339,
+        0.3564693519823722,
+        0.11882311732745734
+      ]
+    },
+    "steady/-1": {
+      "n": 92,
+      "p0": 0.3865212020338022,
+      "p_win": 0.6134787979661978,
+      "positive_size": [
+        0.6078042571322997,
+        0.3137565942941603,
+        0.0768703656020693,
+        0.001568782971470802
+      ]
+    },
+    "steady/0": {
+      "n": 86,
+      "p0": 0.4695038435582802,
+      "p_win": 0.5304961564417198,
+      "positive_size": [
+        0.6115061028649552,
+        0.31079511770803586,
+        0.07614480383846879,
+        0.0015539755885401799
+      ]
+    },
+    "steady/1": {
+      "n": 91,
+      "p0": 0.3574852214164653,
+      "p_win": 0.6425147785835347,
+      "positive_size": [
+        0.6029135701596435,
+        0.31766914387228523,
+        0.0778289402487099,
+        0.0015883457193614265
+      ]
+    }
+  },
+  "ceilings": {
+    "empirical_win_true_size": {
+      "R": 0.9800367233754101,
+      "per_condition_ratio": {
+        "drift": 0.9946864274017515,
+        "shared_change": 0.9423402342149219,
+        "short_history": 1.0498737529491666,
+        "stable": 0.9332464789358005
+      },
+      "points": 30.30246827832402
+    },
+    "true_win_empirical_size": {
+      "R": 0.06902647184303481,
+      "per_condition_ratio": {
+        "drift": 0.07975374922918517,
+        "shared_change": 0.06281414083398726,
+        "short_history": 0.06497256896520553,
+        "stable": 0.06856542834376132
+      },
+      "points": 56.125831848259224
+    }
+  },
+  "lag_effects_validation_labels": {
+    "(1, 2)": {
+      "machines": 752,
+      "mean_mi": 0.049260655074261736,
+      "mean_win_rate_difference": 0.47366449567507085,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(1, 3)": {
+      "machines": 752,
+      "mean_mi": 0.05385231639798563,
+      "mean_win_rate_difference": 0.5106989390343513,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(1, 4)": {
+      "machines": 752,
+      "mean_mi": 0.052066589919176516,
+      "mean_win_rate_difference": 0.48912832941593093,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(1, 5)": {
+      "machines": 752,
+      "mean_mi": 0.04915495194356702,
+      "mean_win_rate_difference": 0.4836538441033166,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(1, 6)": {
+      "machines": 753,
+      "mean_mi": 0.050152095350810486,
+      "mean_win_rate_difference": 0.4721513744274217,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(1, 7)": {
+      "machines": 753,
+      "mean_mi": 0.053916489292919645,
+      "mean_win_rate_difference": 0.5128629149773404,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(1, 8)": {
+      "machines": 752,
+      "mean_mi": 0.05054837749171964,
+      "mean_win_rate_difference": 0.49865270485027874,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(2, 3)": {
+      "machines": 751,
+      "mean_mi": 0.04865629441719175,
+      "mean_win_rate_difference": 0.4623387552835613,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(2, 4)": {
+      "machines": 751,
+      "mean_mi": 0.05134938631754899,
+      "mean_win_rate_difference": 0.4904689630080096,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(2, 5)": {
+      "machines": 752,
+      "mean_mi": 0.05436363266043739,
+      "mean_win_rate_difference": 0.4757330605109506,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(2, 6)": {
+      "machines": 752,
+      "mean_mi": 0.0518690041321776,
+      "mean_win_rate_difference": 0.49389558684426366,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(2, 7)": {
+      "machines": 751,
+      "mean_mi": 0.0522086232042547,
+      "mean_win_rate_difference": 0.4964778224069845,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(2, 8)": {
+      "machines": 752,
+      "mean_mi": 0.05172348793663283,
+      "mean_win_rate_difference": 0.5017155689456384,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(3, 4)": {
+      "machines": 751,
+      "mean_mi": 0.050087998420488625,
+      "mean_win_rate_difference": 0.47589215448800354,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(3, 5)": {
+      "machines": 750,
+      "mean_mi": 0.048456416610776105,
+      "mean_win_rate_difference": 0.47523440229843533,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(3, 6)": {
+      "machines": 752,
+      "mean_mi": 0.049465725779716155,
+      "mean_win_rate_difference": 0.4804897860537618,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(3, 7)": {
+      "machines": 750,
+      "mean_mi": 0.05201615282798351,
+      "mean_win_rate_difference": 0.49841014557992996,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(3, 8)": {
+      "machines": 752,
+      "mean_mi": 0.049920156157375835,
+      "mean_win_rate_difference": 0.47974834530613575,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(4, 5)": {
+      "machines": 750,
+      "mean_mi": 0.05111875887060157,
+      "mean_win_rate_difference": 0.4882391871340507,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(4, 6)": {
+      "machines": 750,
+      "mean_mi": 0.05211512702712229,
+      "mean_win_rate_difference": 0.4881176781273638,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(4, 7)": {
+      "machines": 752,
+      "mean_mi": 0.05761456102059273,
+      "mean_win_rate_difference": 0.5181391511136528,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(4, 8)": {
+      "machines": 749,
+      "mean_mi": 0.05212334581134541,
+      "mean_win_rate_difference": 0.49171821764894413,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(5, 6)": {
+      "machines": 750,
+      "mean_mi": 0.049715623804561515,
+      "mean_win_rate_difference": 0.4956907338653913,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(5, 7)": {
+      "machines": 749,
+      "mean_mi": 0.050968462162097945,
+      "mean_win_rate_difference": 0.49308038645828856,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(5, 8)": {
+      "machines": 749,
+      "mean_mi": 0.04984455662962561,
+      "mean_win_rate_difference": 0.48391469385231317,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(6, 7)": {
+      "machines": 748,
+      "mean_mi": 0.05265394700157112,
+      "mean_win_rate_difference": 0.5018117796434881,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(6, 8)": {
+      "machines": 748,
+      "mean_mi": 0.05100491821499895,
+      "mean_win_rate_difference": 0.49221602637215195,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "(7, 8)": {
+      "machines": 746,
+      "mean_mi": 0.05302685940311841,
+      "mean_win_rate_difference": 0.5026035102881113,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "1": {
+      "machines": 755,
+      "mean_mi": 0.016757632242845606,
+      "mean_win_rate_difference": 0.18563302861106687,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "2": {
+      "machines": 755,
+      "mean_mi": 0.016563088507698654,
+      "mean_win_rate_difference": 0.18410134056557453,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "3": {
+      "machines": 757,
+      "mean_mi": 0.01569603700244393,
+      "mean_win_rate_difference": 0.17750854944348288,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "4": {
+      "machines": 753,
+      "mean_mi": 0.017944414524507776,
+      "mean_win_rate_difference": 0.18686486742015018,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "5": {
+      "machines": 752,
+      "mean_mi": 0.015362441971751782,
+      "mean_win_rate_difference": 0.17149091709611905,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "6": {
+      "machines": 753,
+      "mean_mi": 0.016688624012074882,
+      "mean_win_rate_difference": 0.1864369832609729,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "7": {
+      "machines": 751,
+      "mean_mi": 0.018638865245814245,
+      "mean_win_rate_difference": 0.19223216764356302,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    },
+    "8": {
+      "machines": 752,
+      "mean_mi": 0.016057642766754473,
+      "mean_win_rate_difference": 0.18112689673160426,
+      "sign_conflict_any_type": true,
+      "sign_conflict_by_type": {
+        "balanced": true,
+        "jackpot": true,
+        "steady": true
+      }
+    }
+  },
+  "positive_size_clusters": {
+    "cluster_sizes": {
+      "0.121,0.324,0.416,0.139": 118,
+      "0.214,0.547,0.205,0.034": 103,
+      "0.335,0.245,0.315,0.105": 147,
+      "0.455,0.436,0.107,0.002": 132,
+      "0.5,0.348,0.13,0.022": 131,
+      "0.754,0.197,0.048,0.001": 137
+    },
+    "distinct_rounded_3dp": 6
+  },
+  "temporal_missingness_validation": {
+    "drift": {
+      "change": 0.0010909593372811263,
+      "change_point_count_mean": 31.567708333333332,
+      "cross_machine_corr_mean": -0.0018749111598213223,
+      "first_win_rate": 0.07822899739014769,
+      "missing_rows_mean": 0.0,
+      "observed_rows_mean": 226.20833333333334,
+      "second_win_rate": 0.07931995672742881
+    },
+    "shared_change": {
+      "change": 0.000880382246818408,
+      "change_point_count_mean": 32.1875,
+      "cross_machine_corr_mean": 0.002111900322514329,
+      "first_win_rate": 0.08060477769226124,
+      "missing_rows_mean": 0.0,
+      "observed_rows_mean": 224.79166666666666,
+      "second_win_rate": 0.08148515993907963
+    },
+    "short_history": {
+      "change": -0.006673177083333333,
+      "change_point_count_mean": 5.5,
+      "cross_machine_corr_mean": -0.001573201488931485,
+      "first_win_rate": 0.08040364583333333,
+      "missing_rows_mean": 154.79166666666666,
+      "observed_rows_mean": 64.0,
+      "second_win_rate": 0.07373046875
+    },
+    "stable": {
+      "change": 0.0010879003382424062,
+      "change_point_count_mean": 29.552083333333332,
+      "cross_machine_corr_mean": 0.003550302098779916,
+      "first_win_rate": 0.07453300696457381,
+      "missing_rows_mean": 0.0,
+      "observed_rows_mean": 221.41666666666666,
+      "second_win_rate": 0.07562090730281622
+    }
+  }
+}
