@@ -12,7 +12,7 @@ import fresh_eval
 ROOT = Path(__file__).resolve().parent
 PUBLIC = ROOT / "mainFiles" / "public"
 PAYOUTS = (0, 1, 2, 5, 20)
-WIN = {0: 0, 1: 0, 2: 0, 5: 1, 20: 1}
+WIN = {payout: int(payout > 0) for payout in PAYOUTS}
 
 
 def rows(path):
@@ -192,6 +192,17 @@ def ceilings(q, t, tq, ty):
     global_outcomes = list(train_labels.values())
     predictions_win = {}
     predictions_size = {}
+    validation_queries = fresh_eval.QUERIES
+    _, validation_history = fresh_eval.load_inputs(PUBLIC / "validation")
+    train_queries, train_history = fresh_eval.load_inputs(PUBLIC / "train")
+    train_labels = fresh_eval.read_labels(PUBLIC / "train" / "labels.csv", train_queries)
+    model_predictions = {}
+    for method in ("pooled", "recent"):
+        model = fresh_eval.FrequencyForecaster(method).fit(
+            train_queries, train_history, train_labels
+        )
+        model_predictions[method] = model.predict(validation_queries, validation_history)
+    predictions_model_size = {method: {} for method in model_predictions}
     for target in t:
         row = qmap[target["query_id"]]
         true = [float(target[f"p_{x}"]) for x in PAYOUTS]
@@ -205,10 +216,20 @@ def ceilings(q, t, tq, ty):
         predictions_size[target["query_id"]] = tuple(
             [1 - empirical_win] + [empirical_win * x for x in true_size]
         )
-    return {
+        for method, model_pred in model_predictions.items():
+            model_positive = model_pred[target["query_id"]][1:]
+            model_total = sum(model_positive)
+            model_size = [value / model_total for value in model_positive]
+            predictions_model_size[method][target["query_id"]] = tuple(
+                [1 - pwin] + [pwin * x for x in model_size]
+            )
+    result = {
         "true_win_empirical_size": fresh_eval.score(predictions_win),
         "empirical_win_true_size": fresh_eval.score(predictions_size),
     }
+    for method, predictions in predictions_model_size.items():
+        result[f"true_win_{method}_size"] = fresh_eval.score(predictions)
+    return result
 
 
 def main():
@@ -230,7 +251,7 @@ def main():
     }
     out = ROOT / "eda_results.json"
     out.write_text(__import__("json").dumps(result, indent=2, sort_keys=True) + "\n")
-    report = ["# Fresh-start EDA", "", "All measurements below were produced by `eda_analysis.py`; the complete machine-level and pair-level data is in `eda_results.json`.", ""]
+    report = ["# Fresh-start EDA", "", "All measurements below were produced by `eda_analysis.py`; the complete machine-level and pair-level data is in `eda_results.json`.", "", "Win means any payout greater than zero (`1, 2, 5, 20`); only payout zero is a loss.", ""]
     report += ["## Base rates and target size distributions", "",
                "| machine type / signal | n | p0 | p(win) | positive payout shares (1,2,5,20) |",
                "|---|---:|---:|---:|---|"]
@@ -250,7 +271,7 @@ def main():
     for key, value in result["temporal_missingness_validation"].items():
         report.append(f"| {key} | {value['first_win_rate']:.4f} | {value['second_win_rate']:.4f} | {value['change']:.4f} | {value['change_point_count_mean']:.2f} | {value['missing_rows_mean']:.2f} | {value['observed_rows_mean']:.2f} | {value['cross_machine_corr_mean']:.4f} |")
     report += ["", "## Validation score ceilings", "",
-               "The first ceiling gives each target's true total win probability but uses train empirical positive-payout shares. The second gives the train empirical win rate but uses each target's true positive-payout shares.", "",
+               "The first ceiling gives each target's true total win probability but uses train empirical positive-payout shares. The model-size ceilings use the true win probability with the pooled or recent model's own conditional positive-payout distribution. The empirical-win ceiling uses the train empirical win rate with each target's true positive-payout shares.", "",
                "| construction | points | R | condition ratios (stable, short_history, drift, shared_change) |", "|---|---:|---:|---|"]
     for key, value in result["ceilings"].items():
         ratios = ", ".join(f"{value['per_condition_ratio'][c]:.4f}" for c in ("stable", "short_history", "drift", "shared_change"))

@@ -20,6 +20,7 @@ from mainFiles.slot_forecasting.io import (
 )
 from mainFiles.slot_forecasting.rounds import round_metadata
 from mainFiles.slot_forecasting.schema import CONDITIONS
+from mainFiles.slot_forecasting.scoring import distribution_error
 
 
 PUBLIC = KIT_ROOT / "mainFiles" / "public"
@@ -125,7 +126,7 @@ def _episode_errors(preds_dict, episodes):
 
 
 def bootstrap_ci(preds_dict, repeats=1000, seed=314159):
-    """Return a percentile 95% CI for points, resampling episodes by condition."""
+    """Return a percentile 95% CI, resampling all episodes per condition."""
     by_condition = {
         condition: tuple(
             sorted({
@@ -135,13 +136,32 @@ def bootstrap_ci(preds_dict, repeats=1000, seed=314159):
         )
         for condition in CONDITIONS
     }
+    episode_errors = {}
+    for condition, episodes in by_condition.items():
+        for episode in episodes:
+            ids = [
+                query_id for query_id, query_episode in EPISODE_BY_ID.items()
+                if query_episode == episode
+            ]
+            episode_errors[(condition, episode)] = (
+                sum(distribution_error(preds_dict[query_id], TARGET_BY_ID[query_id].probabilities)
+                    for query_id in ids) / len(ids),
+                sum(distribution_error(REFERENCE[query_id], TARGET_BY_ID[query_id].probabilities)
+                    for query_id in ids) / len(ids),
+            )
     rng = random.Random(seed)
     points = []
     for _ in range(repeats):
-        sampled = tuple(
-            rng.choice(episodes) for episodes in by_condition.values()
-        )
-        ratios = _episode_errors(preds_dict, sampled)
+        ratios = {}
+        for condition, episodes in by_condition.items():
+            sampled = [rng.choice(episodes) for _ in episodes]
+            prediction_error = sum(
+                episode_errors[(condition, episode)][0] for episode in sampled
+            ) / len(sampled)
+            reference_error = sum(
+                episode_errors[(condition, episode)][1] for episode in sampled
+            ) / len(sampled)
+            ratios[condition] = prediction_error / max(reference_error, 1e-9)
         ratio = sum(ratios.values()) / len(CONDITIONS)
         points.append(60.0 / (1.0 + ratio))
     points.sort()
