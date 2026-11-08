@@ -19,7 +19,7 @@ from slot_forecasting.pair_mixer import (ALL_PAIRS, WIN_PRIOR_ETA, PairMixer, ad
 
 from rule_model import RuleForecaster
 from hmm_model import HiddenRuleHMM, levels_from_targets
-from size_hmm import SizeRuleHMM, core_from_train, default_rules, modes_from_targets
+from size_hmm import SizeRuleHMM, modes_from_targets, prior_from_train
 from slot_forecasting.pair_mixer import choose_pairs
 
 HERE = Path(__file__).resolve().parent
@@ -131,8 +131,9 @@ def saved_priors(data):
 
 
 # Size-rule HMM (size_hmm.py): replaces the payout-size split given a win. No switching (the size
-# rule does not drift on main). Validation 56.59 -> 57.32 (halves 57.44 / 57.20), every condition better.
-SIZE_HMM = dict(core_weight=0.97, none_weight=0.02, switch=0.0)
+# rule does not drift on main). Validation 56.59 -> 57.30 with the EM rule prior (57.32 with a
+# hand-set 97% core prior, which loses 0.2-0.6 / 40 on simulated round-two kits).
+SIZE_HMM = dict(none_weight=0.02, switch=0.0)
 
 
 class WithSizeHMM:
@@ -192,10 +193,10 @@ def build(data, weights=None, log=lambda *_: None):
         base = WithHMM(base, hmm, weights["hmm"])
     modes = size_rule_modes(data)
     if modes:
-        # common size rules rediscovered on this round's train (main: payout >= 2x at lag 1, 2 or 4)
-        core = core_from_train(queries, history, modes)
-        log("size-rule core:", core)
-        rules = default_rules(SIZE_HMM["core_weight"], SIZE_HMM["none_weight"], core)
+        # rule prior fitted by EM on this round's train (lag rules, fixed mixes, none), so a round
+        # with a different size mechanism re-learns it. Main: ~91% on payout >= 2x at lag 1/2/4.
+        rules = prior_from_train(queries, history, modes, none_weight=SIZE_HMM["none_weight"])
+        log("size-rule prior (top):", sorted(rules, key=rules.get, reverse=True)[:6])
         base = WithSizeHMM(base, SizeRuleHMM(modes, rules, SIZE_HMM["switch"]))
     return base
 

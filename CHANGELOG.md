@@ -19,6 +19,7 @@ How to add an entry (every PR):
 ## [Unreleased]
 
 ### Added
+- Size-rule HMM learns its rule prior by EM on each round's train (lag rules, fixed mixes); +0.2-0.6 / 40 on simulated round-two kits, main unchanged (57.30)
 - Size-rule HMM for payout size (`mainFiles/size_hmm.py`): learns which of a few "payout >= 2x k spins back" rules sets each machine's size mix; validation 56.59 -> 57.32
 - Lag-pair mixer forecaster with a verified, reproducible entry ZIP (`mainFiles/run_pair_mixer.py`); validation 53.75 / 60
 - eval_suite: --jobs N runs independent entry executions in parallel (identical results)

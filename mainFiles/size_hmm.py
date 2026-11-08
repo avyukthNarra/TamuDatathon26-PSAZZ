@@ -20,7 +20,10 @@ CLASS = {1: 0, 2: 1, 5: 2, 20: 3}
 CORE = [(2, k, d) for k in (1, 2, 4) for d in (False, True)]
 
 
-ALL_RULES = [(t, k, d) for t in (2, 5) for k in range(1, 9) for d in (False, True)]
+# (0, 0, d) = a FIXED mix for the machine (small if d is False, big if True), no lag rule:
+# lets the filter (and the train-learned prior) cover rounds where size does not follow a lag.
+FIXED = [(0, 0, False), (0, 0, True)]
+ALL_RULES = [(t, k, d) for t in (2, 5) for k in range(1, 9) for d in (False, True)] + FIXED
 
 
 def default_rules(core_weight=0.9, none_weight=0.02, core=CORE):
@@ -73,6 +76,8 @@ class SizeRuleHMM:
         if state is None:
             return None
         threshold, lag, inverted = state
+        if lag == 0:
+            return inverted
         x = seq.get(t - lag)
         if x is None:
             return None
@@ -112,6 +117,81 @@ def modes_from_targets(targets, queries):
             a, b = sorted(top, key=lambda s: s[2] + s[3])  # small mix = less 5x/20x mass
             out[k] = (a, b)
     return out
+
+
+def _winner_counts(queries, history, modes, min_spins):
+    indexed = index_history(queries, history)
+    wins, n = {}, 0
+    for q in queries:
+        if q.machine_type not in modes:
+            continue
+        seq = {p.tick: p.payout for p in indexed.get((q.episode_id, q.machine_id), [])}
+        if len(seq) < min_spins:
+            continue
+        A, B = modes[q.machine_type]
+        best, best_ll = None, None
+        for rule in [None] + ALL_RULES:
+            ll = 0.0
+            for t, v in seq.items():
+                if v not in CLASS or v == 0:
+                    continue
+                c = CLASS[v]
+                big = SizeRuleHMM._big(seq, t, rule)
+                ll += math.log(max(0.5 * (A[c] + B[c]) if big is None else (B[c] if big else A[c]), 1e-9))
+            if best_ll is None or ll > best_ll + 1e-12:
+                best, best_ll = rule, ll
+        n += 1
+        wins[best] = wins.get(best, 0) + 1
+    return wins, n
+
+
+def _rule_loglik(queries, history, modes, min_spins):
+    """Per long-history train machine: log-likelihood of its win sizes under every rule."""
+    indexed = index_history(queries, history)
+    rules = [None] + ALL_RULES
+    rows = []
+    for q in queries:
+        if q.machine_type not in modes:
+            continue
+        seq = {p.tick: p.payout for p in indexed.get((q.episode_id, q.machine_id), [])}
+        if len(seq) < min_spins:
+            continue
+        A, B = modes[q.machine_type]
+        row = []
+        for rule in rules:
+            ll = 0.0
+            for t, v in seq.items():
+                if v not in CLASS or v == 0:
+                    continue
+                c = CLASS[v]
+                big = SizeRuleHMM._big(seq, t, rule)
+                ll += math.log(max(0.5 * (A[c] + B[c]) if big is None else (B[c] if big else A[c]), 1e-9))
+            row.append(ll)
+        rows.append(row)
+    return rules, rows
+
+
+def prior_from_train(queries, history, modes, min_spins=150, iterations=50, floor=0.002, none_weight=0.02):
+    """Rule prior fitted by EM on this round's long-history train machines: the mixture weights
+    over rules (lag rules, fixed mixes) that best explain their win sizes. Adapts to whatever size
+    mechanism the round uses. Falls back to default_rules() when train has no long histories."""
+    rules, rows = _rule_loglik(queries, history, modes, min_spins)
+    if not rows:
+        return default_rules(0.97, none_weight)
+    w = [1.0 / len(rules)] * len(rules)
+    for _ in range(iterations):
+        acc = [0.0] * len(rules)
+        for row in rows:
+            top = max(math.log(max(wi, 1e-300)) + li for wi, li in zip(w, row))
+            post = [wi * math.exp(li - top + 0.0) if wi > 0 else 0.0 for wi, li in zip(w, row)]
+            z = math.fsum(post)
+            for i, x in enumerate(post):
+                acc[i] += x / z
+        w = [a / len(rows) for a in acc]
+    prior = {r: max(wi, floor) for r, wi in zip(rules, w)}
+    prior[None] = max(prior[None], none_weight)
+    total = math.fsum(prior.values())
+    return {r: v / total for r, v in prior.items()}
 
 
 def core_from_train(queries, history, modes, min_spins=150, min_share=0.05):
