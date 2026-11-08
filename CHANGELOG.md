@@ -19,6 +19,7 @@ How to add an entry (every PR):
 ## [Unreleased]
 
 ### Added
+- Independent self-supervised global learning experiment with causal in-context features, train-only calibration, and episode cross-fitted evaluation
 - Method-agnostic evaluation suite (`python -m eval_suite run --entry DIR`) that checks any entry against all 88 documented requirements and scores it with the official metric (#19)
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 
