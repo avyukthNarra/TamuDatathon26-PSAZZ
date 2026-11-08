@@ -48,6 +48,7 @@ Every member learns its own lag pairs from the current round's training data, so
 
 - Improve the short-history case, where the blend is weakest: identify each short machine's lag pair with fewer spins (for example from the payout-size channel, whose lags are the smaller member of each win pair), and shrink short machines' size split toward type-level sizes.
 - Tighten the payout-size rule for the largest-pot cases.
+- Model the cross-machine signal directly: in round two, the share of an episode's other machines that won 3 spins ago predicts a machine's win probability (+0.06 / +0.11 on the two validation halves; no other lag helps).
 
 ## Round two (adaptation)
 
@@ -61,7 +62,7 @@ Every member learns its own lag pairs from the current round's training data, so
 - **Final experiments (11:00-11:28, none cleared the 0.1-on-both-halves bar):** a train-only prior over pair identities for short-history machines in the exact filter (+0.022 overall, but -0.006 on one half); logit-normal pooling of short machines' win levels with the spread chosen on one half (+0.008, positive on both halves); self-supervised recalibration of short-history P(win) on masked train histories (-0.022; the fitted slope was about 1.1, so it was already well calibrated); type-level shrinkage of short-history payout sizes (worse at every weight); size-channel pair evidence (+0.0006); a peer lag-3 win correction (+0.06 / +0.11). **Uploaded: the default blend.**
 - **Reproducibility:** the organizer-style Docker rerun (python 3.13, pinned numpy/scipy, offline, 2 CPUs) matches our CSV to 9.7e-15; 4.8 minutes locally.
 - **Kit note:** the adaptation kit shipped the organizers' older 80/20 scoring library, which our newer 60/40 tooling rejects; we scored on a copy with `max_points` 40, which rescales points without changing any ranking.
-- **Files uploaded:** `ADAPTATION_submission.csv` and `ADAPTATION_entry.zip` (see `CHECKLIST.md`).
+- **Files uploaded:** `ADAPTATION_submission.csv` (SHA-256 `a7ec520d…190f`) and `ADAPTATION_entry.zip` (`feb33968…29d2`); two independent builds agree to 3.2e-14 with identical ZIP code (see `SUBMISSIONS.md`).
 
 ## Built with
 
