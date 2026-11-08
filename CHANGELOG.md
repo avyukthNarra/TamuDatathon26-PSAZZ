@@ -24,6 +24,8 @@ How to add an entry (every PR):
 - Causal residual stacking of mixer forecasts with separate prior-fold training and checkpoint-only test prediction
 - Independent self-supervised global learning experiment with causal in-context features, train-only calibration, and episode cross-fitted evaluation
 - eval_suite: --jobs N runs independent entry executions in parallel (identical results)
+- Win-probability form study: cutoff chances are per-machine logit-normal levels on a parity cell that has already finished flipping
+- Validation forecast that pairs the train-history win posterior with the v13 size split (`validation_crossfit.csv`, 57.68 points)
 - Method-agnostic evaluation suite (`python -m eval_suite run --entry DIR`) that checks any entry against all 88 documented requirements and scores it with the official metric (#19)
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 - Empirical-Bayes latent-state experiment with reproducible cross-fitted validation and uncertainty reporting

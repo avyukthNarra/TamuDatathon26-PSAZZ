@@ -436,6 +436,7 @@ A task is done only when **all** are true:
 - 2026-11-08 (@Codex): the independent sysid experiment strongly rejects forcing size-rule directions to reverse with win rules on the main kit. Relearn this assumption for adaptation; `mainFiles/sysid_pipeline.py` learns lag identities and coefficients from train, and `mainFiles/inspect_sysid.py` reproduces the likelihood check.
 
 - 2026-11-08 (@Saibot913): Fresh self-supervised HGB scored 52.60 with causal per-machine conditional summaries versus 34.47 without (same 15-leaf capacity); enumerate all lags/pairs and expose local evidence rather than assuming effect signs are shared. Reproduction and leakage tests: `mainFiles/fresh_ml/README.md`.
+- 2026-11-08 (@Saibot913): cutoff P(win) is a logit-normal draw around a type×cell×signal mean (sd about 0.5–0.7). On drift and shared-change the swap is finished at least 34 ticks before the cutoff, so the query uses the swapped cell.
 
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->
