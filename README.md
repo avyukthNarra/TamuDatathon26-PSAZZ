@@ -29,6 +29,7 @@ scored against the organizers' reference (`mainFiles/RULES.md`).
   branch (`docs/devpost/research/COMMIT_LOG.md`), and Sai's narrative (`docs/devpost/SAI_ITERATIONS.md`).
 - **Research reports:** `docs/devpost/research/` (main-round forensics and methods; every round-two experiment) plus the raw research
   in `docs/sai/`, `orch/RESULTS.md` and `adapted_entry/ADAPTED.md`. Experiment code stays on each person's branches, linked from these pages.
+- **AI usage:** `docs/devpost/SAI_AI_REPORT.md`: 575M tokens of context, 16 AI-active hours, Claude + Codex orchestration, and the mistakes the AI made and how they were caught.
 - **Devpost:** `docs/devpost/WRITEUP.md` (project text) and `docs/devpost/CHECKLIST.md`.
 
 ## Round two in four commands
