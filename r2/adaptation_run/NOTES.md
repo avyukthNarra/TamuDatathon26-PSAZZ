@@ -24,3 +24,10 @@ Verdict: no change. Script `tweak.py`, output `tweak_out.txt`.
 - Train + validation half as extra training episodes, predicting the other half as test (`trainval_*.py`):
   held-out B 38.502 -> 38.495 (-0.007), held-out A 38.404 -> 38.401 (-0.003). Members are data-saturated.
 - Size lags moved to {1,2,3} (smaller member of each new win pair); the size rule searches range(1,9) on train and picks them up.
+
+## 11:15 checks (40-point scale), all no change
+- Short-history-only weights/temperature (detected from history gaps, 192/192 correct; `shortcal.py`): fit A -> B +0.02, fit B -> A -0.30; T=1.0 best.
+- 4th win member (Codex, `research_pf/r2-member4`): + v19 A +0.009 / B -0.005; + v7c A -0.013 / B -0.097. v19's file is contaminated by full-validation gate choices.
+- v20 (pre-fix, `research_pf/r2-v20`): 38.582 (A 38.633 / B 38.561). Pranav's 7b89c64 fix reports 38.62 (his halves 38.3 / 38.8).
+- Docker (python:3.13, pinned numpy/scipy, offline, 2 CPUs, real 20-point kit): matches ADAPTATION_submission.csv, max diff 9.7e-15.
+- Running: size-channel pair evidence (Codex), episode pair sharing (Grok), peer residuals (Grok), web research (Grok).
