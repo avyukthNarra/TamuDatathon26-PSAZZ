@@ -25,10 +25,11 @@ V17G_REF = "origin/zhill/v17-round2-guards"  # mainFiles/ has run_strongest.py a
 MIXER6_REF = "814cb60"  # frozen mixer6 snapshot (see docs/sai/round/jackpot/README.md)
 V7C_REF = "origin/avyukth/v7c-size-flip"
 V6_SUB = "mainFiles/round2/tooling/fallback-v6"
-BLEND_DIR = REPO / "adapted_entry_v17g"   # default pick: adapted blend, v17-guards first (PR #22)
+BLEND_DIR = REPO / "adapted_entry_v17g_rules"   # default pick: adapted blend + exact filter learning 3-lag/AND/OR rules (PR #24)
+BLEND_V17G_DIR = REPO / "adapted_entry_v17g"     # previous default (PR #22), kept as a challenger
 BLEND_V13_DIR = REPO / "adapted_entry"    # same blend with v13 first, kept as a challenger
 DEFAULT = "blend"  # upload first if its test CSV is valid
-FALLBACK = ("blend", "v17-guards", "v7c", "v6", "mixer6")  # zhill v18 is not built here; add it with --extra if wanted
+FALLBACK = ("blend", "blend_v17g", "v17-guards", "v7c", "v6", "mixer6")  # zhill v18 is not built here; add it with --extra if wanted
 MARGIN = 0.1  # a challenger must beat the default on both halves and on the mean by more than this
 SAFE = "v17-guards"
 ORIG_PAIRS = [(1, 3), (2, 5), (4, 7)]
@@ -248,6 +249,8 @@ def main():
     extras = list(args.extra)
     if args.blend and Path(args.blend).is_dir() and not any(e.startswith("blend=") for e in extras):
         extras.insert(0, f"blend={args.blend}")
+    if BLEND_V17G_DIR.is_dir() and not any(e.startswith("blend_v17g=") for e in extras):
+        extras.append(f"blend_v17g={BLEND_V17G_DIR}")
     if BLEND_V13_DIR.is_dir() and not any(e.startswith("blend_v13=") for e in extras):
         extras.append(f"blend_v13={BLEND_V13_DIR}")
     for spec in extras:
