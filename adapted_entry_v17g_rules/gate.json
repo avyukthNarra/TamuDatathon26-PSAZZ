@@ -6,7 +6,6 @@
   ],
   "size_member": "v13_short",
   "margin": 0.1,
-  "all_members_points": 57.971407,
-  "chosen_points": 57.971407,
-  "kit_round": "main"
+  "kit_round": "adaptation",
+  "note": "gate scoring skipped on the 20-point adaptation kit (rounds.py expects 40); all members kept"
 }
