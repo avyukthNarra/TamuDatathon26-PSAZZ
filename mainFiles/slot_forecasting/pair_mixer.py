@@ -44,6 +44,26 @@ WIN_PRIOR_ETA = 6.0
 MIN_PROBABILITY = 1e-4
 
 
+def swap_parity_counts(win_tab):
+    """Exchange agree/differ counts so earlier spins match the new direction.
+
+    Full-cell keys are left alone: the swap is the parity relabel. ``sym``
+    evidence counts "win iff agree", which becomes ``n - evidence`` after the
+    exchange.
+    """
+    for tab in win_tab:
+        agree = tab.pop((True,), None)
+        differ = tab.pop((False,), None)
+        if agree is not None:
+            tab[(False,)] = agree
+        if differ is not None:
+            tab[(True,)] = differ
+        sym = tab.get("sym")
+        if sym is not None:
+            evidence, n = sym
+            sym[0] = n - evidence
+
+
 def _normalize_size_modes(spec):
     if isinstance(spec, dict):
         modes = tuple(tuple(float(x) for x in mode) for mode in spec["modes"])
@@ -151,8 +171,11 @@ class PairMixer:
     def _size_prior(self, machine_type):
         return self.type_size_priors.get(machine_type, [0.25] * (CLASSES - 1))
 
-    def walk(self, own, machine_type, stop, emit):
+    def walk(self, own, machine_type, stop, emit, swap_tick=None):
         """own[t] = payout class index or None. Calls emit(t, probs) for t in 0..stop before absorbing t.
+
+        swap_tick: first tick of a new parity direction. Counts are exchanged
+        at the start of that tick, before the forecast, then learning continues.
 
         Win chance: mixture over lag-pair experts (decayed win table per pair cell).
         Payout size given a win: separate mixture over size experts keyed by
@@ -196,6 +219,8 @@ class PairMixer:
             return tuple(values)
 
         for t in range(stop + 1):
+            if swap_tick is not None and t == swap_tick:
+                swap_parity_counts(win_tab)
             base = (rate[0] + a0) / (rate[1] + b0)
             msum = math.fsum(machine_size)
             msize = [(c + self.k_machine * p) / (msum + self.k_machine) for c, p in zip(machine_size, type_size)]
@@ -308,7 +333,7 @@ class PairMixer:
         post = [math.exp(v - top) for v in logs]
         return math.fsum(p * m for p, m in zip(post, means)) / math.fsum(post)
 
-    def predict(self, queries, history, baseline=None):
+    def predict(self, queries, history, baseline=None, swap_at=None):
         query_map = unique_queries(queries)
         indexed = index_history(queries, history)
         result = {}
@@ -317,7 +342,9 @@ class PairMixer:
             for play in indexed.get((query.episode_id, query.machine_id), []):
                 own[play.tick] = CLASS_INDEX[play.payout]
             captured = {}
-            self.walk(own, query.machine_type, query.cutoff, lambda t, p: captured.__setitem__(t, p))
+            swap_tick = None if swap_at is None else swap_at.get(query.episode_id)
+            self.walk(own, query.machine_type, query.cutoff, lambda t, p: captured.__setitem__(t, p),
+                      swap_tick=swap_tick)
             probs = [max(p, MIN_PROBABILITY) for p in captured[query.cutoff]]
             total = math.fsum(probs)
             result[query.query_id] = probabilities([p / total for p in probs], query.query_id)
@@ -382,7 +409,85 @@ def choose_pairs(queries, history, min_share=0.3):
     return tuple(sorted(pair for pair, count in found if count >= min_share * top))
 
 
-def discover_size_keys(queries, history, lags=range(1, 9), min_share=0.5, top=4, min_wins=12):
+def _pair_separation(wins, ticks):
+    """Between-cell win-rate variance for every lag pair. ``ticks`` limits outcome ticks."""
+    scores = {}
+    for a, b in ALL_PAIRS:
+        cells = {}
+        for t, won in wins.items():
+            if ticks is not None and t not in ticks:
+                continue
+            if t - a not in wins or t - b not in wins:
+                continue
+            row = cells.setdefault((wins[t - a], wins[t - b]), [0, 0])
+            row[0] += int(won)
+            row[1] += 1
+        n = sum(row[1] for row in cells.values())
+        if n < 20:
+            continue
+        mean = sum(row[0] for row in cells.values()) / n
+        scores[(a, b)] = sum(row[1] * (row[0] / row[1] - mean) ** 2 for row in cells.values()) / n
+    return scores
+
+
+def _best_scored_pair(scores):
+    best, best_score = None, -1.0
+    for pair in ALL_PAIRS:
+        score = scores.get(pair)
+        if score is not None and score > best_score:
+            best, best_score = pair, score
+    return best, best_score
+
+
+def robust_assignment(queries, history):
+    """Per-machine winner across the full history and the two end windows.
+
+    The windows are the full history, the first 45% of ticks, and the last 40
+    ticks. A finished drift or a shared flip cancels in the pooled history and
+    does not cancel in both ends. The machine keeps the window with the
+    largest cell separation.
+    """
+    indexed = index_history(queries, history)
+    qmap = {(q.episode_id, q.machine_id): q for q in queries}
+    out = {}
+    for key, plays in indexed.items():
+        wins = {p.tick: p.payout > 0 for p in plays}
+        cutoff = qmap[key].cutoff
+        windows = {
+            "all": None,
+            "early": {t for t in wins if t <= int(0.45 * cutoff)},
+            "late": {t for t in wins if t >= cutoff - 40},
+        }
+        best = None
+        for name, ticks in windows.items():
+            pair, score = _best_scored_pair(_pair_separation(wins, ticks))
+            if pair is None:
+                continue
+            if best is None or score > best[0]:
+                best = (score, name, pair)
+        if best is not None:
+            out[key] = {"pair": best[2], "score": best[0], "window": best[1]}
+    return out
+
+
+def choose_pairs_robust(queries, history):
+    """Pairs used by at least 5% of scored machines. An empty search returns all 28 pairs.
+
+    A 0.3-of-the-leader cut kept a spurious pair and only barely kept a real
+    rare pair. The floor is ``max(3, 5% of scored machines)``. Never returns
+    the main-round default pairs.
+    """
+    found = robust_assignment(queries, history)
+    if not found:
+        return ALL_PAIRS
+    counts = Counter(rec["pair"] for rec in found.values())
+    floor = max(3, math.ceil(0.05 * sum(counts.values())))
+    kept = [pair for pair, count in counts.items() if count >= floor]
+    return tuple(sorted(kept)) if kept else ALL_PAIRS
+
+
+def discover_size_keys(queries, history, lags=range(1, 9), min_share=0.5, top=4, min_wins=12,
+                       on_empty=None):
     """Lags whose exact payout class best predicts the next win's payout size, from train history.
 
     Per machine, splits winning spins by the payout class `lag` spins back and measures the
@@ -414,7 +519,9 @@ def discover_size_keys(queries, history, lags=range(1, 9), min_share=0.5, top=4,
     scores = {lag: gain[lag] / machines[lag] for lag in machines}
     best = max(scores.values(), default=0.0)
     if best <= 0.0:
-        return MODE_SIZE_KEYS
+        # Default keeps lags 1-4. Pass on_empty=((),) so an all-loss history
+        # does not fall back to that main-round size story.
+        return MODE_SIZE_KEYS if on_empty is None else on_empty
     kept = sorted(lag for lag, score in sorted(scores.items(), key=lambda kv: (-kv[1], kv[0]))[:top]
                   if score >= min_share * best)
     return ((),) + tuple((lag,) for lag in kept)
@@ -515,7 +622,54 @@ def win_prior_from_train(queries, history, pairs=None, min_spins=10):
     return _u_shaped_prior(rates, 6.0)
 
 
-def win_prior_by_type_from_targets(targets, queries, strength=10.0, global_shrink=0.0, middle_strength=10.0):
+def two_level_fit(rates, strength=10.0, min_n=20, min_gap=0.08):
+    """3-component Beta prior from 1d 2-means. None if the rates do not split.
+
+    Used when a type has fewer than 20 targets on one side of 0.5, so the
+    median split cannot see two levels (a jackpot whose live rate sits near
+    0.3-0.5). Returns the same ``(weight, mean, strength)`` triples as
+    ``win_prior_from_targets``.
+    """
+    if len(rates) < min_n:
+        return None
+    ordered = sorted(rates)
+    c1 = ordered[len(ordered) // 4]
+    c2 = ordered[(3 * len(ordered)) // 4]
+    if c2 - c1 < min_gap:
+        return None
+    groups = None
+    for _ in range(30):
+        left, right = [], []
+        for rate in rates:
+            (left if abs(rate - c1) <= abs(rate - c2) else right).append(rate)
+        if not left or not right:
+            return None
+        n1 = math.fsum(left) / len(left)
+        n2 = math.fsum(right) / len(right)
+        groups = (left, right)
+        if abs(n1 - c1) < 1e-8 and abs(n2 - c2) < 1e-8:
+            c1, c2 = n1, n2
+            break
+        c1, c2 = n1, n2
+    left, right = groups
+    if abs(c1 - c2) < min_gap:
+        return None
+    if c1 > c2:
+        c1, c2, left, right = c2, c1, right, left
+
+    def clamp(mean):
+        return min(0.99, max(0.01, mean))
+
+    total = len(left) + len(right) + 1
+    return [
+        (len(left) / total, round(clamp(c1), 4), strength),
+        (len(right) / total, round(clamp(c2), 4), strength),
+        (1 / total, round(clamp(0.5 * (c1 + c2)), 4), 2.0),
+    ]
+
+
+def win_prior_by_type_from_targets(targets, queries, strength=10.0, global_shrink=0.0, middle_strength=10.0,
+                                  two_means=False):
     """Beta-mixture win prior per machine type: {type: components}, levels read per type.
 
     Types differ a lot (main round: jackpot is rarely live, only 10 of 265 targets above 0.8,
@@ -542,7 +696,12 @@ def win_prior_by_type_from_targets(targets, queries, strength=10.0, global_shrin
     for kind in sorted(by_type):
         own = win_prior_from_targets(by_type[kind], strength)
         if own is None:
-            priors[kind] = global_prior
+            if two_means:
+                rates = [1.0 - t.probabilities[0] for t in by_type[kind]]
+                alt = two_level_fit(rates, strength)
+                priors[kind] = alt if alt is not None else global_prior
+            else:
+                priors[kind] = global_prior
             continue
         priors[kind] = [(w, round((1.0 - global_shrink) * m + global_shrink * g[1], 4), k)
                         for (w, m, k), g in zip(own, global_prior)]
@@ -584,16 +743,23 @@ def cutoff_brier(model, queries, history, labels):
                                for k, p in enumerate(predictions[q])) for q in labels) / len(labels)
 
 
-def adapt(queries, history, labels=None, log=print, size_modes=None, win_prior=None):
+def adapt(queries, history, labels=None, log=print, size_modes=None, win_prior=None, round2=False):
     """Round-two helper: rediscover the lag pairs and pick the cell mode on this round's train data.
 
     size_modes: from size_modes_from_targets on this round's validation targets, if available.
     win_prior: from win_prior_by_type_from_targets (or win_prior_from_targets) on the same
       targets, if available; a {type: components} dict or one component list.
+    round2: windowed pair votes, all-28-pairs empty fallback, and machine-level
+      size key when no lag has positive gain. The 2-means win prior is selected
+      by the caller (``win_prior_by_type_from_targets(..., two_means=True)``).
     """
-    pairs = choose_pairs(queries, history)
+    if round2:
+        pairs = choose_pairs_robust(queries, history)
+        size_keys = discover_size_keys(queries, history, on_empty=((),))
+    else:
+        pairs = choose_pairs(queries, history)
+        size_keys = discover_size_keys(queries, history)
     log(f"lag pairs found on train: {pairs}")
-    size_keys = discover_size_keys(queries, history)
     log(f"payout-size keys discovered: {size_keys}")
     log(f"payout-size modes: {'target-derived mixture' if size_modes else 'none (free frequencies)'}")
     log(f"win-cell prior: {win_prior if win_prior else 'none (smooth toward base rate)'}")
@@ -606,4 +772,17 @@ def adapt(queries, history, labels=None, log=print, size_modes=None, win_prior=N
     scores = [cutoff_brier(model, queries, history, labels) for model in candidates]
     for model, score in zip(candidates, scores):
         log(f"cell_mode={model.cell_mode[0]}: train cutoff Brier {score:.5f}")
-    return candidates[scores.index(min(scores))]
+    selected = candidates[scores.index(min(scores))]
+    selected.cell_mode_gate = None
+    if round2 and labels is not None and selected.cell_mode[0] == "full":
+        # Full cells are retained only when a whole-episode TRAIN cross-fit
+        # supports them over parity. The guard never reads validation targets.
+        from .cell_mode_gate import guard_full_cell_mode
+
+        gate = guard_full_cell_mode(queries, history, labels)
+        selected.cell_mode_gate = gate["diagnostics"]
+        log(f"cell_mode train gate: {gate['diagnostics']}")
+        if not gate["allow_full"]:
+            selected = candidates[0]
+            selected.cell_mode_gate = gate["diagnostics"]
+    return selected

@@ -1,6 +1,7 @@
 """Run from mainFiles/:  python -m unittest discover -s tests -v"""
 import random
 import unittest
+from unittest.mock import patch
 
 from slot_forecasting.pair_mixer import (CLASS_INDEX, MODE_SIZE_KEYS, PairMixer, adapt, choose_pairs,
                                          discover_pairs, episode_kfolds, split_episodes, win_prior_from_train,
@@ -275,6 +276,32 @@ class PairMixerTest(unittest.TestCase):
         won = {p.tick: p.payout > 0 for p in history if p.machine_id == "e1-m1"}
         predicted_win = 1 - model.predict(queries, history)["e1-m1-next"][0]
         self.assertGreater(predicted_win if won[218] == won[214] else 1 - predicted_win, 0.8)
+
+    def test_full_cell_guard_is_skipped_without_round2(self):
+        queries, history = make_data(cutoff=60)
+        labels = {q.query_id: 0 for q in queries}
+        with patch("slot_forecasting.pair_mixer.cutoff_brier", side_effect=(1.0, 0.0)), \
+             patch("slot_forecasting.cell_mode_gate.guard_full_cell_mode") as guard:
+            model = adapt(queries, history, labels, log=lambda *_: None, round2=False)
+        self.assertEqual(model.cell_mode, ("full",))
+        guard.assert_not_called()
+
+    def test_full_cell_guard_is_skipped_without_labels(self):
+        queries, history = make_data(cutoff=60)
+        model = adapt(queries, history, labels=None, log=lambda *_: None, round2=True)
+        self.assertEqual(model.cell_mode, ("parity",))
+        self.assertIsNone(getattr(model, "cell_mode_gate", None))
+
+    def test_rejected_full_cell_guard_falls_back_to_parity(self):
+        queries, history = make_data(cutoff=60)
+        labels = {q.query_id: 0 for q in queries}
+        rejected = {"allow_full": False, "diagnostics": {"chosen_mode": "parity", "reason": "test"}}
+        with patch("slot_forecasting.pair_mixer.cutoff_brier", side_effect=(1.0, 0.0)), \
+             patch("slot_forecasting.cell_mode_gate.guard_full_cell_mode", return_value=rejected) as guard:
+            model = adapt(queries, history, labels, log=lambda *_: None, round2=True)
+        self.assertEqual(model.cell_mode, ("parity",))
+        self.assertEqual(model.cell_mode_gate, rejected["diagnostics"])
+        guard.assert_called_once()
 
 
 if __name__ == "__main__":
