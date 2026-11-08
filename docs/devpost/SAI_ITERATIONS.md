@@ -55,7 +55,7 @@ Ran four independent "fresh" research tracks with agents, each forbidden to copy
 - Risk: the blend hard-coded the main-round pairs; on simulated shifted rounds it scored about 18/40.
 - Sai: made the exact filter learn its pair set from the kit's histories (all 28 pairs, census + floor; main 57.478 vs 57.49
   hard-coded) and wrote the round-two structure screen (`orch/r2screen/`: single lags, pairs, triples).
-- Avyukth (team effort, credit his): adapted the whole blend so every member learns its lag pairs per round (`2730597`), swapped member 1
+- Avyukth: adapted the whole blend so every member learns its lag pairs per round (`2730597`), swapped member 1
   to Zhill's v17-round2-guards on Sai's suggestion (`3083c87`), made the exact filter learn 3-lag XOR and AND/OR rule families from
   the train census (`979d2d9`), and built the 10-kit simulated adaptability benchmark (K1-K10). Adapted blend: about 38/40 on shifted kits
   vs about 18 locked; main unchanged (57.97); the rules version lifted the hardest kit K10 from 32.1 to 35.4.
