@@ -16,7 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from slot_forecasting.io import load_inputs, read_labels, read_targets, write_submission  # noqa: E402
-from slot_forecasting.combo import V7C, combine  # noqa: E402
+from slot_forecasting.combo import V7C, combine, gate_terms  # noqa: E402
 from slot_forecasting.ensemble import build_ensemble  # noqa: E402
 from slot_forecasting.pair_mixer import size_modes_from_targets, win_prior_by_type_from_targets  # noqa: E402
 
@@ -51,6 +51,8 @@ v7c = V7C(data, targets_available=targets_path.exists(),
           saved_priors=json.loads((here / "v7c_priors.json").read_text(encoding="utf-8")))
 queries, history = load_inputs(data / args.split)
 cfg = json.loads((here / "combo.json").read_text(encoding="utf-8"))
+if cfg.get("gates") and labels is not None:  # re-check every add-on on THIS round's train outcomes
+    cfg = gate_terms(model, v7c, train_queries, train_history, labels, cfg)
 write_submission(args.out, combine(model.predict(queries, history), v7c.predict_ids(data, args.split, None),
                                    cfg["win_weight"], cfg["extra_peer"], queries, history, cfg["center"],
                                    cfg.get("signal_coef", 0.0), v7c.predict_ids(data, args.split, None, flip=False),

@@ -59,3 +59,19 @@ docs/RESIDUAL_HUNT.md, docs/STACKING_RESEARCH.md, docs/MODEL_PROMPTS.md.
 docs/RESIDUAL_HUNT.md - regime model member, learned stackers, population priors, size shrinkage,
 gap decay, leave-one-out expert scoring, coarse / pooled size cells, size-flip detection (AUC 0.54-0.64),
 HMM-off-on-flip, per-type / short-history blend weights, sub-cell on all types.
+
+## v18: adaptable for part 2 (same main score, 57.72)
+- **Avyukth's v7c round-two guard fix** (via zhill's acc3d73, cherry-picked): v7c's round-two path
+  lost to v6 on 5 of 7 simulated shifted rounds; fixed (edge_cases 28.82 -> 37.51 in zhill's check).
+  Main test submission unchanged (byte-identical).
+- **Train-evidence gates** (`combo.gate_terms`): the entry re-checks each add-on (jackpot sub-cell,
+  flip transfer, extra peer, signal) on THIS round's train outcomes (cutoff + last 5 observed ticks)
+  and switches it off if it doesn't help. Main round: all four kept (train Brier 0.36000 with all;
+  off: sub-cell 0.36013, flip 0.36040, peer 0.36023, signal 0.36004).
+- Built: validation 57.72 (57.720965), halves 57.71 / 57.68, test SHA-256 6ca96a1f... (= v17).
+  Entry runtime 293 s (v17: 122 s), byte-identical on Python 3.13 read-only without targets.
+- **Main round: submit v17's files** (identical predictions, faster entry). **Round two: v18**
+  (`round_two.py` builds it and v8-v12 and picks by cross-fit on the new data).
+- Not adopted from teammates: Sai's exact filter / sysid members (NumPy + SciPy: reproduction within
+  1e-8 on the organisers' machines is a risk, and Sai measured our v16 adds only +0.01 to his blend,
+  i.e. the members overlap); Avyukth's HMM-off-on-flip (worse in our blend, train +0.0015).
