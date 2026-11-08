@@ -25,6 +25,7 @@ How to add an entry (every PR):
 - Combined entry: 20% rule model + 80% pair mixer, 54.45 / 60 on validation (built by `mainFiles/make_entry.py`)
 - `mainFiles/auto_tune.py` re-picks the blend on each round's validation and keeps it only if the audit half confirms a real gain
 - Combined entry now uses pair mixer v3 (two-mode payout size, dead/live win prior): 55.58 / 60 on validation
+- Hidden-rule HMM (`mainFiles/hmm_model.py`) blended 50/50 into the entry: 56.28 / 60 on all 96 validation episodes
 
 ### Changed
 - Pair mixer pulls each noisy win estimate toward the nearer typical level (dead ~0.04 / live ~0.90, read from validation targets); validation 54.90 -> 55.34 / 60

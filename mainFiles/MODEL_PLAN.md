@@ -490,3 +490,21 @@ information rather than more tuning or mixing.
 | Rules that use a NEIGHBOUR's past spin (own lag × neighbour lag, 4-cell match/differ) | Real 0.700 vs time-shifted null 0.702 → no such rules | ❌ |
 | Why 46% of machines fit no pair well | Stable machines fit at 0.899; weak ones are drift/shared machines whose rule changes (a rule per half: +0.10 vs +0.03 null) | finding |
 | Extrapolate the fast-minus-slow trend (for "gradually reverse") | Helps only drift (corr +0.14), hurts others (−0.20); 55.58 → 55.46 at λ=0.1 | ❌ |
+
+## 15. v5: hidden-rule HMM (Nov 7, 8 PM) — **56.28 on all 96**
+
+A different kind of model (`hmm_model.py`). Instead of tally tables with exponential forgetting, it states the
+simulator's rule outright and filters over it: hidden state = (lag pair, match/differ) for the pairs
+`choose_pairs` finds on train, plus a "no rule" state. Emission = the type's **live** win chance if the rule
+says live, else its **dead** level (per type, from validation answers: steady .955/.148, balanced .839/.039,
+jackpot .667/.013). Each tick the machine keeps its rule with prob 0.999, else jumps (Bayesian change-point
+switching). Forward filtering gives the rule posterior; payout size given a win comes from the rule+mixer blend.
+
+| Model (validation) | all 96 | tune / audit | Sai 24 | stable | short | drift | shared |
+|---|---|---|---|---|---|---|---|
+| 0.2 rule + 0.8 mixer v4 (previous entry) | 55.58 | 55.26 / 55.96 | 56.22 | .059 | .120 | .066 | .073 |
+| HMM alone | 55.72 | 55.86 / 55.57 | | .064 | .122 | .058 | .063 |
+| **0.5 HMM + 0.5 previous (entry v5)** | **56.28** | **56.27 / 56.31** | **56.66** | **.051** | **.108** | **.049** | **.056** |
+
+Blend weights 0.4–0.6 all give 56.2–56.3. Entry: `python3 make_entry.py --out runs/hmm-v1`; runs in ~100 s;
+`priors.json` now also stores `hmm_levels` (tested: identical CSV with no validation folder).

@@ -18,13 +18,18 @@ from slot_forecasting.pair_mixer import (ALL_PAIRS, WIN_PRIOR_ETA, PairMixer, ad
                                          win_prior_from_targets)
 
 from rule_model import RuleForecaster
+from hmm_model import HiddenRuleHMM, levels_from_targets
+from slot_forecasting.pair_mixer import choose_pairs
 
 HERE = Path(__file__).resolve().parent
 
 # Default blend. On main: 0.2 rule -> 54.45, 0.3 -> 54.48, mixer alone 54.21, rule alone 52.89.
 # An independent check (fit on validation, Brier on train outcomes) slightly favoured the mixer
 # alone, so 0.2 is the compromise. auto_tune.py may replace this via blend_config.json.
-DEFAULT_WEIGHTS = {"rule": 0.2, "mixer": 0.8}
+# v5 (Nov 7, 8 PM): + hidden-rule HMM (hmm_model.py) at 50%: validation 56.28 on all 96 episodes
+# (tune 56.27, audit 56.31) vs 55.58 for 0.2 rule + 0.8 mixer. The HMM takes its payout-size split
+# from the rule+mixer part, so "hmm" here only replaces the win chance.
+DEFAULT_WEIGHTS = {"rule": 0.1, "mixer": 0.4, "hmm": 0.5}
 
 # Rule model v4 (52.89 / 60 alone): average of two variants that make different mistakes.
 #  - "full":     rules are graded on predicting the exact payout
@@ -87,8 +92,38 @@ def mixer_priors(data):
                 "win_prior": win_prior_from_targets(targets)}
     saved = HERE / "priors.json"
     if saved.exists():
-        return json.loads(saved.read_text(encoding="utf-8"))
+        priors = json.loads(saved.read_text(encoding="utf-8"))
+        return {"size_modes": priors["size_modes"], "win_prior": priors["win_prior"]}
     return {"size_modes": None, "win_prior": None}
+
+
+def hmm_levels(data):
+    """Per-type live/dead win levels for the HMM, from validation answers, else priors.json."""
+    targets_path = Path(data) / "validation" / "targets.csv"
+    if targets_path.exists():
+        return levels_from_targets(read_targets(targets_path), load_inputs(Path(data) / "validation")[0])
+    saved = HERE / "priors.json"
+    if saved.exists():
+        return {k: tuple(v) for k, v in json.loads(saved.read_text(encoding="utf-8")).get("hmm_levels", {}).items()}
+    return {}
+
+
+def saved_priors(data):
+    """Everything priors.json stores, so the entry also runs without validation answers."""
+    return {**mixer_priors(data), "hmm_levels": hmm_levels(data)}
+
+
+class WithHMM:
+    """The HMM replaces the win chance; its payout sizes come from the rule+mixer blend."""
+
+    def __init__(self, base, hmm, weight):
+        self.base, self.hmm, self.weight = base, hmm, weight
+
+    def predict(self, queries, history):
+        base = self.base.predict(queries, history)
+        hmm = self.hmm.predict(queries, history, size_from=base)
+        w = self.weight
+        return {k: tuple(w * a + (1 - w) * b for a, b in zip(hmm[k], base[k])) for k in base}
 
 
 def build(data, weights=None, log=lambda *_: None):
@@ -107,10 +142,14 @@ def build(data, weights=None, log=lambda *_: None):
                                         size_modes=priors["size_modes"], **extra).fit(queries, history)
     if "rule" in weights:
         fitted["rule"] = rule_model().fit(queries, history, labels)
-    unknown = set(weights) - set(fitted)
+    unknown = set(weights) - set(fitted) - {"hmm"}
     if unknown:
         raise SystemExit(f"blend_config.json names unknown models: {sorted(unknown)}")
-    return Weighted([(w, fitted[name]) for name, w in weights.items() if w > 0])
+    base = Weighted([(w, fitted[name]) for name, w in weights.items() if w > 0 and name != "hmm"])
+    if weights.get("hmm", 0) > 0:
+        hmm = HiddenRuleHMM(choose_pairs(queries, history), levels=hmm_levels(data))
+        return WithHMM(base, hmm, weights["hmm"])
+    return base
 
 
 def main():
