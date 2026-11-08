@@ -1,0 +1,4 @@
+USE_SIZE = True
+USE_SIZE_GATE = True
+USE_FLIP = True
+USE_ROUND2 = True
