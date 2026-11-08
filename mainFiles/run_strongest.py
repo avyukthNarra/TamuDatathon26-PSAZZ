@@ -1,4 +1,4 @@
-"""Build v13 (slot_forecasting/combo.py: v12 + vendored v7c) and score it on validation, write a test submission, and build a verified entry ZIP.
+"""Build v19 (entry_template_strongest/predict.py: our model + vendored v7c, gated add-ons) and score it on validation, write a test submission, and build a verified entry ZIP.
 
 Usage (from mainFiles/):  python run_strongest.py --out runs/strongest-v13 --cv-val
 Writes to <out>/: validation_predictions.csv, submission.csv, validation_score.json,
@@ -19,7 +19,7 @@ from time import perf_counter
 
 from slot_forecasting.contest import score_contest_files
 from slot_forecasting.io import load_inputs, read_labels, read_submission, read_targets, write_json, write_submission
-from slot_forecasting.combo import V7C, combine, gate_terms
+from slot_forecasting.combo import V7C, combine
 from slot_forecasting.ensemble import build_ensemble
 from slot_forecasting.pair_mixer import size_modes_from_targets, win_prior_by_type_from_targets
 from slot_forecasting.rounds import VERSION, round_metadata
@@ -31,13 +31,13 @@ MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py", "rule_hmm.py", 
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", default=str(HERE / "public"))
-parser.add_argument("--out", default="runs/strongest-v18")
+parser.add_argument("--out", default="runs/strongest-v19")
 parser.add_argument("--cv-val", action="store_true", help="also score validation halves with opposite-half priors")
 parser.add_argument("--win-weight", type=float, default=0.3, help="share of v7c's win chance (v13: 0.5, v15: 0.4)")
 parser.add_argument("--flip-transfer", type=float, default=1.0, help="v7c flip-swap effect added to our win (v15: 0)")
 parser.add_argument("--subcell", action=argparse.BooleanOptionalAction, default=True, help="v17 jackpot sub-cell correction")
 parser.add_argument("--gates", action=argparse.BooleanOptionalAction, default=True,
-                    help="v18: keep each add-on only if this round's train outcomes support it (re-run by the entry)")
+                    help="re-check each add-on on this round's validation targets (else train outcomes) at run time")
 parser.add_argument("--extra-peer", type=float, default=0.5, help="extra peer term on the blend (v13: 0)")
 parser.add_argument("--signal-coef", type=float, default=0.05, help="log-odds per signal step (v14: 0)")
 parser.add_argument("--variant", default="strongest", choices=("strongest",),
@@ -54,22 +54,57 @@ val_queries, val_history = load_inputs(public / "validation")
 train_labels = read_labels(public / "train/labels.csv", train_queries)
 size_modes = size_modes_from_targets(val_targets, val_queries)
 win_prior = win_prior_by_type_from_targets(val_targets, val_queries)
-model = build_ensemble(train_queries, train_history, train_labels, size_modes, win_prior, variant=args.variant)
-v7c = V7C(public, targets_available=True)
 from slot_forecasting.peers import train_center
 center = train_center(train_queries, train_history)
-print(f"blend: win weight on v7c {args.win_weight}, extra peer {args.extra_peer} (centre {center:.4f})")
-cfg = {"win_weight": args.win_weight, "extra_peer": args.extra_peer, "center": center, "signal_coef": args.signal_coef,
-       "flip_transfer": args.flip_transfer, "subcell": args.subcell}
-if args.gates:
-    cfg = gate_terms(model, v7c, train_queries, train_history, train_labels, cfg)
-print(f"settings after gates: {cfg}")
+from v7c_forecasting.entry_config import USE_ROUND2
+from v7c_forecasting.io import load_inputs as v7c_load, read_targets as v7c_read_targets
+from v7c_forecasting.pair_mixer import size_modes_from_targets as v7c_modes, win_prior_by_type_from_targets as v7c_prior
+_v7c_vq = v7c_load(public / "validation")[0]
+_v7c_t = v7c_read_targets(public / "validation/targets.csv")
+v7c_priors = {"size_modes": v7c_modes(_v7c_t, _v7c_vq), "win_prior": v7c_prior(_v7c_t, _v7c_vq, two_means=USE_ROUND2)}
+
+# --- entry folder first: the scored files below are produced BY the entry, in fresh processes ---
+entry = out / "entry"
+if entry.exists():
+    shutil.rmtree(entry)
+(entry / "slot_forecasting").mkdir(parents=True)
+for name in MODULES:
+    shutil.copyfile(HERE / "slot_forecasting" / name, entry / "slot_forecasting" / name)
+for name in ("predict.py", "reproduce.json"):
+    shutil.copyfile(HERE / "entry_template_strongest" / name, entry / name)
+shutil.copytree(HERE / "v7c_forecasting", entry / "v7c_forecasting", ignore=shutil.ignore_patterns("__pycache__"))
+(entry / "combo.json").write_text(json.dumps({"win_weight": args.win_weight, "extra_peer": args.extra_peer,
+                                           "center": center, "signal_coef": args.signal_coef,
+                                           "flip_transfer": args.flip_transfer, "subcell": args.subcell,
+                                           "gates": args.gates}), encoding="utf-8")
+(entry / "v7c_priors.json").write_text(json.dumps(v7c_priors), encoding="utf-8")
+(entry / "priors.json").write_text(json.dumps({"size_modes": size_modes, "win_prior": win_prior}), encoding="utf-8")
+
+if args.gates:  # decide the add-on gates on this round's validation targets, save them into the entry
+    decided = out / "combo_decided.json"
+    run = subprocess.run([sys.executable, "predict.py", "--data", str(public), "--out", "unused", "--decide-gates", str(decided)],
+                         cwd=entry, capture_output=True, text=True)
+    if run.returncode != 0:
+        raise SystemExit(f"gate decision failed:\n{run.stderr[-3000:]}")
+    for line in run.stdout.splitlines():
+        if line.startswith("gate "):
+            print(line)
+    shutil.copyfile(decided, entry / "combo.json")
 files = {"validation": out / "validation_predictions.csv", "test": out / "submission.csv"}
+entry_seconds, cfg = {}, None
 for split, path in files.items():
-    queries, history = load_inputs(public / split)
-    write_submission(path, combine(model.predict(queries, history), v7c.predict_ids(public, split, None),
-                                   cfg["win_weight"], cfg["extra_peer"], queries, history, cfg["center"], cfg["signal_coef"],
-                                   v7c.predict_ids(public, split, None, flip=False), cfg["flip_transfer"], cfg["subcell"]))
+    t0 = perf_counter()
+    run = subprocess.run([sys.executable, "predict.py", "--data", str(public), "--out", str(path), "--split", split],
+                         cwd=entry, capture_output=True, text=True)
+    if run.returncode != 0:
+        raise SystemExit(f"entry failed on {split}:\n{run.stderr[-3000:]}")
+    entry_seconds[split] = perf_counter() - t0
+    for line in run.stdout.splitlines():
+        if line.startswith("gate "):
+            print(f"[{split}] {line}")
+        if line.startswith("settings: "):
+            cfg = json.loads(line[len("settings: "):])
+print(f"entry runtime: validation {entry_seconds['validation']:.0f}s, test {entry_seconds['test']:.0f}s; settings {cfg}")
 
 # --- validation: official contest score + win-chance vs payout-size error split ---
 event = {"max_points": round_metadata(public)["max_points"], "version": VERSION}
@@ -127,30 +162,11 @@ if args.cv_val:
     print(f"Cross-fitted validation: tuning {halves[0]['technical_points']:.2f} / {event['max_points']:g}; "
           f"audit {halves[1]['technical_points']:.2f} / {event['max_points']:g}")
 
-# --- entry folder + ZIP ---
-entry = out / "entry"
-if entry.exists():
-    shutil.rmtree(entry)
-(entry / "slot_forecasting").mkdir(parents=True)
-for name in MODULES:
-    shutil.copyfile(HERE / "slot_forecasting" / name, entry / "slot_forecasting" / name)
-for name in ("predict.py", "reproduce.json"):
-    shutil.copyfile(HERE / "entry_template_strongest" / name, entry / name)
-shutil.copytree(HERE / "v7c_forecasting", entry / "v7c_forecasting", ignore=shutil.ignore_patterns("__pycache__"))
-(entry / "combo.json").write_text(json.dumps({"win_weight": args.win_weight, "extra_peer": args.extra_peer,
-                                           "center": center, "signal_coef": args.signal_coef,
-                                           "flip_transfer": args.flip_transfer, "subcell": args.subcell,
-                                           "gates": args.gates}), encoding="utf-8")
-(entry / "v7c_priors.json").write_text(json.dumps({"size_modes": v7c.size_modes, "win_prior": v7c.win_prior}),
-                                      encoding="utf-8")  # v7c's fallback if /data lacks validation targets
-(entry / "variant.json").write_text(json.dumps({"variant": args.variant}), encoding="utf-8")
-(entry / "priors.json").write_text(json.dumps({"size_modes": size_modes, "win_prior": win_prior}),
-                                  encoding="utf-8")  # fallback if /data lacks validation targets
 metadata = json.loads((public / "metadata.json").read_text(encoding="utf-8"))
 sha = hashlib.sha256(files["test"].read_bytes()).hexdigest()
 commit = subprocess.run(["git", "-C", str(HERE), "rev-parse", "--short", "HEAD"],
                         capture_output=True, text=True).stdout.strip() or "unknown"
-(entry / "README.md").write_text(f"""# House Edge entry: v13 (our v12 + Avyukth's v7c)
+(entry / "README.md").write_text(f"""# House Edge entry: v19 (our win model + Avyukth's v7c)
 
 - Round: {metadata.get('round', 'main')}
 - Season ID: {metadata.get('season_id', 'see public/metadata.json')}
@@ -182,11 +198,13 @@ python predict.py --data /data --out /output/submission.csv
   episode's other machines just did, with payout sizes from a size-rule HMM. Avyukth's v7c
   (vendored in `v7c_forecasting/`): its own lag-pair mixer with an episode flip swap and a
   train-learned payout-size rule. Final win chance = log-odds blend of the two (settings in combo.json) plus an extra peer term; payout
-  sizes given a win = v7c's. Only ticks before each cutoff are read.
+  sizes given a win = v7c's. Each add-on (jackpot sub-cell, v7c flip transfer, peer term,
+  signal term) is re-checked on this round's validation targets and switched off if it does not
+  help. Only ticks before each cutoff are read.
 - Model files: `priors.json` and `v7c_priors.json` (fallback copies of the validation-derived priors).
 - Seeds/settings: deterministic, no randomness; settings are the defaults in
   `slot_forecasting/pair_mixer.py`, `rule_hmm.py`, `changepoint.py` and `ensemble.py`.
-- Runtime: about {perf_counter() - started:.0f} s for train + validation + test on one CPU core.
+- Runtime: about {entry_seconds['test']:.0f} s for the test forecast (v7c runs in a second process; 2 CPUs).
 """, encoding="utf-8")
 zip_path = out / "entry.zip"
 if zip_path.exists():

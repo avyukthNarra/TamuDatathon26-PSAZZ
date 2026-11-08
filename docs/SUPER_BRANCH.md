@@ -75,3 +75,22 @@ HMM-off-on-flip, per-type / short-history blend weights, sub-cell on all types.
 - Not adopted from teammates: Sai's exact filter / sysid members (NumPy + SciPy: reproduction within
   1e-8 on the organisers' machines is a risk, and Sai measured our v16 adds only +0.01 to his blend,
   i.e. the members overlap); Avyukth's HMM-off-on-flip (worse in our blend, train +0.0015).
+
+## v19: faster, gated on validation truth at build time (57.74)
+Task list from the v18 review, with what the evidence said:
+| Task | Result |
+|---|---|
+| 1. Runtime 293 s -> ~120 s | **Done: 81-88 s.** v7c runs in a forked 2nd process (pure stdlib, pickled results, deterministic); gates are decided at BUILD time on validation truth (768 exact targets instead of 4,608 noisy train outcomes) and saved in combo.json |
+| 1. Continuous add-on scales | Tested (`research/continuous_scales.py`): train-chosen scales (v7c weight 0.1, peer 0.625...) 57.68 (57.71 / 57.66) vs 57.69 - not adopted; binary gates kept |
+| 2. 5-band quantile win prior, LOO pair weighting | Already tested earlier: quantile prior 56.19 vs 56.26 (tuning half down); LOO 56.04 vs 56.12 - skipped |
+| 3. Coarse / LOO size cells in our mixer | v17+ take payout sizes from v7c, so mixer size cells cannot change the forecast; coarse cells failed before - skipped |
+| 4. Size flips coupled to win flips | v7c's flip gate fires for ALL drift / shared machines and no others (it identifies the condition, not the 8.8% wrong ones); hedging size toward 50/50 in flip episodes lowers both checks (`research/size_flip_coupling.py`, `size_hedge_flip.py`) - rejected |
+| Build-time gates on main | sub-cell keep (0.007477 vs off 0.007903), flip keep (0.007779), signal keep, **extra peer OFF** (0.007398): both validation halves choose off independently, but held-out train says off is worse (window +0.0012 [+0.0003, +0.0022]); 0.25 is in between. A real split between the data sets (~+-0.02 on test) |
+| Reproduction flaw found and fixed | Gating at run time made the forecast depend on whether validation answers are mounted (the eval suite mounts none): v19 decides at build time, so it is byte-identical with and without targets |
+
+v19: validation 57.74 (57.742585), cross-fit halves 57.74 / 57.69 (the gate choice uses all of validation,
+so these include that selection), R 0.0391 (stable 0.028, short 0.066, drift 0.027, shared 0.035). Entry
+81-88 s; byte-identical on Python 3.13 read-only with and without validation targets. Test SHA-256
+cd59f8b23599202c2ac6ba7b6c92a663c5cc0759a7176a0082504719b64a4e54.
+Main-round upload: v17 (every part supported by both checks) or v19 (+0.02 on validation, peer
+decision contradicted by train) - see the summary for the recommendation. Round two: v19 via round_two.py.

@@ -173,3 +173,58 @@ def gate_terms(our_model, v7c, train_queries, train_history, labels, cfg, window
         if not keep:
             cfg, base = off, score
     return cfg
+
+
+def gate_terms_truth(ours, theirs, noflip, queries, history, targets, cfg, log=print):
+    """Same gates as gate_terms, judged against validation TRUE probabilities (768 exact targets at the
+    cutoff: more power and far cheaper than train outcomes at 6 truncations). Used when the round ships
+    validation/targets.csv; gate_terms (train outcomes) is the fallback."""
+    truth = {t.query_id: t.probabilities for t in targets}
+    cache = {}
+
+    def err(c):
+        pred = combine(ours, theirs, c["win_weight"], c["extra_peer"], queries, history, c["center"], c["signal_coef"],
+                       noflip, c["flip_transfer"], c["subcell"], _cache=cache)
+        return math.fsum(math.fsum((a - b) ** 2 for a, b in zip(p, truth[k])) for k, p in pred.items() if k in truth) / len(truth)
+    cfg = dict(cfg)
+    base = err(cfg)
+    for term in GATED_TERMS:
+        off = dict(cfg, **{term: (False if term == "subcell" else 0.0)})
+        score = err(off)
+        keep = score >= base
+        log(f"gate {term}: validation error on {base:.6f} / off {score:.6f} -> {'keep' if keep else 'switch off'}")
+        if not keep:
+            cfg, base = off, score
+    return cfg
+
+
+def run_in_parallel(child_fn):
+    """Run child_fn() in a forked process (the second CPU) and return a callable that yields its result.
+    Deterministic: the child's return value is pickled exactly. Falls back to running inline when fork
+    is unavailable."""
+    import multiprocessing
+    try:
+        ctx = multiprocessing.get_context("fork")
+    except ValueError:
+        result = child_fn()
+        return lambda: result
+    reader, writer = ctx.Pipe(duplex=False)
+
+    def target():
+        try:
+            writer.send(("ok", child_fn()))
+        except BaseException as exc:  # surface child errors in the parent
+            writer.send(("error", repr(exc)))
+        finally:
+            writer.close()
+    proc = ctx.Process(target=target)
+    proc.start()
+    writer.close()
+
+    def get():
+        status, value = reader.recv()
+        proc.join()
+        if status != "ok":
+            raise RuntimeError(f"parallel worker failed: {value}")
+        return value
+    return get
