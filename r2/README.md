@@ -39,3 +39,12 @@ Options: `--v7c-ref` (default `origin/avyukth/v7c-size-flip`; run `git fetch ori
 Expected main-kit check (metadata `round: main`, so the warning fires and max_points is 60), in-sample:
 v17-guards 57.72, v7c 57.37, mixer6 56.19, blend 57.96 (cross-fit). Runtime about 8 minutes on this laptop.
 See `_coord/fresh/runbook.md`.
+
+## Pick rule (2026-11-08, after PR #22)
+- Default candidate `blend` = `adapted_entry_v17g/` (adapted blend, v17-guards first; main 57.97, adapt_bench mean 38.39/40).
+  `blend_v13` = `adapted_entry/` is added as a challenger automatically.
+- Upload the default first. Switch to a challenger only if it beats the default by more than 0.1 on the mean AND on both
+  cross-fit halves. Paired deltas in RANKING.md are measured against the default.
+- Fallback order if the default's test CSV is invalid: blend -> v17-guards -> v7c -> v6 -> mixer6 (add zhill's v18 with --extra).
+- Main-kit rehearsal (8.9 min): blend 57.97 (57.98/57.96), blend_v13 57.96, v17-guards 57.69, v7c 57.34, v6 56.26,
+  mixer6 56.18; all test CSVs valid; pick = blend, keep it.

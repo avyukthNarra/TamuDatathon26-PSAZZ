@@ -25,7 +25,11 @@ V17G = TM / "v17g/mainFiles"
 MIXER6 = TM / "mixer6/mainFiles"
 V7C_REF = "origin/avyukth/v7c-size-flip"
 V6_SUB = "mainFiles/round2/tooling/fallback-v6"
-BLEND_DIR = Path("/Users/saisreed/Desktop/Coding/TamuDatathon26-PSAZZ/adapted_entry")  # untracked in the main checkout
+BLEND_DIR = Path(__file__).resolve().parents[1] / "adapted_entry_v17g"  # default pick: adapted blend, v17-guards first (PR #22)
+BLEND_V13_DIR = Path(__file__).resolve().parents[1] / "adapted_entry"   # same blend with v13 first, kept as a challenger
+DEFAULT = "blend"  # upload first if its test CSV is valid
+FALLBACK = ("blend", "v17-guards", "v7c", "v6", "mixer6")  # zhill v18 is not built here; add it with --extra if wanted
+MARGIN = 0.1  # a challenger must beat the default on both halves and on the mean by more than this
 SAFE = "v17-guards"
 ORIG_PAIRS = [(1, 3), (2, 5), (4, 7)]
 BAR = "!" * 78
@@ -224,6 +228,8 @@ def main():
     extras = list(args.extra)
     if args.blend and Path(args.blend).is_dir() and not any(e.startswith("blend=") for e in extras):
         extras.insert(0, f"blend={args.blend}")
+    if BLEND_V13_DIR.is_dir() and not any(e.startswith("blend_v13=") for e in extras):
+        extras.append(f"blend_v13={BLEND_V13_DIR}")
     for spec in extras:
         name, _, d = spec.partition("=")
         if not name or not d:
@@ -267,21 +273,25 @@ def main():
             row["status"] += "; no submission.csv"
         rows.append(row)
 
-    # paired vs the safe candidate
-    base = preds.get(SAFE)
+    # paired vs the default candidate (the adapted blend); v17-guards if the blend has no validation predictions
+    ref = DEFAULT if DEFAULT in preds else SAFE
+    base = preds.get(ref)
     for row in rows:
-        if row["name"] == SAFE or base is None or row["name"] not in preds:
+        if row["name"] == ref or base is None or row["name"] not in preds:
             continue
         d, ci, pg = pairedmod.paired(base, preds[row["name"]], kit=kit, max_points=mp)
         row.update(delta=d, ci=ci, pgain=pg)
 
-    order = {SAFE: 0, "v7c": 1, "v6": 2, "mixer6": 3, "blend": 4}
+    order = {n: i for i, n in enumerate(FALLBACK)}
     rows.sort(key=lambda r: (order.get(r["name"], 9), r["name"]))
     safe_row = next((r for r in rows if r["name"] == SAFE), None)
     safe_ok = bool(safe_row and safe_row["test_ok"])
     valid = [r for r in rows if r["test_ok"]]
-    safe_pick = next((r for r in rows if r["test_ok"] and r["name"] == SAFE), valid[0] if valid else None)
-    alt = max((r for r in valid if r["name"] != (safe_pick["name"] if safe_pick else None) and r["points"] is not None),
+    # first upload: the first valid candidate in FALLBACK order (default = adapted blend), else any valid one
+    safe_pick = next((r for n in FALLBACK for r in rows if r["name"] == n and r["test_ok"]), valid[0] if valid else None)
+    def beats(r, d):  # challenger rule: both halves and the mean higher by more than MARGIN
+        return all(r[k] is not None and d[k] is not None and r[k] - d[k] > MARGIN for k in ("points", "halfA", "halfB"))
+    alt = max((r for r in valid if safe_pick and r["name"] != safe_pick["name"] and r["points"] is not None),
               key=lambda r: r["points"], default=None)
     lines = []
     lines.append("# Round-two ranking\n")
@@ -290,12 +300,12 @@ def main():
     lines.append(f"Kit: `{kit}` round={meta.get('round')} season={meta.get('season_id')} max_points={mp}\n")
     lines.append("| candidate | scored file | points | in-sample points | half A | half B | "
                  + " | ".join(f"ratio {c}" for c in ("stable", "short_history", "drift", "shared_change"))
-                 + " | paired delta vs v17-guards [95% CI] | P(gain>0) | runtime s | test CSV valid | sha256[:16] | status |")
+                 + f" | paired delta vs {ref} [95% CI] | P(gain>0) | runtime s | test CSV valid | sha256[:16] | status |")
     lines.append("|" + "---|" * 16)
     fmt = lambda x: "-" if x is None else f"{x:.2f}"
     for r in rows:
         ratio_cells = [f"{r['ratios'][c]:.3f}" if c in r["ratios"] else "-" for c in ("stable", "short_history", "drift", "shared_change")]
-        d = "(safe)" if r["name"] == SAFE else ("-" if r["delta"] is None else f"{r['delta']:+.2f} [{r['ci'][0]:+.2f}, {r['ci'][1]:+.2f}]")
+        d = "(reference)" if r["name"] == ref else ("-" if r["delta"] is None else f"{r['delta']:+.2f} [{r['ci'][0]:+.2f}, {r['ci'][1]:+.2f}]")
         pg = "-" if r["pgain"] is None else f"{r['pgain']:.2f}"
         lines.append(f"| {r['name']} | {r['scored']} | {fmt(r['points'])} | {fmt(r['insample'])} | {fmt(r['halfA'])} | {fmt(r['halfB'])} | "
                      + " | ".join(ratio_cells) + f" | {d} | {pg} | {r['secs']:.0f} | "
@@ -311,15 +321,15 @@ def main():
         lines.append("No candidate produced a valid test CSV. Do not upload; read the build logs.")
     else:
         lines.append(f"1. Upload first: **{safe_pick['name']}** (`{out / safe_pick['name'] / 'submission.csv'}`)"
-                     + ("" if safe_pick["name"] == SAFE else f" - {SAFE} was not valid or not built."))
+                     + ("" if safe_pick["name"] == DEFAULT else f" - {DEFAULT} was not valid or not built; next in fallback order."))
         if alt is None:
             lines.append("2. No other valid candidate with a score; nothing further to upload.")
-        elif alt["ci"] is not None and alt["ci"][0] > 0:
-            lines.append(f"2. Then upload **{alt['name']}** (`{out / alt['name'] / 'submission.csv'}`): paired CI vs "
-                         f"{safe_pick['name']} excludes 0 ({alt['delta']:+.2f} [{alt['ci'][0]:+.2f}, {alt['ci'][1]:+.2f}]).")
+        elif safe_pick["points"] is not None and beats(alt, safe_pick):
+            lines.append(f"2. Then upload **{alt['name']}** (`{out / alt['name'] / 'submission.csv'}`): beats {safe_pick['name']} "
+                         f"by > {MARGIN} on the mean and both halves ({alt['points']:.2f} vs {safe_pick['points']:.2f}).")
         else:
-            cis = "no paired CI" if alt["ci"] is None else f"CI [{alt['ci'][0]:+.2f}, {alt['ci'][1]:+.2f}] includes 0"
-            lines.append(f"2. Do not upload {alt['name']} on this evidence ({cis}; highest points {alt['points']:.2f}).")
+            lines.append(f"2. Keep {safe_pick['name']}: best challenger {alt['name']} ({alt['points']:.2f}) does not beat it by > {MARGIN} "
+                         f"on the mean and both halves.")
     total = time.monotonic() - t_all
     lines.append(f"\nTotal wall time: {total / 60:.1f} min ({total:.0f} s).")
     (out / "RANKING.md").write_text("\n".join(lines) + "\n")
