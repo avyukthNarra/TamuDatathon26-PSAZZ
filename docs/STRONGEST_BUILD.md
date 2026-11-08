@@ -110,3 +110,9 @@ validation targets. Test SHA-256 8d42dc08bc06b8f67895879630d00c88907b74c0e0a4888
   main_like (+0.42) and fast_drift (+0.62), worse on round2_shift (-0.49), all_lags (-0.74),
   hidden_state_heavy (-1.13), edge_cases (-0.93). Round two must therefore pick by cross-fit on the
   new data (round_two.py does), not assume v15/v16. Slowest preset run: 514 s (28.6% of the limit).
+
+## Residual hunt on v16 (`research/v16_residuals.py`)
+Win and size residuals vs every signal used before (own lags 1-8 won / >=2x / >=5x, peers' lags
+1-8 won / >=2x, signal, history length, forecast level, own recent win share, v7c-minus-ours,
+flip swap active, flip effect size): **nothing** has |z| > 2 with the same sign on both validation
+and held-out train. The signal-column and peer effects found earlier are fully absorbed.
