@@ -20,7 +20,7 @@ What it does, in order:
    - `v7c`: `origin/avyukth/v7c-size-flip` `mainFiles/`, extracted with `git archive`, `run_pair_mixer.py --cv-val`
    - `v6`: the same branch's `mainFiles/round2/tooling/fallback-v6`, extracted, `run_pair_mixer.py --cv-val`
    - `mixer6`: commit `814cb60` `mainFiles/` (frozen snapshot), extracted, `run_pair_mixer.py --cv-val`
-   - `blend`: `adapted_entry_v17g/` in this repo (default `--blend`; `--blend ""` disables it); `blend_v13` =
+   - `blend`: `adapted_entry_v17g_rules/` in this repo (default `--blend`; `--blend ""` disables it); `blend_v13` =
      `adapted_entry/` runs as a challenger. Runs `predict.py --data KIT --out OUT/blend/submission.csv`,
      then `--split validation --protocol crossfit` for cross-fitted validation predictions.
    - each other `--extra NAME=ENTRY_DIR`: `predict.py --data KIT --out OUT/NAME/submission.csv`
@@ -42,7 +42,7 @@ v17-guards 57.72, v7c 57.37, mixer6 56.19, blend 57.96 (cross-fit). Runtime abou
 See `_coord/fresh/runbook.md`.
 
 ## Pick rule (2026-11-08, after PR #22)
-- Default candidate `blend` = `adapted_entry_v17g/` (adapted blend, v17-guards first; main 57.97, adapt_bench mean 38.39/40).
+- Default candidate `blend` = `adapted_entry_v17g_rules/` (adapted blend, v17-guards first, exact filter also learns 3-lag XOR and AND/OR rules from train; main 57.97, adapt_bench K1–K9 unchanged, K10 32.08 → 35.38).
   `blend_v13` = `adapted_entry/` is added as a challenger automatically.
 - Upload the default first. Switch to a challenger only if it beats the default by more than 0.1 on the mean AND on both
   cross-fit halves. Paired deltas in RANKING.md are measured against the default.
