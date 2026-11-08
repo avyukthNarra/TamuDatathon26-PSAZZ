@@ -14,7 +14,7 @@ so it is jackpot-only. Only ticks before the cutoff are read.
 """
 import math
 
-PAIRS = ((1, 3), (2, 5), (4, 7))
+PAIRS = ((1, 3), (2, 5), (4, 7))  # main-round fallback only; each round's pairs are found from the data
 SUBCELL_K = 16.0
 SUBCELL_ALPHA = 1.0
 SUBCELL_TYPES = ("jackpot",)
@@ -25,11 +25,11 @@ def _logit(p):
     return math.log(p / (1 - p))
 
 
-def subcell_shift(seq, cutoff, k=SUBCELL_K):
+def subcell_shift(seq, cutoff, k=SUBCELL_K, pairs=PAIRS):
     """Log-odds shift (logit r4 - logit rp) for one machine, or 0 if the cutoff's cell is unknown."""
     won = {t: v > 0 for t, v in seq.items() if t < cutoff}
     best = None
-    for a, b in PAIRS:
+    for a, b in pairs:
         par = {True: [0, 0], False: [0, 0]}
         four = {}
         for t, w in won.items():
@@ -56,10 +56,12 @@ def subcell_shift(seq, cutoff, k=SUBCELL_K):
 
 def subcell_shifts(queries, history, types=SUBCELL_TYPES):
     from .schema import index_history
+    from .pair_mixer import choose_pairs
+    pairs = choose_pairs(queries, history) or PAIRS  # round 2 moved the pairs: rediscover them (no labels needed)
     indexed = index_history(queries, history)
     out = {}
     for q in queries:
         if q.machine_type in types:
             seq = {p.tick: p.payout for p in indexed.get((q.episode_id, q.machine_id), [])}
-            out[q.query_id] = SUBCELL_ALPHA * subcell_shift(seq, q.cutoff)
+            out[q.query_id] = SUBCELL_ALPHA * subcell_shift(seq, q.cutoff, pairs=pairs)
     return out

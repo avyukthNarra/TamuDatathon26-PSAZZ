@@ -109,7 +109,7 @@ with tempfile.TemporaryDirectory() as tmp:
         targets.unlink()
     for p in (tmp / "submission").rglob("*"):
         p.chmod(p.stat().st_mode & ~(stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH))
-    rerun = subprocess.run([sys.executable, "-I", "predict.py", "--data", str(tmp / "data"), "--out", str(tmp / "out.csv")],
+    rerun = subprocess.run([sys.executable, "predict.py", "--data", str(tmp / "data"), "--out", str(tmp / "out.csv")],
                            cwd=tmp / "submission", capture_output=True, text=True)
     for p in (tmp / "submission").rglob("*"):
         p.chmod(p.stat().st_mode | stat.S_IWUSR)
