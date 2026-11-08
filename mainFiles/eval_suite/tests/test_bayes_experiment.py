@@ -34,6 +34,25 @@ class BayesianExperimentTests(unittest.TestCase):
         self.assertAlmostEqual(sum(prediction["q"]), 1.0, places=12)
         self.assertTrue(np.isfinite(prediction["q"]).all())
 
+    def test_binary_size_mode_and_hmm_normalize(self):
+        query = Query("q", "e", "m", "jackpot", 0, 3)
+        history = (
+            Play("e", "m", 0, 0),
+            Play("e", "m", 1, 5),
+            Play("e", "m", 2, 20),
+        )
+        data = DataView((query,), history)
+        for size_mode in ("binary_mode", "binary_hmm"):
+            model = BayesianLatentModel(
+                half_life=None,
+                shared=False,
+                drop_missing=False,
+                size_mode=size_mode,
+            ).fit(data, {"q": 2})
+            prediction, _ = model.predict(data)
+            self.assertAlmostEqual(sum(prediction["q"]), 1.0, places=12)
+            self.assertTrue(np.isfinite(prediction["q"]).all())
+
 
 if __name__ == "__main__":
     unittest.main()

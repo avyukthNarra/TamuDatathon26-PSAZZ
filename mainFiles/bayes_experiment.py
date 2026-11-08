@@ -184,14 +184,53 @@ def weighted_age(tick: int, cutoff: int, half_life: float | None) -> float:
     return 2.0 ** (-age / half_life)
 
 
+def transition_matrix(stay: float, steps: int) -> np.ndarray:
+    base = np.asarray(((stay, 1.0 - stay), (1.0 - stay, stay)))
+    return np.linalg.matrix_power(base, steps)
+
+
+def hmm_log_likelihood(sequence, prior, centers, stay: float) -> float:
+    state = np.asarray(prior, dtype=float).copy()
+    previous_tick = 0
+    result = 0.0
+    for tick in sorted(sequence):
+        state = state @ transition_matrix(stay, tick - previous_tick)
+        previous_tick = tick
+        payout = sequence[tick]
+        emission = (
+            np.ones(2)
+            if payout == 0
+            else np.asarray(
+                [centers[0, PAYOUTS.index(payout) - 1],
+                 centers[1, PAYOUTS.index(payout) - 1]]
+            )
+        )
+        normalization = max(float(state @ emission), 1e-300)
+        result += math.log(normalization)
+        state = state * emission / normalization
+    return result
+
+
 class BayesianLatentModel:
-    def __init__(self, *, half_life: float | None, shared: bool, drop_missing: bool):
+    def __init__(
+        self,
+        *,
+        half_life: float | None,
+        shared: bool,
+        drop_missing: bool,
+        size_mode: str = "dirichlet",
+    ):
         self.half_life = half_life
         self.shared = shared
         self.drop_missing = drop_missing
+        if size_mode not in ("dirichlet", "binary_mode", "binary_hmm"):
+            raise ValueError("unsupported size_mode")
+        self.size_mode = size_mode
         self.mean = None
         self.variance = None
         self.size_prior = None
+        self.size_modes = {}
+        self.size_mode_priors = {}
         self.train_evidence = None
         self.machine_posteriors = {}
 
@@ -256,6 +295,63 @@ class BayesianLatentModel:
         )
         return float(best_score), float(best)
 
+    def _learn_size_modes(self, outcomes, groups, data: DataView):
+        counts_by_type = defaultdict(lambda: defaultdict(lambda: np.zeros(4)))
+        for key, payout in zip(groups, outcomes):
+            if payout > 0:
+                machine_type = data.query_by_machine[key].machine_type
+                counts_by_type[machine_type][key][PAYOUTS.index(payout) - 1] += 1
+        evidence = 0.0
+        for machine_type, machine_counts in counts_by_type.items():
+            keys = sorted(machine_counts)
+            matrix = np.asarray([machine_counts[key] for key in keys], dtype=float)
+            proportions = (matrix + 0.5) / (matrix.sum(axis=1, keepdims=True) + 2.0)
+            order = np.argsort(proportions[:, 3] + 0.25 * proportions[:, 2])
+            low = proportions[order[: max(1, len(order) // 2)]].mean(axis=0)
+            high = proportions[order[-max(1, len(order) // 2):]].mean(axis=0)
+            centers = np.asarray((low, high), dtype=float)
+            prior = np.asarray((0.5, 0.5), dtype=float)
+            for _ in range(30):
+                log_scores = matrix @ np.log(np.maximum(centers.T, 1e-12))
+                log_scores += np.log(np.maximum(prior, 1e-12))
+                log_scores -= log_scores.max(axis=1, keepdims=True)
+                responsibilities = np.exp(log_scores)
+                responsibilities /= responsibilities.sum(axis=1, keepdims=True)
+                prior = responsibilities.mean(axis=0)
+                component_counts = responsibilities.T @ matrix
+                centers = (component_counts + 0.5) / (
+                    component_counts.sum(axis=1)[:, None] + 2.0
+                )
+            self.size_modes[machine_type] = centers
+            self.size_mode_priors[machine_type] = prior
+            for counts in matrix:
+                log_scores = np.log(np.maximum(prior, 1e-12)) + (
+                    counts @ np.log(np.maximum(centers.T, 1e-12))
+                )
+                evidence += float(np.logaddexp(log_scores[0], log_scores[1]))
+        return evidence
+
+    def _learn_size_transition(self, data: DataView, labels):
+        candidates = (0.5, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99, 0.995)
+        sequences = {}
+        for key, sequence in data.sequence.items():
+            sequences[key] = dict(sequence)
+            query = data.query_by_machine[key]
+            sequences[key][query.cutoff] = labels[query.query_id]
+        scores = {}
+        for stay in candidates:
+            scores[stay] = sum(
+                hmm_log_likelihood(
+                    sequence,
+                    self.size_mode_priors[data.query_by_machine[key].machine_type],
+                    self.size_modes[data.query_by_machine[key].machine_type],
+                    stay,
+                )
+                for key, sequence in sequences.items()
+            )
+        self.size_stay = max(candidates, key=scores.get)
+        self.size_transition_scores = scores
+
     def fit(self, data: DataView, labels):
         x, y, outcomes, groups, weights = self._examples(data, labels)
         dimension = x.shape[1]
@@ -300,7 +396,14 @@ class BayesianLatentModel:
             self.machine_posteriors[key] = (beta, covariance)
             evidence += local_evidence
         size_evidence, concentration = self._learn_size_prior(outcomes, groups)
-        self.train_evidence = float(evidence + size_evidence)
+        mode_evidence = 0.0
+        if self.size_mode == "binary_mode":
+            mode_evidence = self._learn_size_modes(outcomes, groups, data)
+        elif self.size_mode == "binary_hmm":
+            self._learn_size_modes(outcomes, groups, data)
+            self._learn_size_transition(data, labels)
+            mode_evidence = self.size_transition_scores[self.size_stay]
+        self.train_evidence = float(evidence + size_evidence + mode_evidence)
         self.size_concentration = concentration
         return self
 
@@ -334,12 +437,49 @@ class BayesianLatentModel:
         variance_eta = float(x @ covariance @ x)
         p_win = sigmoid_logit(eta / math.sqrt(1 + math.pi * variance_eta / 8))
         counts = np.asarray(self.size_prior, dtype=float).copy()
+        observed_size_counts = np.zeros(4, dtype=float)
         for tick, payout in rows:
             if payout > 0:
-                counts[PAYOUTS.index(payout) - 1] += weighted_age(
-                    tick, query.cutoff, self.half_life
+                weight = weighted_age(tick, query.cutoff, self.half_life)
+                counts[PAYOUTS.index(payout) - 1] += weight
+                observed_size_counts[PAYOUTS.index(payout) - 1] += weight
+        if self.size_mode in ("binary_mode", "binary_hmm"):
+            centers = self.size_modes[query.machine_type]
+            if self.size_mode == "binary_hmm":
+                state = np.asarray(
+                    self.size_mode_priors[query.machine_type], dtype=float
                 )
-        size = counts / counts.sum()
+                previous_tick = 0
+                for tick, payout in rows:
+                    state = state @ transition_matrix(
+                        self.size_stay, tick - previous_tick
+                    )
+                    previous_tick = tick
+                    emission = (
+                        np.ones(2)
+                        if payout == 0
+                        else np.asarray(
+                            [centers[0, PAYOUTS.index(payout) - 1],
+                             centers[1, PAYOUTS.index(payout) - 1]]
+                        )
+                    )
+                    state *= emission
+                    state /= max(state.sum(), 1e-300)
+                state = state @ transition_matrix(
+                    self.size_stay, query.cutoff - previous_tick
+                )
+                mode_posterior = state / state.sum()
+            else:
+                prior = self.size_mode_priors[query.machine_type]
+                log_scores = np.log(np.maximum(prior, 1e-12)) + (
+                    observed_size_counts
+                ) @ np.log(np.maximum(centers.T, 1e-12))
+                log_scores -= log_scores.max()
+                mode_posterior = np.exp(log_scores)
+                mode_posterior /= mode_posterior.sum()
+            size = mode_posterior @ centers
+        else:
+            size = counts / counts.sum()
         return np.asarray((1 - p_win, *(p_win * size))), float(evidence)
 
     def predict(self, data: DataView):
@@ -355,24 +495,31 @@ class BayesianLatentModel:
 def fit_models(train_data, labels):
     models = {}
     settings = (
-        ("static", None, False, False),
-        ("recent24", 24.0, False, False),
-        ("recent24_shared", 24.0, True, False),
-        ("mixture_shared", None, True, False),
-        ("static_drop_missing", None, False, True),
+        ("static", None, False, False, "dirichlet"),
+        ("recent24", 24.0, False, False, "dirichlet"),
+        ("recent24_shared", 24.0, True, False, "dirichlet"),
+        ("mixture_shared", None, True, False, "dirichlet"),
+        ("static_drop_missing", None, False, True, "dirichlet"),
+        ("static_binary_mode", None, False, False, "binary_mode"),
+        ("recent24_binary_mode", 24.0, False, False, "binary_mode"),
+        ("static_drop_binary_mode", None, False, True, "binary_mode"),
+        ("static_drop_binary_hmm", None, False, True, "binary_hmm"),
     )
-    for name, half_life, shared, drop_missing in settings:
+    for name, half_life, shared, drop_missing, size_mode in settings:
         if name == "mixture_shared":
             static = BayesianLatentModel(
-                half_life=None, shared=True, drop_missing=drop_missing
+                half_life=None, shared=True, drop_missing=drop_missing,
+                size_mode=size_mode,
             ).fit(train_data, labels)
             recent = BayesianLatentModel(
-                half_life=24.0, shared=True, drop_missing=drop_missing
+                half_life=24.0, shared=True, drop_missing=drop_missing,
+                size_mode=size_mode,
             ).fit(train_data, labels)
             models[name] = (static, recent)
         else:
             models[name] = BayesianLatentModel(
-                half_life=half_life, shared=shared, drop_missing=drop_missing
+                half_life=half_life, shared=shared, drop_missing=drop_missing,
+                size_mode=size_mode,
             ).fit(train_data, labels)
     return models
 
@@ -529,6 +676,9 @@ def main():
     cross_fitted_ci = bootstrap_points(
         cross_fitted_predictions, targets, groups, reference
     )
+    by_crossfit = max(
+        comparison, key=lambda name: comparison[name]["cross_fitted_mean_points"]
+    )
     pooled = FrequencyForecaster("pooled").fit(
         train_q, train_h, labels
     ).predict(validation_q, validation_h)
@@ -541,7 +691,7 @@ def main():
     pooled_ci = bootstrap_points(pooled, targets, groups, reference)
     test_q, test_h = load_inputs(public / "test")
     test_predictions, _ = predict_models(models, DataView(test_q, test_h))
-    selected_test = test_predictions[by_train_evidence]
+    selected_test = test_predictions[by_crossfit]
     out.mkdir(parents=True)
     write_submission(out / "submission.csv", selected_test)
     write_submission(out / "validation_predictions.csv", cross_fitted_predictions)
@@ -554,6 +704,14 @@ def main():
             "missing_ticks": "explicit missing indicators; static_drop_missing is the comparison",
             "shared_change": "peer event rates at the previous 1, 4, and 8 ticks",
             "size_prior_concentration_grid": [1, 2, 5, 10, 20, 50],
+            "size_hmm_stay": {
+                name: (
+                    getattr(model[0], "size_stay", None)
+                    if isinstance(model, tuple)
+                    else getattr(model, "size_stay", None)
+                )
+                for name, model in models.items()
+            },
             "size_prior_concentration": {
                 name: (
                     model[0].size_concentration
@@ -561,6 +719,24 @@ def main():
                     else model.size_concentration
                 )
                 for name, model in models.items()
+            },
+            "size_mode_centers": {
+                name: (
+                    {
+                        key: value.tolist()
+                        for key, value in model[0].size_modes.items()
+                    }
+                    if isinstance(model, tuple)
+                    else {
+                        key: value.tolist()
+                        for key, value in model.size_modes.items()
+                    }
+                )
+                for name, model in models.items()
+                if (
+                    (isinstance(model, tuple) and model[0].size_modes)
+                    or (not isinstance(model, tuple) and model.size_modes)
+                )
             },
             "seed": 314159,
         },
@@ -573,6 +749,7 @@ def main():
                 "points": cross_fitted_score["technical_points"],
                 "bootstrap_ci95_points": cross_fitted_ci,
                 "by_condition": cross_fitted_score["by_condition"],
+                "test_model": by_crossfit,
             },
         },
         "pooled_anchor": {
