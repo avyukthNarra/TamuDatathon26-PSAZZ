@@ -27,14 +27,15 @@ from slot_forecasting.starter import public_directory
 from slot_forecasting.submission_contract import package_code
 
 HERE = Path(__file__).resolve().parent
-MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py", "rule_hmm.py", "changepoint.py", "ensemble.py", "peers.py", "plateau.py", "size_rule_hmm.py", "strongest.py", "combo.py")
+MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py", "rule_hmm.py", "changepoint.py", "ensemble.py", "peers.py", "plateau.py", "size_rule_hmm.py", "strongest.py", "combo.py", "subcell.py")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", default=str(HERE / "public"))
-parser.add_argument("--out", default="runs/strongest-v16")
+parser.add_argument("--out", default="runs/strongest-v17")
 parser.add_argument("--cv-val", action="store_true", help="also score validation halves with opposite-half priors")
 parser.add_argument("--win-weight", type=float, default=0.3, help="share of v7c's win chance (v13: 0.5, v15: 0.4)")
 parser.add_argument("--flip-transfer", type=float, default=1.0, help="v7c flip-swap effect added to our win (v15: 0)")
+parser.add_argument("--subcell", action=argparse.BooleanOptionalAction, default=True, help="v17 jackpot sub-cell correction")
 parser.add_argument("--extra-peer", type=float, default=0.5, help="extra peer term on the blend (v13: 0)")
 parser.add_argument("--signal-coef", type=float, default=0.05, help="log-odds per signal step (v14: 0)")
 parser.add_argument("--variant", default="strongest", choices=("strongest",),
@@ -61,7 +62,7 @@ for split, path in files.items():
     queries, history = load_inputs(public / split)
     write_submission(path, combine(model.predict(queries, history), v7c.predict_ids(public, split, None),
                                    args.win_weight, args.extra_peer, queries, history, center, args.signal_coef,
-                                   v7c.predict_ids(public, split, None, flip=False), args.flip_transfer))
+                                   v7c.predict_ids(public, split, None, flip=False), args.flip_transfer, args.subcell))
 
 # --- validation: official contest score + win-chance vs payout-size error split ---
 event = {"max_points": round_metadata(public)["max_points"], "version": VERSION}
@@ -109,7 +110,7 @@ if args.cv_val:
         crossfit.update(combine(fold_model.predict(fold_queries, fold_history),
                                 fold_v7c.predict_ids(public, "validation", keep),
                                 args.win_weight, args.extra_peer, fold_queries, fold_history, center, args.signal_coef,
-                                fold_v7c.predict_ids(public, "validation", keep, flip=False), args.flip_transfer))
+                                fold_v7c.predict_ids(public, "validation", keep, flip=False), args.flip_transfer, args.subcell))
     write_submission(out / "crossfit_validation_predictions.csv", crossfit)
     halves = [subset_score(crossfit, val_targets, val_groups,
                            read_submission(val / "reference.csv"), episodes,
@@ -131,7 +132,7 @@ for name in ("predict.py", "reproduce.json"):
 shutil.copytree(HERE / "v7c_forecasting", entry / "v7c_forecasting", ignore=shutil.ignore_patterns("__pycache__"))
 (entry / "combo.json").write_text(json.dumps({"win_weight": args.win_weight, "extra_peer": args.extra_peer,
                                            "center": center, "signal_coef": args.signal_coef,
-                                           "flip_transfer": args.flip_transfer}), encoding="utf-8")
+                                           "flip_transfer": args.flip_transfer, "subcell": args.subcell}), encoding="utf-8")
 (entry / "v7c_priors.json").write_text(json.dumps({"size_modes": v7c.size_modes, "win_prior": v7c.win_prior}),
                                       encoding="utf-8")  # v7c's fallback if /data lacks validation targets
 (entry / "variant.json").write_text(json.dumps({"variant": args.variant}), encoding="utf-8")

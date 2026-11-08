@@ -64,7 +64,7 @@ EXTRA_PEER = 0.5    # v14: extra peer term (v7c ignores other machines, so the b
 
 
 def combine(ours, theirs, win_weight=0.5, extra_peer=0.0, queries=None, history=None, center=0.5, signal_coef=0.0,
-            theirs_noflip=None, flip_transfer=0.0):
+            theirs_noflip=None, flip_transfer=0.0, subcell=False):
     """Blend ours and v7c. With extra_peer > 0 (and queries / history), add
     extra_peer x (peers' lag 1-5 win share - center) to the blended log-odds (peers.py).
     v14 research (research/v13_variants.py, v13_eval.py): win 0.4 + extra peer 0.5 vs v13 -
@@ -77,6 +77,10 @@ def combine(ours, theirs, win_weight=0.5, extra_peer=0.0, queries=None, history=
     (logit v7c with swap - without); vs v15 validation 57.52 (57.58 / 57.47) -> 57.57 (57.62 /
     57.52), held-out train window -0.0015 [-0.0029, -0.0002] (research/flip_transfer.py)."""
     signals = {q.query_id: q.signal for q in queries} if queries is not None else {}
+    shifts = {}
+    if subcell and queries is not None:  # v17: jackpot sub-cell correction on our win model
+        from .subcell import subcell_shifts
+        shifts = subcell_shifts(queries, history)
     shares = {}
     if extra_peer and queries is not None:
         from .peers import _by_machine, peer_share
@@ -93,6 +97,7 @@ def combine(ours, theirs, win_weight=0.5, extra_peer=0.0, queries=None, history=
             wa_logit = _logit(wa) + flip_transfer * (_logit(wb) - _logit(1.0 - theirs_noflip[qid][0]))
         else:
             wa_logit = _logit(wa)
+        wa_logit += shifts.get(qid, 0.0)
         win = 1.0 / (1.0 + math.exp(-((1 - win_weight) * wa_logit + win_weight * _logit(wb) + bump)))
         sizes = [x / wb for x in b[1:]]
         raw = [max(p, MIN_PROBABILITY) for p in [1.0 - win] + [win * s for s in sizes]]
