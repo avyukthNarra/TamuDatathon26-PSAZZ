@@ -51,6 +51,12 @@ SCORER = Path(
 OUT_DIR = ROOT / "jackpot"
 PAIRS = tuple((a, b) for a in range(1, 8) for b in range(a + 1, 9))
 PAIR_INDEX = {pair: i for i, pair in enumerate(PAIRS)}
+# Measured on train, validation and test histories (ticks 8..95, margin >= 3 nats):
+# every confident machine uses one of these three, about 1/3 each.
+CANONICAL_PAIRS = ((1, 3), (2, 5), (4, 7))
+LEVELS_TRUTH = Path(
+    "/Users/saisreed/Desktop/Coding/TamuDatathon26-PSAZZ/worktrees/_coord/fresh/levels_from_truth.json"
+)
 CONDITIONS = ("stable", "short_history", "drift", "shared_change")
 PCOLS = ["p_0", "p_1", "p_2", "p_5", "p_20"]
 # map is the parity posterior. atomK uses the four lag-patterns of the MAP pair
@@ -156,10 +162,10 @@ def binomial_gain(k0, n0, k1, n1):
     return ll(k0, n0) + ll(k1, n1) - ll(k0 + k1, n0 + n1)
 
 
-def best_pair(obs, win, cutoff, t0, t1, min_n=10):
+def best_pair(obs, win, cutoff, t0, t1, min_n=10, pairs=PAIRS):
     """Pair with the largest two-cell binomial gain. None if both cells are thin."""
     best, best_gain, best_counts = None, 0.0, None
-    for pair in PAIRS:
+    for pair in pairs:
         counts = cell_counts(obs, win, cutoff, pair[0], pair[1], t0, t1)
         k0, n0, k1, n1 = counts
         if n0 < min_n or n1 < min_n:
@@ -487,6 +493,15 @@ def fit_drift(train):
 
 
 def level_nodes(signal, params):
+    """Quadrature nodes for the two levels.
+
+    A truth-based spec (separate logit-normals for dead and live) takes over
+    when ``a_dead`` is set. Otherwise the train-history regression is used.
+    """
+    if "a_dead" in params:
+        p_dead = sigmoid(params["a_dead"] + params["b_dead"] * signal + params["sd_dead"] * params["z1"])
+        p_live = sigmoid(params["a_live"] + params["b_live"] * signal + params["sd_live"] * params["z2"])
+        return np.clip(p_dead, 1e-4, 1.0 - 1e-4), np.clip(p_live, 1e-4, 1.0 - 1e-4)
     center = params["a"] + params["b"] * signal
     e1 = params["sigma"] * params["z1"]
     scale = np.sqrt(max(0.0, 1.0 - params["rho"] ** 2))
@@ -496,23 +511,47 @@ def level_nodes(signal, params):
     return p_dead, p_live
 
 
+def canonical_pair_prior():
+    prior = np.zeros(len(PAIRS))
+    for pair in CANONICAL_PAIRS:
+        prior[PAIR_INDEX[pair]] = 1.0 / len(CANONICAL_PAIRS)
+    return prior
+
+
+def truth_level_spec(block):
+    """Fold-specific jackpot logit-normal from validation targets. Dead and live are separate."""
+    jackpot = block["jackpot"]
+    return {
+        "a_dead": jackpot["dead"]["a"],
+        "b_dead": jackpot["dead"]["b"],
+        "sd_dead": jackpot["dead"]["sd"],
+        "a_live": jackpot["live"]["a"],
+        "b_live": jackpot["live"]["b"],
+        "sd_live": jackpot["live"]["sd"],
+    }
+
+
 def _tick_loglik(p, win, valid):
     p = np.clip(p, 1e-6, 1.0 - 1e-6)
     return np.where(valid[:, None], np.where(win[:, None], np.log(p), np.log(1.0 - p)), 0.0)
 
 
-def hypothesis_table(obs, win, cutoff, p_dead, p_live, node_w, regime, anchor, duration, c_logprior):
+def hypothesis_table(obs, win, cutoff, p_dead, p_live, node_w, regime, anchor, duration, c_logprior, pair_mask=None):
     """Integrated-level evidence and predictive P(win) for every pair and direction.
 
     Direction 1 means the agree cell is live at the start of the episode.
     """
     log_node = np.log(np.clip(node_w, 1e-300, None))
     ticks = np.arange(cutoff, dtype=float)
-    logevid = np.empty((len(PAIRS), 2))
-    pred = np.empty((len(PAIRS), 2))
+    logevid = np.full((len(PAIRS), 2), -np.inf)
+    pred = np.zeros((len(PAIRS), 2))
     lags_ok = np.zeros(len(PAIRS), dtype=bool)
     agree_now = np.zeros(len(PAIRS), dtype=bool)
+    if pair_mask is None:
+        pair_mask = np.ones(len(PAIRS), dtype=bool)
     for index, (a, b) in enumerate(PAIRS):
+        if not pair_mask[index]:
+            continue
         valid = np.zeros(cutoff, dtype=bool)
         agree = np.zeros(cutoff, dtype=bool)
         if cutoff > b:
@@ -657,6 +696,7 @@ def predict_jackpot(obs, win, cutoff, signal, regime, params, c_logprior):
     logevid, pred = hypothesis_table(
         obs, win, cutoff, p_dead, p_live, params["node_w"],
         regime, params["anchor"], params["duration"], c_logprior,
+        pair_mask=params["pair_prior"] > 0,
     )
     post, map_, info = mix_hypotheses(logevid, pred, params["pair_prior"])
     post_flat, _, _ = mix_hypotheses(logevid, pred, params["pair_prior_flat"])
@@ -749,11 +789,15 @@ def self_check(params):
         win[t] = bool(rng.random() < p)
     obs = np.ones(cutoff, dtype=bool)
     # Tight levels around the planted rates so this checks pair recovery, not the prior.
-    saved = {k: params[k] for k in ("a", "b", "c", "sigma", "rho")}
+    saved = {k: params[k] for k in ("a", "b", "c", "sigma", "rho", "pair_prior")}
     params["a"], params["b"], params["c"] = float(np.log(0.02 / 0.98)), 0.0, float(
         np.log(0.62 / 0.38) - np.log(0.02 / 0.98)
     )
     params["sigma"], params["rho"] = 0.35, 0.0
+    # Flat support, so a planted rare pair can still be recovered. The real
+    # model restricts support to the three measured pairs.
+    params["pair_prior"] = np.full(len(PAIRS), 1.0 / len(PAIRS))
+    params.pop("a_dead", None)
     result = predict_jackpot(obs, win, cutoff, 0, "stable", params, None)
     params.update(saved)
     # The query's lags are the last two relevant ticks; rebuild what the rule says at `cutoff`
@@ -898,8 +942,9 @@ def main():
     z1, z2, node_w = quadrature(7)
     params = {
         **levels,
-        "pair_prior": pair_fit["smoothed"],
+        "pair_prior": canonical_pair_prior(),
         "pair_prior_flat": pair_fit["flat"],
+        "pair_prior_smoothed": pair_fit["smoothed"],
         "anchor": drift["anchor"],
         "duration": drift["duration"],
         "flip_frac": flip["frac"],
@@ -915,46 +960,35 @@ def main():
 
     c_prior = episode_c_logpriors(val["Q"], val["H"], val["cond"], flip["frac"], flip["sd"])
     jackpot_queries = [q for q in val["Q"] if q["machine_type"] == "jackpot"]
-    print(f"scoring {len(jackpot_queries)} jackpot validation queries", flush=True)
-    variant_p = {name: {} for name in (*MENU, "post", "flatpair", "nocond", "atom16_keepdrift")}
-    map_info = {}
-    for i, query in enumerate(jackpot_queries):
-        obs, win = series_from_history(
-            val["H"][(query["episode_id"], query["machine_id"])], query["cutoff"]
-        )
-        kind = val["cond"][query["query_id"]]
-        regime = regime_of(kind)
-        c_log = c_prior.get(query["query_id"])
-        hat = predict_jackpot(obs, win, query["cutoff"], query["signal"], regime, params, c_log)
-        variant_p["map"][query["query_id"]] = hat["map"]
-        variant_p["post"][query["query_id"]] = hat["post"]
-        variant_p["flatpair"][query["query_id"]] = hat["flatpair"]
-        map_info[query["query_id"]] = hat["info"]
-        p_dead, p_live = level_nodes(query["signal"], params)
-        # Prior means of the two levels (quadrature weights, sigmoid is nonlinear).
-        t0 = clean_window_start(regime, query["cutoff"], params, c_log)
-        for strength, name in ((4.0, "atom4"), (8.0, "atom8"), (16.0, "atom16")):
-            atomic = atomic_win_probability(
-                obs, win, query["cutoff"], tuple(hat["info"]["pair"]), t0, strength,
-                float(params["node_w"] @ p_live), float(params["node_w"] @ p_dead),
+    truth_levels = json.loads(LEVELS_TRUTH.read_text())
+
+    def fill_variants(queries, model_params):
+        """Win probabilities for the menu. ``model_params`` carries the level prior."""
+        out = {name: {} for name in (*MENU, "post")}
+        for query in queries:
+            obs, win = series_from_history(
+                val["H"][(query["episode_id"], query["machine_id"])], query["cutoff"]
             )
-            variant_p[name][query["query_id"]] = hat["map"] if atomic is None else float(atomic)
-        if kind == "drift":
-            variant_p["atom16_keepdrift"][query["query_id"]] = 1.0 - float(v13[query["query_id"]][0])
-        else:
-            variant_p["atom16_keepdrift"][query["query_id"]] = variant_p["atom16"][query["query_id"]]
-        # Condition-blind ablation: stable kernel 1/2 (stable + short_history),
-        # drift 1/4, shared_change 1/4. Shared tick uses only the train prior.
-        parts = []
-        for regime_name, weight in (("stable", 0.5), ("drift", 0.25), ("shared", 0.25)):
-            blind = predict_jackpot(
-                obs, win, query["cutoff"], query["signal"], regime_name, params,
-                None if regime_name == "shared" else None,
-            )
-            parts.append(weight * blind["post"])
-        variant_p["nocond"][query["query_id"]] = float(sum(parts))
-        if i and i % 40 == 0:
-            print(f"  {i}/{len(jackpot_queries)}", flush=True)
+            kind = val["cond"][query["query_id"]]
+            regime = regime_of(kind)
+            c_log = c_prior.get(query["query_id"])
+            hat = predict_jackpot(obs, win, query["cutoff"], query["signal"], regime, model_params, c_log)
+            out["map"][query["query_id"]] = hat["map"]
+            out["post"][query["query_id"]] = hat["post"]
+            p_dead, p_live = level_nodes(query["signal"], model_params)
+            t0 = clean_window_start(regime, query["cutoff"], model_params, c_log)
+            live_mean = float(model_params["node_w"] @ p_live)
+            dead_mean = float(model_params["node_w"] @ p_dead)
+            for strength, name in ((4.0, "atom4"), (8.0, "atom8"), (16.0, "atom16")):
+                atomic = atomic_win_probability(
+                    obs, win, query["cutoff"], tuple(hat["info"]["pair"]), t0, strength,
+                    live_mean, dead_mean,
+                )
+                out[name][query["query_id"]] = hat["map"] if atomic is None else float(atomic)
+        return out
+
+    print(f"scoring {len(jackpot_queries)} jackpot queries, history levels", flush=True)
+    hist_p = fill_variants(jackpot_queries, params)
 
     def apply(p_win_map, qids):
         pred = {qid: v13[qid].copy() for qid in v13}
@@ -976,7 +1010,18 @@ def main():
     for query in val["Q"]:
         qids_by_fold["A" if query["episode_id"] in fold_a else "B"].append(query["query_id"])
 
-    # Cross-fit the discrete variant. Parameters stay train-only.
+    # Cross-fit. Each fold's jackpot level prior is the other fold's truth-based
+    # logit-normal (dead and live separate). Pair support is the three measured pairs.
+    fold_episodes = {"A": fold_a, "B": fold_b}
+    other_spec = {"A": truth_level_spec(truth_levels["foldB"]), "B": truth_level_spec(truth_levels["foldA"])}
+    fold_p = {}
+    for fold in ("A", "B"):
+        queries = [q for q in jackpot_queries if q["episode_id"] in fold_episodes[fold]]
+        print(f"scoring fold {fold} with the other fold's level prior ({len(queries)} jackpots)", flush=True)
+        spec = dict(params)
+        spec.update(other_spec[fold])
+        fold_p[fold] = fill_variants(queries, spec)
+
     chosen = {}
     cross_p = {}
     fold_choice = {}
@@ -987,7 +1032,7 @@ def main():
         best_name, best_pts = None, -1.0
         tune_scores = {}
         for name in MENU:
-            pred = apply(variant_p[name], qids_by_fold[tune])
+            pred = apply(fold_p[tune][name], qids_by_fold[tune])
             pack = score_pack(pred, scored, scorer, qids=qids_by_fold[tune])
             tune_scores[name] = pack["points"]
             if pack["points"] > best_pts:
@@ -995,13 +1040,22 @@ def main():
         fold_choice[f"tune_{tune_name}_score_{score_name}"] = {
             "chosen": best_name,
             "tune_points": tune_scores,
+            "level_prior": "fold" + ("B" if tune == "A" else "A"),
         }
         for qid in qids_by_fold[score_fold]:
-            if qid in variant_p[best_name]:
-                cross_p[qid] = variant_p[best_name][qid]
+            if qid in fold_p[score_fold][best_name]:
+                cross_p[qid] = fold_p[score_fold][best_name][qid]
                 chosen[qid] = best_name
 
     cross_pred = apply(cross_p, jackpot_ids)
+    # Stitched predictions: each fold uses the other fold's prior, one K everywhere.
+    # Descriptive only. The headline is the per-fold choice above.
+    stitched = {}
+    for name in MENU:
+        merged = {}
+        merged.update(fold_p["A"][name])
+        merged.update(fold_p["B"][name])
+        stitched[name] = score_pack(apply(merged, jackpot_ids), scored, scorer)
     # Train-only strength: cutoff Brier against train labels, stable and short
     # jackpot only, pair chosen by the parity score. No validation target is read.
     train_labels = {
@@ -1017,7 +1071,9 @@ def main():
         obs, win = series_from_history(
             train["H"][(query["episode_id"], query["machine_id"])], query["cutoff"]
         )
-        pair, gain, _counts = best_pair(obs, win, query["cutoff"], 0, query["cutoff"], min_n=8)
+        pair, gain, _counts = best_pair(
+            obs, win, query["cutoff"], 0, query["cutoff"], min_n=8, pairs=CANONICAL_PAIRS,
+        )
         if pair is None:
             continue
         y = train_labels[query["query_id"]]
@@ -1046,10 +1102,10 @@ def main():
             brier[name].append((p_hat - float(y)) ** 2)
     train_brier = {name: float(np.mean(v)) if v else None for name, v in brier.items()}
     train_choice = min((name for name, v in train_brier.items() if v is not None), key=lambda name: train_brier[name])
-    train_only_pred = apply(variant_p[train_choice], jackpot_ids)
+    train_only_pred = apply(hist_p[train_choice], jackpot_ids)
     full_variant = {
-        name: score_pack(apply(variant_p[name], jackpot_ids), scored, scorer)
-        for name in (*MENU, "post", "flatpair", "nocond", "atom16_keepdrift")
+        name: score_pack(apply(hist_p[name], jackpot_ids), scored, scorer)
+        for name in (*MENU, "post")
     }
     # Descriptive full-validation numbers. The selection itself is the cross-fit above.
     cross_pack = score_pack(cross_pred, scored, scorer)
@@ -1069,7 +1125,7 @@ def main():
         by_cond_rmse[cond] = {
             "n": len(ids),
             "v13": jackpot_win_rmse(v13_p, scored, ids),
-            "post": jackpot_win_rmse(variant_p["post"], scored, ids),
+            "post": jackpot_win_rmse(hist_p["post"], scored, ids),
             "cross": jackpot_win_rmse(cross_p, scored, ids),
             "oracle": 0.0,
         }
@@ -1098,7 +1154,14 @@ def main():
         "crossfit_choice": fold_choice,
         "oracle_jackpot_win": oracle_pack,
         "pooled_anchor": anchor_pack,
-        "full_validation_variants_descriptive": full_variant,
+        "history_level_variants": full_variant,
+        "truth_prior_stitched": stitched,
+        "truth_level_priors": {
+            "foldA_live": truth_levels["foldA"]["jackpot"]["live"],
+            "foldB_live": truth_levels["foldB"]["jackpot"]["live"],
+            "foldA_dead": truth_levels["foldA"]["jackpot"]["dead"],
+            "foldB_dead": truth_levels["foldB"]["jackpot"]["dead"],
+        },
         "jackpot_win_rmse": by_cond_rmse,
         "delta_points_cross_minus_v13": cross_pack["points"] - base_pack["points"],
         "delta_cross_ci95": bootstrap_delta(cross_pred, base_pred, scored),
@@ -1112,7 +1175,7 @@ def main():
     print(json.dumps({k: results[k] for k in (
         "self_check", "levels", "drift", "flip", "v13", "train_only_post", "crossfit",
         "crossfit_choice", "oracle_jackpot_win", "pooled_anchor",
-        "full_validation_variants_descriptive", "jackpot_win_rmse",
+        "history_level_variants", "truth_prior_stitched", "jackpot_win_rmse",
         "delta_points_cross_minus_v13", "delta_points_oracle_minus_v13", "pair_prior_top",
     )}, indent=2))
 
