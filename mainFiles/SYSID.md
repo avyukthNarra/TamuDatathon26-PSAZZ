@@ -283,6 +283,8 @@ The new `PRIORS_FACTS.md` result is consistent with a binary parity state plus a
 
 I fit two-component logit levels separately by type on each tune fold, regressed dead/live centers on signal, and used the resulting type-specific midpoint, half-gap, signal slope, and pooled residual SD inside the finite parity/reversal likelihood. The other fold was scored with official validation targets and exact conditional sizes only for the win-only ceiling. Fold A/B level estimates were independent; no held-out target entered its model.
 
+The best-supported predictive form is a logit followed by a logistic link: `z[i,t] = mu[type] + beta[type] * signal[t] + u[i] + A[type] * q[i] * x[i,t] + gamma * peer_win_lag3[t]`, with `P(win)=sigmoid(z)`. Here `x` is the learned one-of-three pair-parity feature, `q` is its machine-specific direction, `u` is a continuous machine intercept, and the time model averages static, per-machine reversal, and episode-shared reversal states that can flip the parity contribution. The signal term shifts the type-specific level; the parity state creates low/high bands; the Gaussian `u` and posterior uncertainty make individual probabilities continuous. This is a predictive approximation: the fold truth fits recover per-type dead/live level distributions and support the components, but do not prove every simulator term.
+
 | Candidate win estimate | Cross-fitted win-only ceiling / 60 | 95% episode CI | Stable | Short | Drift | Shared |
 |---|---:|---:|---:|---:|---:|---:|
 | Train-selected history posterior, fixed-form target calibration | 58.105 | 57.513–58.545 | 0.0258 | 0.0595 | 0.0218 | 0.0233 |
