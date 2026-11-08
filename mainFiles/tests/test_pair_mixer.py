@@ -265,6 +265,20 @@ class PairMixerTest(unittest.TestCase):
         flat = win_prior_by_type_from_targets(targets, queries, middle_strength=None)["jackpot"][2]
         self.assertEqual(flat[1:], (0.5, 2.0))
 
+    def test_signal_prior_shifts_levels_and_is_used_by_the_walk(self):
+        queries, targets = [], []
+        for i in range(120):
+            sig = (-1, 1)[i % 2]
+            win = 0.02 if i % 4 < 2 else (0.70 if sig < 0 else 0.90)
+            queries.append(Query(f"q{i}", "e1", f"m{i}", "balanced", sig, 1))
+            targets.append(Target(f"q{i}", "e1", (1 - win, win, 0, 0, 0), 0))
+        prior = win_prior_by_type_from_targets(targets, queries)
+        low, high = prior["balanced|-1"][1][1], prior["balanced|1"][1][1]
+        self.assertAlmostEqual(low, 0.5 * 0.70 + 0.5 * prior["balanced"][1][1], places=4)
+        self.assertLess(low, high)
+        model = PairMixer(win_prior=prior)
+        self.assertLess(model._cell_rate(3.0, 3.0, "balanced|-1"), model._cell_rate(3.0, 3.0, "balanced|1"))
+
     def test_adapts_to_new_lag_pairs(self):
         """Round two may use different pairs: rediscovery must find them and the mixer must use them."""
         queries, history = make_data(seed=7, cutoff=220, rule=True, lags=(2, 6))

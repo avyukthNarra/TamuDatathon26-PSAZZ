@@ -4,7 +4,7 @@ A running log of the requests (to Claude Code or any coding agent) that led to
 real score gains, and the ones that didn't. Use it to steer the next agent fast,
 especially in round two. Validation points are out of 60; the pooled baseline is 30.
 
-## At a glance: everything that lowered the error (30 -> 56.29)
+## At a glance: everything that lowered the error (30 -> 56.32)
 
 Each step was kept only because it helped; from step 9 on, it also had to help out of fold on
 train AND on both cross-fitted validation halves. Details and prompts are in the round sections.
@@ -24,7 +24,8 @@ train AND on both cross-fitted validation halves. Details and prompts are in the
 | 10 | Size lags found from train (1, 2, 4; lag 3 was noise) | size: a noisy expert | 55.45 |
 | 11 | Dead / live levels per machine TYPE | win: jackpot is almost never live | 56.12 |
 | 12 | Third win memory (half-life 100) + slower size re-weighting (size_eta 4) | short_history size error | 56.19 |
-| 13 | Middle prior level per type at the type's own median (steady 0.24, jackpot 0.55, balanced 0.75) | win: middle machines (0.2-0.8) | **56.29** |
+| 13 | Middle prior level per type at the type's own median (steady 0.24, jackpot 0.55, balanced 0.75) | win: middle machines (0.2-0.8) | 56.29 |
+| 14 | Prior levels also by the signal column (shrunk halfway to the type's) | win: signal shifts the active level ~+0.05 per step | **56.32** |
 
 Honest evaluation (round 4) is what made steps 10-12 trustworthy: cross-fitted validation (each
 half's priors from the other half), 8-fold episode-grouped train scoring, and a late-window
@@ -78,7 +79,7 @@ rule changes well, which is why drift is the best condition.
 4. Ceiling check: a perfect win chance alone would score 58.40, perfect sizes alone 57.57
    (round-4 model), so 57+ needs a new discovery, not tuning.
 
-## Paste-ready prompt (rebuilds the 56.29 model from the starter kit)
+## Paste-ready prompt (rebuilds the 56.32 model from the starter kit)
 
 Copy everything inside the box into a fresh coding agent opened in the repo root.
 It describes the finished model exactly, so the agent doesn't have to rediscover it.
@@ -91,7 +92,7 @@ submission_contract.py), and the organizers' baseline in run_starter.py (it alwa
 scores ~30/60 because "pooled" IS the reference model; points = 60/(1+R)).
 Read AGENTS.md first and follow it: work on a feature branch, never commit to main.
 
-GOAL: build a forecaster that scores ~56.29/60 on validation (~56.28 cross-fitted,
+GOAL: build a forecaster that scores ~56.32/60 on validation (~56.31 cross-fitted,
 see VERIFY), plus a verified entry ZIP.
 
 HARD CONSTRAINTS
@@ -129,7 +130,9 @@ BUILD mainFiles/slot_forecasting/pair_mixer.py with:
      Beta-MIXTURE prior PER MACHINE TYPE: components (weight, mean, strength) =
      (0.45, dead_type, 10), (0.45, live_type, 10), (0.1, middle_type, 10), where
      middle_type = the type's median true win chance among its targets in 0.2-0.8
-     (flat (0.5, 2) if fewer than 10),
+     (flat (0.5, 2) if fewer than 10). Also a "type|signal" entry per (type, signal):
+     each level re-read from that group's targets (if >= 10 in the band) and pulled halfway
+     back to the type's level; the walk uses it when present,
      Beta(a = mean*strength, b = (1-mean)*strength).
      post_k ∝ weight_k * B(a_k + w, b_k + n - w) / B(a_k, b_k) (use math.lgamma);
      rate = sum_k post_k * (a_k + w) / (a_k + b_k + n). dead_type / live_type = median true
@@ -204,19 +207,47 @@ ALSO CREATE
 
 VERIFY (and report the actual output)
   cd mainFiles && python -m unittest discover -s tests
-  python run_pair_mixer.py --out runs/combined-v6 --cv-val
-  python check_submission.py runs/combined-v6/submission.csv
-  python check_submission.py runs/combined-v6/validation_predictions.csv --split validation
-Expect validation ~56.29/60 (R ~0.066: stable ~0.054, short_history ~0.105,
-drift ~0.049, shared_change ~0.056) and cross-fitted halves (each half's priors read
-from the OTHER half's targets) ~56.13 / 56.43. The reference build's test submission
-SHA-256 is cb9aaa7761c821afed0f4c6febe7c6d0adc1f522f5d206a44090dc25d3c50ba3. A rebuild
+  python run_pair_mixer.py --out runs/combined-v7 --cv-val
+  python check_submission.py runs/combined-v7/submission.csv
+  python check_submission.py runs/combined-v7/validation_predictions.csv --split validation
+Expect validation ~56.32/60 (R ~0.065: stable ~0.054, short_history ~0.104,
+drift ~0.047, shared_change ~0.056) and cross-fitted halves (each half's priors read
+from the OTHER half's targets) ~56.14 / 56.47. The reference build's test submission
+SHA-256 is e9552839e4722c41afd33927db3994d830cbf86aba068a3a6bb558ac711b25d1. A rebuild
 will only match it byte for byte if the arithmetic order is identical, so treat the
-score as the check. Upload runs/combined-v6/submission.csv and runs/combined-v6/entry.zip.
+score as the check. Upload runs/combined-v7/submission.csv and runs/combined-v7/entry.zip.
 ````
 
 The shortcut, if the branch `COMBINED_SOLUTIONS` is available, is to check it out and
-run the VERIFY commands (current reference: 56.29). The prompt above is for rebuilding without it.
+run the VERIFY commands (current reference: 56.32). The prompt above is for rebuilding without it.
+
+## Round 8: all-branch review and the signal prior (56.29 -> 56.32)
+
+**Branch review.** Remaining branches: main, avy, avyukth/master-research (archive of deleted
+experiment branches), sai/master-test, zhill-56.2. Sai's branch already scored our v6 model and
+tested add-ons on top of it: rule-model blends (+-0.06), a Walsh-logistic Bayesian win expert
+(7.4x the win error), an exact 8-hypothesis size switch (loses 0.3-1.1), a size-rule family
+search with HMM / BIC (none beats ours on held-out train), and jackpot priors (+0.05, noise).
+Their research reports (Gemini deep research, 20 papers) point at logistic / Walsh models,
+which lost. Nothing on any branch beats this model.
+
+**What we found.** The signal column shifts the active (non-dead) win level by ~+0.05 per step:
+balanced 0.80 / 0.85 / 0.90 and jackpot 0.52 / 0.58 / 0.67 for signal -1 / 0 / +1. The prior
+now has a "type|signal" entry with each level re-read from that group and pulled halfway back
+to the type's level.
+
+| Change | Cross-fit (halves) | OOF train cutoff / window dR | Kept? |
+|---|---|---|---|
+| Type-by-signal prior, shrink 0.5 | 56.29 (56.14 / 56.47) vs 56.26 | -0.0001 [-0.003, +0.003] / **-0.0012 [-0.0021, -0.0004]** | **YES** |
+| ...shrink 0.25 / 0 | 56.29 / 56.27 | n/a | (same plateau / worse tuning half) |
+| Log-loss weighting of win experts (eta 0.5 / 1 / 2) | 56.28-56.29 | n/a | no: pair identification is not the bottleneck |
+
+Why 57 is out of reach for this approach: 57 needs ~24% of the remaining error removed; every
+structural idea from the team, the research reports and this review now adds 0.00-0.05. What
+is left is mostly per-machine level and size-mode uncertainty from limited spins.
+
+Prompt used: "Look at all the branches on this repo and any online resources; find strategies
+to push the score to 57. Test anything new the same honest way and push only what passes."
 
 ## Round 7 attempt: jackpot win error and live / short_history size error (no change, 56.29)
 
@@ -664,6 +695,7 @@ run the tests and check_submission.py, and commit and push.
 | 14 | **"Make the evaluation honest (cross-fit validation, out-of-fold train, a late-window train score), replace hard-coded assumptions with learned ones, keep only what passes both"** | Size lags now discovered from train (1, 2, 4; lag 3 was noise); data-driven prior weights and a train-history prior REJECTED (worse on train); the win prior is per machine type (jackpot is almost never live). OOF window dR -0.0113 [-0.015, -0.008]; cross-fit halves 55.90 / 56.37 | **56.12** |
 | 15 | **"Diagnose short_history (win vs size, sparse cells, wins in the window), test four targeted fixes one at a time, keep only what passes OOF train and both cross-fit halves"** | Its extra error is payout size, not sparse win cells. A third win memory (half-life 100) plus slower size-expert re-weighting (size_eta 4) passed; leave-one-out scoring, gap decay, coarse/pooled size cells did not. OOF window dR -0.0012 [-0.0024, -0.0001]; cross-fit halves 56.00 / 56.40 | **56.19** |
 | 16 | **"Middle machines have the worst ratio; give the per-type prior a middle level learned from each type's targets"** | Middle component at each type's own median (steady 0.24, jackpot 0.55, balanced 0.75), strength 10. OOF window dR -0.0022 [-0.0029, -0.0014], all four conditions better; cross-fit halves 56.13 / 56.43 | **56.29** |
+| 17 | **"Review every branch and online resource for anything that beats this; test it honestly"** | No branch beats it; the signal column shifts the active win level, so the prior is now per (type, signal), shrunk halfway to the type. OOF window dR -0.0012 [-0.0021, -0.0004]; cross-fit halves 56.14 / 56.47 | **56.32** |
 
 ## Prompt patterns that work
 

@@ -69,7 +69,8 @@ def resolve_settings(settings, prior_targets):
     settings = dict(settings)
     win_prior_strength = settings.pop("win_prior_strength", 6.0)
     win_prior_shrink = settings.pop("win_prior_shrink", 0.0)
-    win_prior_middle = settings.pop("win_prior_middle_strength", None)
+    win_prior_middle = settings.pop("win_prior_middle_strength", 10.0)
+    win_prior_signal = settings.pop("win_prior_signal_shrink", 0.5)
     if settings.get("size_modes") == "val":
         settings["size_modes"] = size_modes_from_targets(prior_targets, val_queries)
     if settings.get("win_prior") == "val-v3":  # combined-v3: fixed 0.45/0.45/0.1 weights, 0.5 split
@@ -82,7 +83,7 @@ def resolve_settings(settings, prior_targets):
     elif settings.get("win_prior") == "val-by-type":
         settings["win_prior"] = win_prior_by_type_from_targets(
             prior_targets, val_queries, strength=win_prior_strength, global_shrink=win_prior_shrink,
-            middle_strength=win_prior_middle)
+            middle_strength=win_prior_middle, signal_shrink=win_prior_signal)
     return settings
 
 
@@ -120,7 +121,7 @@ def window_errors(model, queries, history):
         for play in indexed.get((query.episode_id, query.machine_id), []):
             own[play.tick] = CLASS_INDEX[play.payout]
         captured = {}
-        model.walk(own, query.machine_type, query.cutoff, captured.__setitem__)
+        model.walk(own, query.machine_type, query.cutoff, captured.__setitem__, query.signal)
         scores = []
         for tick in range(query.cutoff - args.window, query.cutoff + 1):
             outcome = CLASS_INDEX[labels[query.query_id]] if tick == query.cutoff else own[tick] if tick >= 0 else None

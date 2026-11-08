@@ -151,7 +151,7 @@ class PairMixer:
     def _size_prior(self, machine_type):
         return self.type_size_priors.get(machine_type, [0.25] * (CLASSES - 1))
 
-    def walk(self, own, machine_type, stop, emit):
+    def walk(self, own, machine_type, stop, emit, signal=None):
         """own[t] = payout class index or None. Calls emit(t, probs) for t in 0..stop before absorbing t.
 
         Win chance: mixture over lag-pair experts (decayed win table per pair cell).
@@ -179,6 +179,10 @@ class PairMixer:
         size_logw = [0.0] * len(self.size_keys)
         type_size = self._size_prior(machine_type)
         mode_spec = self.size_modes.get(machine_type)
+        # win prior: a (type, signal) entry "type|signal" if present, else the type's own
+        prior_key = f"{machine_type}|{signal}"
+        if prior_key not in self.win_priors:
+            prior_key = machine_type
         a0, b0 = self.rate_prior
 
         def cell_of(t, lags, how="win"):
@@ -217,8 +221,8 @@ class PairMixer:
                 key = (agree,) if mode == "parity" else cell
                 w, n = win_tab[i].get(key, (0.0, 0.0))
                 win_keys.append(key)
-                has_cell_prior = self.win_priors.get(machine_type) or self.win_prior
-                win_preds.append(self._cell_rate(w, n, machine_type) if has_cell_prior
+                has_cell_prior = self.win_priors.get(prior_key) or self.win_prior
+                win_preds.append(self._cell_rate(w, n, prior_key) if has_cell_prior
                                  else (w + self.k_win * base) / (n + self.k_win))
             size_cells = [cell_of(t, key, how) for key, how in zip(self.size_keys, self.size_cell)]
             size_preds = []
@@ -317,7 +321,7 @@ class PairMixer:
             for play in indexed.get((query.episode_id, query.machine_id), []):
                 own[play.tick] = CLASS_INDEX[play.payout]
             captured = {}
-            self.walk(own, query.machine_type, query.cutoff, lambda t, p: captured.__setitem__(t, p))
+            self.walk(own, query.machine_type, query.cutoff, lambda t, p: captured.__setitem__(t, p), query.signal)
             probs = [max(p, MIN_PROBABILITY) for p in captured[query.cutoff]]
             total = math.fsum(probs)
             result[query.query_id] = probabilities([p / total for p in probs], query.query_id)
@@ -341,7 +345,7 @@ class PairMixer:
                 if t >= start and own[t] is not None:
                     errors.append(math.fsum((p - (1.0 if k == own[t] else 0.0)) ** 2 for k, p in enumerate(probs)))
             if query.cutoff > 0:
-                self.walk(own, query.machine_type, query.cutoff - 1, emit)
+                self.walk(own, query.machine_type, query.cutoff - 1, emit, query.signal)
         if not errors:
             raise ValidationError("No ticks to score.")
         return math.fsum(errors) / len(errors)
@@ -515,7 +519,8 @@ def win_prior_from_train(queries, history, pairs=None, min_spins=10):
     return _u_shaped_prior(rates, 6.0)
 
 
-def win_prior_by_type_from_targets(targets, queries, strength=10.0, global_shrink=0.0, middle_strength=10.0):
+def win_prior_by_type_from_targets(targets, queries, strength=10.0, global_shrink=0.0, middle_strength=10.0,
+                                   signal_shrink=0.5):
     """Beta-mixture win prior per machine type: {type: components}, levels read per type.
 
     Types differ a lot (main round: jackpot is rarely live, only 10 of 265 targets above 0.8,
@@ -528,6 +533,9 @@ def win_prior_by_type_from_targets(targets, queries, strength=10.0, global_shrin
     middle_strength: the weight-0.1 middle component sits at the type's own median win chance
     among targets in 0.2-0.8 (main round: steady 0.24, jackpot 0.55, balanced 0.75) instead of a
     flat 0.5; None keeps it flat. OOF window dR -0.0022 [-0.0029, -0.0014]; cross-fit 56.18 -> 56.26.
+    signal_shrink: also add "type|signal" entries whose levels are re-read from that group and pulled
+    this far back to the type's (the signal column shifts the active level ~+0.05 per step);
+    None = type only. OOF window dR -0.0012 [-0.0021, -0.0004]; cross-fit 56.26 -> 56.29.
     """
     global_prior = win_prior_from_targets(targets, strength)
     if global_prior is None or not 0.0 <= global_shrink <= 1.0:
@@ -552,6 +560,25 @@ def win_prior_by_type_from_targets(targets, queries, strength=10.0, global_shrin
             if len(middle) >= 10:
                 weight = priors[kind][2][0]
                 priors[kind][2] = (weight, round(middle[len(middle) // 2], 4), middle_strength)
+    if signal_shrink is not None:
+        # "type|signal" entries: each level re-read from that (type, signal) group, then pulled
+        # signal_shrink of the way back to the type's level (groups are small)
+        signal = {q.query_id: q.signal for q in queries}
+        groups = {}
+        for target in targets:
+            kind = machine_type.get(target.query_id)
+            if kind in priors:
+                groups.setdefault(f"{kind}|{signal[target.query_id]}", (kind, []))[1].append(1.0 - target.probabilities[0])
+        for key, (kind, wins) in sorted(groups.items()):
+            bands = ([w for w in wins if w < 0.5], [w for w in wins if w >= 0.5],
+                     [w for w in wins if 0.2 <= w <= 0.8] if middle_strength else [])
+            levels = []
+            for (weight, mean, k), band in zip(priors[kind], bands):
+                band.sort()
+                if len(band) >= 10:
+                    mean = round((1.0 - signal_shrink) * band[len(band) // 2] + signal_shrink * mean, 4)
+                levels.append((weight, mean, k))
+            priors[key] = levels
     return priors
 
 
