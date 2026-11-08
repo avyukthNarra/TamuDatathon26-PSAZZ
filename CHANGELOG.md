@@ -22,6 +22,7 @@ How to add an entry (every PR):
 - eval_suite: --jobs N runs independent entry executions in parallel (identical results)
 - Method-agnostic evaluation suite (`python -m eval_suite run --entry DIR`) that checks any entry against all 88 documented requirements and scores it with the official metric (#19)
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
+- adapt_bench: simulated round-two benchmark (10 kits, quick/full tiers) for adaptability checks
 
 ### Changed
 - Model outputs go to `mainFiles/runs/<name>/`, which is git-ignored, so prediction files are no longer committed; run docs updated to match (#7)
