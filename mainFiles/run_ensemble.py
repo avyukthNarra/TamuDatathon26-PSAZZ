@@ -26,13 +26,13 @@ from slot_forecasting.starter import public_directory
 from slot_forecasting.submission_contract import package_code
 
 HERE = Path(__file__).resolve().parent
-MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py", "rule_hmm.py", "changepoint.py", "ensemble.py", "peers.py")
+MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py", "rule_hmm.py", "changepoint.py", "ensemble.py", "peers.py", "plateau.py")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", default=str(HERE / "public"))
 parser.add_argument("--out", default="runs/ensemble")
 parser.add_argument("--cv-val", action="store_true", help="also score validation halves with opposite-half priors")
-parser.add_argument("--variant", default="peers", choices=("peers", "logodds", "three-way"),
+parser.add_argument("--variant", default="peers", choices=("plateau", "peers", "logodds", "three-way"),
                     help="ensemble variant (slot_forecasting/ensemble.py); saved into the entry")
 args = parser.parse_args()
 

@@ -70,3 +70,21 @@ calibration) is at chance level. v10 (56.59) is the best verified model.
   in the cache, train window -0.0005 [-0.0012, +0.0001]. Halves move in opposite directions.
 - HMM with an extra "live at the type's middle level" state family (`research/hmm_middle.py`):
   validation 56.56-56.57 with the tuning half down, train cutoff +0.0020 to +0.0028. Not adopted.
+
+## Round 6: plateau averaging -> v11 (56.59 -> 56.61)
+Several variants tie v10 but each wins on a different split or half: a sign of variance. Their
+log-odds average (`slot_forecasting/plateau.py`; `research/plateau_avg.py`, `plateau_oof.py`):
+A = v10, B = 0.6 mixer / 0.4 HMM + peers, C = v10 with per-lag peer weights (train-fitted x0.55).
+
+| Model | Validation (halves) | Honest train cutoff dR | Honest train window dR |
+|---|---|---|---|
+| v10 | 56.55 (56.52 / 56.60) | 0 | 0 |
+| **v11 = mean(A, B, C)** | **56.58 (56.55 / 56.63)** | -0.0008 [-0.0020, +0.0004] | **-0.0006 [-0.0009, -0.0002]** |
+| mean(A, B, C, regime blend) | 56.61 (56.59 / 56.64) | +0.0001 | -0.0006 | (regime's settings were chosen on validation: left out) |
+
+The per-lag weights are refit without each held-out fold in the train check. Built entry
+(`run_ensemble.py --variant plateau --out runs/plateau-v11 --cv-val`): validation 56.61
+(56.611958), cross-fit halves 56.55 / 56.62, R 0.0598 (stable 0.047, short 0.100, drift 0.040,
+shared 0.052); reproduces byte for byte on Python 3.13 read-only without validation targets.
+Test SHA-256 2ab6e9716d3e19ceb5bfa47dc78f57aafcbfb9d2252f171223131e81c5017152. round_two.py now
+also builds v11 (and `--quick` builds v11 only).

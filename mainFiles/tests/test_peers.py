@@ -48,3 +48,18 @@ class PeerTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class PlateauTest(unittest.TestCase):
+    def test_plateau_average_keeps_sizes_and_reacts_to_peers(self):
+        from slot_forecasting.plateau import PlateauAverage
+
+        class FlatHMM:
+            def win_chances(self, queries, history):
+                return {q.query_id: 0.5 for q in queries}
+        model = PlateauAverage(Flat(), FlatHMM(), center=0.5, centers=[0.5] * 8)
+        hot, cold = model.predict(*episode(5))["q0"], model.predict(*episode(0))["q0"]
+        self.assertGreater(1 - hot[0], 0.5)
+        self.assertLess(1 - cold[0], 0.5)
+        self.assertAlmostEqual(sum(hot), 1.0, places=9)
+        self.assertAlmostEqual(hot[2] / (1 - hot[0]), 0.15 / 0.5, places=6)

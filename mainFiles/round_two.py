@@ -3,12 +3,13 @@
 Usage (from mainFiles/), after unzipping the new kit somewhere:
 
     python round_two.py --data /path/to/new-kit/public
-    python round_two.py --data /path/to/new-kit/public --quick     # v10 only (fastest, ~4 min)
+    python round_two.py --data /path/to/new-kit/public --quick     # v11 only (fastest, ~3 min)
 
 Steps:
   1. Check public/metadata.json (warns unless round == "adaptation").
   2. Build up to three candidates on the NEW data; each refits everything (lag pairs, size lags,
      size modes, win priors, peer centre) from that data:
+       v11  log-odds average of v10, a 0.6 / 0.4 version and per-lag peers
        v10  log-odds pool of pair mixer + hidden-rule HMM, plus the peer correction
        v9   the same without the peer correction
        v8   the COMBINED_SOLUTIONS model (pair mixer + 30% HMM, linear)
@@ -33,7 +34,7 @@ HERE = Path(__file__).resolve().parent
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", required=True, help="the NEW kit's public/ folder")
 parser.add_argument("--tag", default="round2")
-parser.add_argument("--quick", action="store_true", help="build v10 only")
+parser.add_argument("--quick", action="store_true", help="build v11 only")
 parser.add_argument("--downloads", default=str(Path.home() / "Downloads" / "HouseEdge_ADAPTATION_submission"))
 args = parser.parse_args()
 data = Path(args.data).expanduser().resolve()
@@ -45,12 +46,13 @@ if meta.get("round") != "adaptation":
     print("WARNING: metadata round is not 'adaptation' - is this the new kit?")
 
 CANDIDATES = {
+    "v11": [sys.executable, "run_ensemble.py", "--variant", "plateau"],
     "v10": [sys.executable, "run_ensemble.py", "--variant", "peers"],
     "v9": [sys.executable, "run_ensemble.py", "--variant", "logodds"],
     "v8": [sys.executable, "run_pair_mixer.py"],
 }
 if args.quick:
-    CANDIDATES = {"v10": CANDIDATES["v10"]}
+    CANDIDATES = {"v11": CANDIDATES["v11"]}
 results = {}
 for name, cmd in CANDIDATES.items():
     out = HERE / "runs" / f"{args.tag}-{name}"
@@ -73,7 +75,7 @@ if not results:
 print("\n=== candidates (validation points; cross-fit = mean of the two halves)")
 for name, r in results.items():
     print(f"  {name}: full {r['full']:.2f}  cross-fit {r['cross']:.2f}  halves {r['halves'][0]:.2f} / {r['halves'][1]:.2f}")
-order = ["v8", "v9", "v10"]  # simplest first
+order = ["v8", "v9", "v10", "v11"]  # simplest first
 best = max(results, key=lambda n: results[n]["cross"])
 for name in order:  # prefer a simpler model within 0.02
     if name in results and results[name]["cross"] >= results[best]["cross"] - 0.02:
