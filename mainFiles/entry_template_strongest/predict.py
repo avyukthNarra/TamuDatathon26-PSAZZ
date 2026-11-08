@@ -53,5 +53,6 @@ queries, history = load_inputs(data / args.split)
 cfg = json.loads((here / "combo.json").read_text(encoding="utf-8"))
 write_submission(args.out, combine(model.predict(queries, history), v7c.predict_ids(data, args.split, None),
                                    cfg["win_weight"], cfg["extra_peer"], queries, history, cfg["center"],
-                                   cfg.get("signal_coef", 0.0)))
+                                   cfg.get("signal_coef", 0.0), v7c.predict_ids(data, args.split, None, flip=False),
+                                   cfg.get("flip_transfer", 0.0)))
 print(f"wrote {args.out}")
