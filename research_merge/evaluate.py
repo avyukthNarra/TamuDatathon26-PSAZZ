@@ -11,8 +11,8 @@ from research_merge.model import merged_predict
 from research_exact.evaluate import Evaluator
 from slot_forecasting.io import read_submission, write_submission
 
-COORD = ROOT.parent/'_coord/fresh'
 V13 = ROOT.parent/'_tm/v13/mainFiles/runs/v13/crossfit_validation_predictions.csv'
+LEVEL_SD = {'steady': (.50,.50), 'balanced': (.59,.57), 'jackpot': (.67,.71)}
 
 def combine(win, sizes):
     return {i: np.r_[1-p, p*np.asarray(sizes[i])] for i,p in win.items()}
@@ -25,21 +25,18 @@ def main():
     else:
         params = fit(ROOT/'mainFiles/public', size=25)
         parpath.write_text(json.dumps(params, indent=2))
-    priors = json.loads((COORD/'levels_from_truth.json').read_text())
     candidates = {m: {} for m in ('merged','static','independent','shared','exact')}
     diagnostics = {}
     cachepath=out/'win_predictions.json'
     cached=json.loads(cachepath.read_text()) if cachepath.exists() else {}
     for fold in (0,1):
         p = json.loads(json.dumps(params))
-        prior = priors['foldB' if fold == 0 else 'foldA']
         for kind in ('steady','balanced','jackpot'):
-            row = prior[kind]; q = p['levels'][kind]
-            q['mean'] = [row['dead']['a'], row['live']['a']]
-            q['slope'] = [row['dead']['b'], row['live']['b']]
-            cov = np.asarray(q['cov']); rho = cov[0,1]/np.sqrt(cov[0,0]*cov[1,1])
-            sd0, sd1 = row['dead']['sd'], row['live']['sd']
-            q['cov'] = [[sd0**2, rho*sd0*sd1],[rho*sd0*sd1, sd1**2]]
+            # Retain train-fitted cell means and shared type slope. Replace the
+            # excess-history covariance with the measured independent residuals.
+            q = p['levels'][kind]
+            sd0, sd1 = LEVEL_SD[kind]
+            q['cov'] = [[sd0**2, 0.], [0., sd1**2]]
         model = ExactModel(p, 25)
         fold_machines = [m for m in ev.machines if ev.folds[m.episode_id] == fold]
         if str(fold) in cached:
@@ -147,6 +144,17 @@ def main():
             ids=[i for i in ev.ids if ev.kind[i]==kind and ev.conditions[i]==con]
             ptype[kind][con]=float(np.mean([(1-peer_exact[i][0]-(1-tm[i][0]))**2 for i in ids]))
     results['peer_diagnostic_win_mse_by_type_condition']=ptype
+    true_size={}
+    for i,q in tm.items():
+        win=1-q[0]
+        true_size[i]=q[1:]/win if win>1e-9 else np.full(4,.25)
+    merged_true_sizes=combine({i:1-np.asarray(v)[0] for i,v in merged.items()},true_size)
+    v13_true_sizes=combine({i:1-np.asarray(v13[i])[0] for i in ev.ids},true_size)
+    results['merged_true_size_diagnostic']=ev.score(merged_true_sizes)
+    results['v13_true_size_diagnostic']=ev.score(v13_true_sizes)
+    results['level_prior']={'means_and_slopes':'train-fitted per-type dead/live means with shared per-type signal slope',
+                           'independent_sd_dead_live':LEVEL_SD,
+                           'drift_cutoff_swap':float(np.clip(params['schedule']['anchor']/params['schedule']['duration'],0,1))}
     results['diagnostics']=diagnostics
     (out/'results.json').write_text(json.dumps(results,indent=2))
     print(json.dumps({k:v for k,v in results.items() if k!='diagnostics'},indent=2))
