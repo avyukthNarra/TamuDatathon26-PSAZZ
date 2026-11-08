@@ -6,9 +6,13 @@ import argparse
 from collections import defaultdict
 import csv
 import hashlib
+from importlib.metadata import version
 import json
 from pathlib import Path
+import platform
 import pickle
+import resource
+import sys
 import time
 
 import numpy as np
@@ -16,6 +20,8 @@ from scipy.optimize import minimize
 from scipy.special import expit, logit, softmax
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.metrics import log_loss
+from sklearn.neural_network import MLPClassifier
+from sklearn.preprocessing import StandardScaler
 from threadpoolctl import threadpool_limits
 
 from slot_forecasting.baseline import FrequencyForecaster
@@ -28,8 +34,15 @@ from .features import machine_features
 
 def load_dataset(data, output, max_examples):
     cache = output / 'features.npz'
+    input_files = [data / split / name for split in ('train', 'validation', 'test')
+                   for name in ('queries.csv', 'history.csv')] + [data / 'train/labels.csv']
+    signature = json.dumps({'max_examples': max_examples, 'sampler_version': 1,
+                            'feature_source': hashlib.sha256(Path(__file__).with_name('features.py').read_bytes()).hexdigest(),
+                            'inputs': {str(p.relative_to(data)): hashlib.sha256(p.read_bytes()).hexdigest() for p in input_files}}, sort_keys=True)
     if cache.exists():
-        return dict(np.load(cache, allow_pickle=False))
+        cached = dict(np.load(cache, allow_pickle=False))
+        if str(cached.get('signature', '')) == signature:
+            return cached
     rng = np.random.default_rng(914)
     all_x, all_y, roles, query_x, query_ids, query_splits = [], [], [], [], [], []
     metadata = {}
@@ -87,6 +100,7 @@ def load_dataset(data, output, max_examples):
     result = dict(x=x, y=y, role=role, qx=np.stack(query_x), ids=np.array(query_ids),
                   splits=np.array(query_splits), names=np.array(names), groups=np.array(groups),
                   metadata=np.array(json.dumps(metadata)),
+                  signature=np.array(signature),
                   calibration_episodes=np.array(sorted(calibration)), selection_episodes=np.array(sorted(selection)))
     np.savez_compressed(cache, **result)
     return result
@@ -170,6 +184,68 @@ def train_models(dataset, output, iterations):
     return predictions, results
 
 
+def train_mlp(dataset, output, predictions, results):
+    """A multiclass MLP tests smooth combinations of in-context evidence."""
+    train, calibration, selection = (dataset['role'] == k for k in range(3))
+    features = dataset['names'] != 'signal'
+    x, y, qx = (dataset[k] for k in ('x', 'y', 'qx'))
+    scaler = StandardScaler().fit(x[train][:, features])
+    tx = scaler.transform(x[train][:, features])
+    cx = scaler.transform(x[calibration][:, features])
+    sx = scaler.transform(x[selection][:, features])
+    qx = scaler.transform(qx[:, features])
+    model = MLPClassifier(hidden_layer_sizes=(64, 32), alpha=10,
+                          batch_size=512, learning_rate_init=0.001,
+                          random_state=914, solver='adam', max_iter=1)
+    start = time.perf_counter()
+    for epoch in range(1, 46):
+        model.partial_fit(tx, y[train], classes=np.arange(5))
+        if epoch not in (10, 25, 45):
+            continue
+        params = calibrate(model.predict_proba(cx), y[calibration])
+        qp, sp = model.predict_proba(qx), model.predict_proba(sx)
+        for suffix, pp, ss in (('raw', qp, sp), ('cal', apply_calibration(qp, params), apply_calibration(sp, params))):
+            candidate = f'mlp_{epoch}_{suffix}'
+            predictions[candidate] = pp
+            results[candidate] = {'selection_logloss': log_loss(y[selection], ss, labels=np.arange(5)),
+                                  'calibration': params, 'seconds': time.perf_counter() - start}
+            print(candidate, results[candidate], flush=True)
+        with (output / f'mlp_{epoch}.pkl').open('wb') as stream:
+            pickle.dump((model, scaler, features, params), stream)
+        np.savez_compressed(output / 'candidate_predictions.npz', **predictions)
+        (output / 'training.json').write_text(json.dumps(results, indent=2) + '\n')
+    return predictions, results
+
+
+def extend_boosting(dataset, output, predictions, results):
+    """Select additional training duration using only train-episode labels."""
+    train, calibration, selection = (dataset['role'] == k for k in range(3))
+    x, y, qx = (dataset[k] for k in ('x', 'y', 'qx'))
+    with (output / 'hgb_context_31.pkl').open('rb') as stream:
+        win_model, size_model, features, _ = pickle.load(stream)
+    tx, ty = x[train][:, features], y[train]
+    for iterations in (320, 640):
+        start = time.perf_counter()
+        for model in (win_model, size_model):
+            model.set_params(warm_start=True, max_iter=iterations)
+        win_model.fit(tx, ty > 0)
+        size_model.fit(tx[ty > 0], ty[ty > 0] - 1)
+        params = calibrate(head_predictions(win_model, size_model, x[calibration][:, features]), y[calibration])
+        qp = head_predictions(win_model, size_model, qx[:, features])
+        sp = head_predictions(win_model, size_model, x[selection][:, features])
+        for suffix, pp, ss in (('raw', qp, sp), ('cal', apply_calibration(qp, params), apply_calibration(sp, params))):
+            candidate = f'hgb_context_31_iter{iterations}_{suffix}'
+            predictions[candidate] = pp
+            results[candidate] = {'selection_logloss': log_loss(y[selection], ss, labels=np.arange(5)),
+                                  'calibration': params, 'additional_seconds': time.perf_counter() - start}
+            print(candidate, results[candidate], flush=True)
+        with (output / f'hgb_context_31_iter{iterations}.pkl').open('wb') as stream:
+            pickle.dump((win_model, size_model, features, params), stream)
+        np.savez_compressed(output / 'candidate_predictions.npz', **predictions)
+        (output / 'training.json').write_text(json.dumps(results, indent=2) + '\n')
+    return predictions, results
+
+
 def evaluation(data, output, dataset, predictions, training):
     # Only this stage can open validation targets. No features or model
     # fitting function takes this information as an argument.
@@ -230,12 +306,25 @@ def evaluation(data, output, dataset, predictions, training):
     write_submission(output / 'validation_predictions.csv', candidates[train_choice])
     testmask = dataset['splits'] == 'test'
     write_submission(output / 'submission.csv', dict(zip(dataset['ids'][testmask], predictions[train_choice][testmask])))
+    if chosen_a == chosen_b:
+        write_submission(output / 'submission_validation_choice.csv',
+                         dict(zip(dataset['ids'][testmask], predictions[chosen_a][testmask])))
+        report['validation_choice_test_candidate'] = chosen_a
     (output / 'results.json').write_text(json.dumps(report, indent=2) + '\n')
     print('SUMMARY', json.dumps({k: report[k] for k in ('crossfit_ci95', 'train_only_choice', 'selected_on_A_for_B', 'selected_on_B_for_A')}), flush=True)
     for name, value in table.items():
         print(name, round(value['all']['technical_points'], 5),
               {c: round(value['all']['by_condition'][c]['loss_ratio'], 5) for c in CONDITIONS}, flush=True)
     return report
+
+
+def predict_without_targets(output, dataset, predictions, training):
+    """Submission path: training labels choose the model; no scoring files."""
+    chosen = min(training, key=lambda n: training[n]['selection_logloss'])
+    for split, filename in (('validation', 'validation_predictions.csv'), ('test', 'submission.csv')):
+        mask = dataset['splits'] == split
+        write_submission(output / filename, dict(zip(dataset['ids'][mask], predictions[chosen][mask])))
+    return {'train_only_choice': chosen, 'training': training}
 
 
 def main():
@@ -245,21 +334,40 @@ def main():
     parser.add_argument('--max-examples', type=int, default=180000)
     parser.add_argument('--iterations', type=int, default=180)
     parser.add_argument('--evaluate-only', action='store_true')
+    parser.add_argument('--include-mlp', action='store_true')
+    parser.add_argument('--resume-models', action='store_true')
+    parser.add_argument('--extend-boosting', action='store_true')
+    parser.add_argument('--predict-only', action='store_true')
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     start = time.perf_counter()
+    source_hashes = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in Path(__file__).parent.glob('*.py')}
     with threadpool_limits(limits=2):
         dataset = load_dataset(args.data, args.out, args.max_examples)
-        if args.evaluate_only:
+        if args.evaluate_only or args.resume_models:
             predictions = dict(np.load(args.out / 'candidate_predictions.npz'))
             training = json.loads((args.out / 'training.json').read_text())
         else:
             predictions, training = train_models(dataset, args.out, args.iterations)
-        report = evaluation(args.data, args.out, dataset, predictions, training)
+        if args.include_mlp and not args.evaluate_only:
+            predictions, training = train_mlp(dataset, args.out, predictions, training)
+        if args.extend_boosting and not args.evaluate_only:
+            predictions, training = extend_boosting(dataset, args.out, predictions, training)
+        if args.predict_only:
+            report = predict_without_targets(args.out, dataset, predictions, training)
+        else:
+            report = evaluation(args.data, args.out, dataset, predictions, training)
     report['total_seconds'] = time.perf_counter() - start
     report['settings'] = vars(args) | {'data': str(args.data), 'out': str(args.out)}
-    report['source_sha256'] = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in Path(__file__).parent.glob('*.py')}
-    (args.out / 'results.json').write_text(json.dumps(report, indent=2) + '\n')
+    report['source_sha256'] = source_hashes
+    input_paths = [p for p in args.data.glob('*/*.csv')
+                   if not args.predict_only or p.name in ('queries.csv', 'history.csv')
+                   or p == args.data / 'train/labels.csv']
+    report['input_sha256'] = {str(p.relative_to(args.data)): hashlib.sha256(p.read_bytes()).hexdigest() for p in input_paths}
+    report['versions'] = {'python': platform.python_version(),
+                          **{p: version(p) for p in ('numpy', 'scipy', 'scikit-learn')}}
+    report['peak_process_mib'] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 ** 2 if sys.platform == 'darwin' else 1024)
+    (args.out / ('prediction_run.json' if args.predict_only else 'results.json')).write_text(json.dumps(report, indent=2) + '\n')
     print('total seconds', report['total_seconds'], flush=True)
 
 

@@ -428,6 +428,8 @@ A task is done only when **all** are true:
 - YYYY-MM-DD (@handle): _example: the shared cluster restarts at 02:00; save work before then._
 - 2026-11-07 (@Codex): generated `counts_per_condition` metadata maps split names to integer counts; keep synthetic test truth under `_truth` and remove it before mounting data for an entry.
 
+- 2026-11-08 (@Saibot913): Fresh self-supervised HGB scored 52.60 with causal per-machine conditional summaries versus 34.47 without (same 15-leaf capacity); enumerate all lags/pairs and expose local evidence rather than assuming effect signs are shared. Reproduction and leakage tests: `mainFiles/fresh_ml/README.md`.
+
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->
 - YYYY-MM-DD (@handle): _example: squash-merge only, so `main` history maps 1:1 to changelog lines._
