@@ -45,6 +45,7 @@ How to add an entry (every PR):
 ### Removed
 
 ### Fixed
+- v17's vendored v7c gets Avyukth's round-two guard fix; main unchanged, edge_cases preset 28.82 -> 37.51
 - Local-mode answer-isolation checks are reported as NOT RUN, and omitted mode selects Docker when available (#19)
 
 ### Security

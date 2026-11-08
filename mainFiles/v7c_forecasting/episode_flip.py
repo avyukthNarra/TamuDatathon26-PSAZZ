@@ -231,11 +231,16 @@ class FlipGate:
         return cls(mid, width, left, right, detect)
 
     def swaps(self, queries, history, pairs):
-        """{episode_id: tau} for episodes whose logBF is above the train gap midpoint."""
+        """{episode_id: tau} for episodes whose logBF beats the train gap and is positive.
+
+        A negative logBF still favors no flip. The widest gap can sit entirely
+        below zero (fast drift); swapping the upper side of that gap flips
+        episodes that are evidence against a flip.
+        """
         detect = detect_all(episode_series(queries, history), pairs)
         chosen = {}
         for episode_id, row in detect.items():
             tau = row["map_tau"]
-            if tau is not None and row["logbf"] > self.threshold:
+            if tau is not None and row["logbf"] > self.threshold and row["logbf"] > 0.0:
                 chosen[episode_id] = tau
         return chosen, detect
