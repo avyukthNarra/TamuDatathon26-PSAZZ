@@ -427,6 +427,7 @@ A task is done only when **all** are true:
 <!-- Format: - YYYY-MM-DD (@handle): what happened → what to do instead -->
 - YYYY-MM-DD (@handle): _example: the shared cluster restarts at 02:00; save work before then._
 - 2026-11-07 (@Codex): generated `counts_per_condition` metadata maps split names to integer counts; keep synthetic test truth under `_truth` and remove it before mounting data for an entry.
+- 2026-11-08 (@Saibot913): cutoff P(win) is a logit-normal draw around a type×cell×signal mean (sd about 0.5–0.7). On drift and shared-change the swap is finished at least 34 ticks before the cutoff, so the query uses the swapped cell.
 
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->
