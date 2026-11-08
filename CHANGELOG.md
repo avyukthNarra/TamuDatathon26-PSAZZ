@@ -23,6 +23,9 @@ How to add an entry (every PR):
 - Independent system-identification forecaster with train-only fitting, cross-fitted validation, and reproducible simulator diagnostics
 - Method-agnostic evaluation suite (`python -m eval_suite run --entry DIR`) that checks any entry against all 88 documented requirements and scores it with the official metric (#19)
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
+- Empirical-Bayes latent-state experiment with reproducible cross-fitted validation and uncertainty reporting
+- Short-history win filter that marginalizes missing lag bits and replaces only v13's win probability
+- Cross-fitted v13 patch and raw short-history win probabilities for the selected grid filter
 
 ### Changed
 - Model outputs go to `mainFiles/runs/<name>/`, which is git-ignored, so prediction files are no longer committed; run docs updated to match (#7)

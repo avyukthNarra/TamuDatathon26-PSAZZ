@@ -430,6 +430,8 @@ A task is done only when **all** are true:
 - 2026-11-07 (@Saibot913): Mixer v4 (`39e5757`) fits both payout-size modes and a Beta-mixture win prior from all validation targets; nested blend CV cannot remove that inherited leakage. Frozen combination search, noise-band ties and audit guard are documented in `docs/sai/COMBOS_TOP10.md`.
 - 2026-11-07 (@Saibot913): Mixer v4 is saturated: ~70 add-ons (blends, priors, gap handling, signal, peer forgetting) all within noise; in docs/sai/FINAL.md (UPDATE 5). Perfect win probability would be worth +3.0 dev vs +1.4 for perfect sizes, and true win chances are continuous, so work on the win function, not blending.
 - 2026-11-07 (@Codex): generated `counts_per_condition` metadata maps split names to integer counts; keep synthetic test truth under `_truth` and remove it before mounting data for an entry.
+- 2026-11-08 (@bayes): Fractionally weighted recent-state Laplace pseudo-evidence has a different effective sample size from static evidence; do not compare its raw values as calibrated marginal likelihood without explicit normalization.
+- 2026-11-08 (@short): One next-spin label per short-history machine cannot choose the win filter; score every observed tick. Dropping ticks with a missing lag partner also makes its joint evidence incomparable with a filter that sums over those partners.
 
 - 2026-11-08 (@Codex): the independent sysid experiment strongly rejects forcing size-rule directions to reverse with win rules on the main kit. Relearn this assumption for adaptation; `mainFiles/sysid_pipeline.py` learns lag identities and coefficients from train, and `mainFiles/inspect_sysid.py` reproduces the likelihood check.
 
