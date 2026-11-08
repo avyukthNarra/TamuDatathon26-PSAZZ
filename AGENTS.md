@@ -85,12 +85,12 @@ step B, and open questions. Then stop. Don't poll CI.
 | Hackathon / deadline | TAMU Datathon 2026. `TODO` demo freeze + judging times |
 | Repo host | GitHub ([avyukthNarra/TamuDatathon26-PSAZZ](https://github.com/avyukthNarra/TamuDatathon26-PSAZZ)), PRs via `gh` |
 | Default branch | `main` |
-| Stack | `TODO` (e.g. Databricks + PySpark + Delta + AI/BI Dashboards) |
-| Install | `TODO` (e.g. `pip install -r requirements.txt`) |
-| Run locally | `TODO` |
+| Stack | Python 3.13 + NumPy/SciPy (entry); scikit-learn, LightGBM, pandas (research); Docker/Colima for the eval suite |
+| Install | `pip install numpy==2.3.4 scipy==1.16.3` (entry: `adapted_entry_v17g_rules/requirements.txt`) |
+| Run locally | `python3 adapted_entry_v17g_rules/predict.py --data mainFiles/public --out sub.csv`; round two: `r2/README.md` |
 | Lint / format | `TODO` (e.g. `ruff check . && ruff format .`) |
-| Tests | `TODO` (e.g. `pytest -q`) |
-| CI | `TODO` (e.g. GitHub Actions: lint + tests on every PR) |
+| Tests | `cd mainFiles && python3 -m eval_suite run --entry ../adapted_entry_v17g_rules --suite quick --out runs/eval/x`; `python3 mainFiles/check_submission.py <csv>` |
+| CI | none (run the eval suite locally before merging entry changes) |
 
 ### Team & ownership
 
@@ -418,7 +418,16 @@ A task is done only when **all** are true:
 ├── scripts/
 │   ├── next-version.sh       ← computes next semver from commits
 │   └── release.sh            ← rolls [Unreleased] into a version
-└── TODO: README.md, src/, notebooks/, pipelines/, tests/, docs/DEMO.md
+├── README.md                 ← what we built, round-two steps, setup
+├── adapted_entry_v17g_rules/ ← final model (default entry); adapted_entry*/ = challengers
+├── r2/                       ← round-two pipeline, member gate, kit-day steps
+├── orch/                     ← scoring helpers, paired bootstrap, RESULTS.md
+├── main-participants-60-40/  ← refreshed main kit (60/40 rules); data = mainFiles/public/
+├── adaptation-participants/  ← round-two kit (metadata max_points 20 is stale; score at 40)
+├── submissions/              ← exact files submitted in round one (60) and round two (40)
+├── mainFiles/                ← organizer kit, eval_suite/, adapt_bench/, research code
+├── docs/devpost/             ← Devpost write-up, research reports, team commit log
+└── TODO: docs/DEMO.md
 ```
 
 ---
@@ -437,8 +446,12 @@ A task is done only when **all** are true:
 
 - 2026-11-08 (@Saibot913): Fresh self-supervised HGB scored 52.60 with causal per-machine conditional summaries versus 34.47 without (same 15-leaf capacity); enumerate all lags/pairs and expose local evidence rather than assuming effect signs are shared. Reproduction and leakage tests: `mainFiles/fresh_ml/README.md`.
 - 2026-11-08 (@Saibot913): cutoff P(win) is a logit-normal draw around a type×cell×signal mean (sd about 0.5–0.7). On drift and shared-change the swap is finished at least 34 ticks before the cutoff, so the query uses the swapped cell.
+- 2026-11-08 (@Saibot913): `adapted_entry_v17g_rules/members/v13_short.py` is v17-round2-guards (Pranav's v17 + Avyukth's v7c via `combo.combine`, win weight 0.3) plus the short/jackpot patches, and it supplies the payout sizes; the file name and older docs saying "v13" are stale, so don't build on plain v13 thinking it is our model.
+- 2026-11-08 (@Saibot913): the adaptation kit's `metadata.json` says `max_points: 20` but the rules give round two 40 and our scorers reject 20; score on a copy with `max_points` 40. Round-two default scores 38.59/40 cross-fit; structure moved to parity pairs (3,8),(1,4),(2,6) only (rule census parity 1.0); the Walsh screen's top 3-lag subsets are artefacts, trust the exact filter's family census.
+- 2026-11-08 (@Saibot913): an organizer-style mount may have no `validation/` at all (the eval suite's kit-test mounts only train/ and test/); entries must not assume it, and anything using validation answers as priors must bundle them. With Colima, run the eval suite with `TMPDIR` under your home directory, or containers see empty mounts and exit at once.
 
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->
 - YYYY-MM-DD (@handle): _example: squash-merge only, so `main` history maps 1:1 to changelog lines._
 - 2026-11-07 (@Saibot913): agents delete branches whose PR is merged (local + origin) after each merge, without asking again; squash merges hide merged status from git, so check `gh pr list --state merged`.
+- 2026-11-08 (@Saibot913): round-two default is `adapted_entry_v17g_rules/`; challengers only replace it if they win by > 0.1 on the mean and both validation halves. Sai's working branch `sai/master-test` was renamed `sai/master` and merged into `main` with a merge commit (PR #30) so the team starts round two from it.

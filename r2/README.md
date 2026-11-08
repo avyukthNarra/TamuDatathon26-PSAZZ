@@ -72,8 +72,17 @@ python3 mainFiles/check_submission.py $OUT/blend/submission.csv
   known future-dated-rows refusal.
 
 ## Round-one (main) upload, 2026-11-08
-Submitted through the main-round Google Form from `sai/master-test` @ 65e55a2 (entry `adapted_entry_v17g_rules/`, gate keeps
+Submitted through the main-round Google Form from `sai/master` (then named `sai/master-test`) @ 65e55a2 (entry `adapted_entry_v17g_rules/`, gate keeps
 all three members, main validation 57.97).
 - `submission.csv` SHA-256 `076014ef241d8b61b6b608a513e350293a309294c538f0125a35d9e80aaba364` (check_submission: VALID FORMAT, 1536 queries, main, test)
 - `entry.zip` SHA-256 `f3dae4e5fdb0a6c83d981f4222bff152a1cf89f6ba091f43a9cdee035250743d` (742 KB; clean `git archive` of the entry + `gate.json` + `bundled/validation/` =
   `mainFiles/public/validation/`)
+
+## Round-two (adaptation) upload, 2026-11-08
+Uploaded Avyukth's build of the default `adapted_entry_v17g_rules/` (gate keeps all three members; no challenger cleared the
+> 0.1 both-halves rule; validation 38.588/40 cross-fit on the max_points-40 copy of the kit). Files and hashes:
+`origin/avyukth/r2-adaptation` @ `a80ddc6`, `r2/adaptation_submission/`.
+- `ADAPTATION_submission.csv` SHA-256 `a7ec520dd737c40502bbb2778f1c1973efdf224e494811dd9243c3798033190f` (check_submission on the real kit: VALID FORMAT, 1536 queries, adaptation, test)
+- `ADAPTATION_entry.zip` SHA-256 `feb33968c7070000891f84547e8a896a3c1e5e0c4538498be840f995d76729d2` (Docker rerun, pinned numpy/scipy, matches to 9.7e-15)
+- Cross-check: Sai's independent build (`submission.csv` `108434136029fcf2…`, `entry.zip` `1b467e5d…`) equals it to 3.2e-14, its ZIP
+  code is identical, and rerunning that ZIP on the real kit reproduced its CSV byte for byte in 159 s.
