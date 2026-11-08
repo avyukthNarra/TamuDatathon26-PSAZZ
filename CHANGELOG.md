@@ -20,9 +20,11 @@ How to add an entry (every PR):
 
 ### Added
 - Shared experiment harness, master test plan, and results leaderboard under docs/sai (reproduces pooled 30.00 and pair prototype 46.07)
+- Method-agnostic evaluation suite (`python -m eval_suite run --entry DIR`) that checks any entry against all 88 documented requirements and scores it with the official metric (#19)
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 
 ### Changed
+- Model outputs go to `mainFiles/runs/<name>/`, which is git-ignored, so prediction files are no longer committed; run docs updated to match (#7)
 - Playbook requires agents to delete branches with merged PRs (local and origin) after each merge (#6)
 - Playbook spells out PR flow: no pushes to `main`, one approval (own is fine), merge only when approved with no conflicts
 - Agents no longer flag unfilled project snapshot `TODO`s before kickoff; whoever adds a piece of the stack fills its row
@@ -32,5 +34,6 @@ How to add an entry (every PR):
 ### Removed
 
 ### Fixed
+- Local-mode answer-isolation checks are reported as NOT RUN, and omitted mode selects Docker when available (#19)
 
 ### Security
