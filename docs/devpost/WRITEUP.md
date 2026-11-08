@@ -8,11 +8,11 @@ House Edge asks for a forecast of the next spin of hidden-rule slot machines: fo
 
 For each test query, the entry outputs P(no win) and P(payout size | win). The final model (`adapted_entry_v17g_rules/`) is an equal log-odds blend of three win-probability models:
 
-1. **v17-guards:** a pair mixer with short-history and jackpot patches.
+1. **v17-guards:** Pranav's v17 ensemble combined with Avyukth's v7c pair mixer (win weight 0.3, Zhill's round-two guards), plus Sai's short-history and jackpot patches. In the code it is still called `members/v13_short.py`.
 2. **Exact Bayesian filter:** an exact Bayesian filter over lag-pair XOR rules learned from the training data. It also learns 3-lag XOR and 2-lag AND/OR rules.
 3. **System-identification model:** a sparse rule library fitted to the machines' history.
 
-Payout size uses v13's size split, with a 1e-4 floor. A build-time member gate (`r2/gate_members.py`) scores the blend with and without each member on that round's cross-fitted validation and drops a member only if removing it gains more than 0.1 points; the result is saved in `gate.json` and shipped with the entry. On both rounds it kept all three members.
+Payout size uses the v17-guards member's size split, with a 1e-4 floor. A build-time member gate (`r2/gate_members.py`) scores the blend with and without each member on that round's cross-fitted validation and drops a member only if removing it gains more than 0.1 points; the result is saved in `gate.json` and shipped with the entry. On both rounds it kept all three members.
 
 Every member learns its own lag pairs from the current round's training data, so nothing is hard-coded to the main round.
 
@@ -46,7 +46,7 @@ Every member learns its own lag pairs from the current round's training data, so
 
 ## What's next
 
-- Improve the short-history case, where the blend is weakest.
+- Improve the short-history case, where the blend is weakest: identify each short machine's lag pair with fewer spins (for example from the payout-size channel, whose lags are the smaller member of each win pair), and shrink short machines' size split toward type-level sizes.
 - Tighten the payout-size rule for the largest-pot cases.
 
 ## Round two (adaptation)
@@ -55,6 +55,9 @@ Every member learns its own lag pairs from the current round's training data, so
 - **Adaptation:** no code changes. Every member relearned the pairs and size lags from the round's training data (pair census on train: (3,8) 185, (1,4) 180, (2,6) 164 confident machines), and the member gate kept all three members.
 - **Score:** cross-fitted validation **38.59 / 40** (condition-balanced halves 38.53 / 38.63). Per-condition loss ratios: stable 0.031, shared change 0.031, drift 0.036, short history 0.049.
 - **What we tried and rejected** (each fitted on one validation half and checked on the other; a change had to gain more than 0.1 on both halves): global and per-type blend weights, logit temperature, short-history-specific weights, other members' size splits, adding v19 or v7c as a fourth member, Pranav's v20 (38.58), and adding validation episodes to train (-0.007 / -0.003, the members are data-saturated). Headroom analysis: perfect win probabilities would give 39.63 and perfect sizes 38.93, so most of the remaining error is hidden win state.
+- **Where the error is (swap-in-truth, official metric):** short history's unusual gap is payout size: true sizes cut its loss ratio from 0.049 to 0.0315 (-0.0175), about 3x more than on any other condition. Perfect short-history predictions alone would add at most +0.29 (win), +0.16 (sizes), +0.46 (both), so the remaining headroom is small. The round's pairs are found cleanly, but only 529 of 768 validation machines get a confident per-machine pair; the rest are averaged over the three pairs.
+- **Members alone vs blend (adaptation validation /40):** sysid 38.54, v17-guards 38.33, exact filter 38.31; the blend 38.59 beats each. All three are weakest on short history (about 37.8 vs 38.5-38.9 elsewhere).
+- **Also tried in the final hour (no gain):** 3-lag rule priors for short history (-0.001), empirical-Bayes pooling of short machines' win levels toward type means (-0.0003), per-condition blend weights with temperature (-0.09), and Pranav's subcell pair fix (identical, because the short-history patch already overrides those queries).
 - **Reproducibility:** the organizer-style Docker rerun (python 3.13, pinned numpy/scipy, offline, 2 CPUs) matches our CSV to 9.7e-15; 4.8 minutes locally.
 - **Kit note:** the adaptation kit shipped the organizers' older 80/20 scoring library, which our newer 60/40 tooling rejects; we scored on a copy with `max_points` 40, which rescales points without changing any ranking.
 - **Files uploaded:** `ADAPTATION_submission.csv` and `ADAPTATION_entry.zip` (see `CHECKLIST.md`).
