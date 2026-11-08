@@ -116,7 +116,25 @@ def main():
     print("Fresh-folder reproduction:", "IDENTICAL ✅" if same else "DIFFERENT ❌")
     if not same:
         raise SystemExit(1)
+
+    # 4. one overall summary: test file check + validation score on ALL validation episodes
+    check = subprocess.run([sys.executable, str(HERE / "check_submission.py"), str(out / "submission.csv"),
+                            "--data", str(data)], cwd=HERE, capture_output=True, text=True)
+    test_ok = check.returncode == 0 and "VALID FORMAT" in check.stdout
+    val = subprocess.run([sys.executable, str(HERE / "check_submission.py"), str(out / "validation_predictions.csv"),
+                          "--split", "validation", "--data", str(data)], cwd=HERE, capture_output=True, text=True)
+    points = next((line.split(":", 1)[1].strip() for line in val.stdout.splitlines()
+                   if line.startswith("Validation points:")), "not available (no validation answers)")
+    print("\n================ OVERALL ================")
+    print(f"Round:              {meta['round']}")
+    print(f"Test file:          {'valid ✅' if test_ok else 'INVALID ❌'} ({out / 'submission.csv'})")
+    print(f"Validation score:   {points}  (all validation episodes)")
+    print(f"Reproduction:       identical from a fresh folder ✅")
+    print(f"Runtime per split:  about {secs:.0f} s")
+    print("=========================================")
     print(f"\nUpload these two files:\n  {out / 'submission.csv'}\n  {out / 'entry.zip'}")
+    if not test_ok:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":
