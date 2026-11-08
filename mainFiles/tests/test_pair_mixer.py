@@ -296,12 +296,23 @@ class PairMixerTest(unittest.TestCase):
         queries, history = make_data(cutoff=60)
         labels = {q.query_id: 0 for q in queries}
         rejected = {"allow_full": False, "diagnostics": {"chosen_mode": "parity", "reason": "test"}}
-        with patch("slot_forecasting.pair_mixer.cutoff_brier", side_effect=(1.0, 0.0)), \
+        # Advantage 0.0004 is below the 0.002 keep-full margin, so the guard runs.
+        with patch("slot_forecasting.pair_mixer.cutoff_brier", side_effect=(0.5004, 0.5000)), \
              patch("slot_forecasting.cell_mode_gate.guard_full_cell_mode", return_value=rejected) as guard:
             model = adapt(queries, history, labels, log=lambda *_: None, round2=True)
         self.assertEqual(model.cell_mode, ("parity",))
         self.assertEqual(model.cell_mode_gate, rejected["diagnostics"])
         guard.assert_called_once()
+
+    def test_large_in_sample_full_advantage_skips_the_veto(self):
+        queries, history = make_data(cutoff=60)
+        labels = {q.query_id: 0 for q in queries}
+        with patch("slot_forecasting.pair_mixer.cutoff_brier", side_effect=(1.0, 0.0)), \
+             patch("slot_forecasting.cell_mode_gate.guard_full_cell_mode") as guard:
+            model = adapt(queries, history, labels, log=lambda *_: None, round2=True)
+        self.assertEqual(model.cell_mode, ("full",))
+        self.assertEqual(model.cell_mode_gate["chosen_mode"], "full")
+        guard.assert_not_called()
 
 
 if __name__ == "__main__":
