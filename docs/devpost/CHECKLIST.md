@@ -34,7 +34,7 @@ Nothing here is uploaded automatically. Each step is done by hand on Devpost.
    - `ADAPTATION_submission.csv` (the test-set predictions)
    - `ADAPTATION_entry.zip` (the code ZIP built with `mainFiles/build_entry.py`)
 5. [ ] Add both as new files to the existing Devpost project. Do not replace or rename the main-round files.
-6. [ ] Fill in the `## Round two (adaptation)` section of `WRITEUP.md` (score, what changed, which candidate was uploaded), remove the TODO lines, and update the Devpost text to match.
+6. [x] Fill in the `## Round two (adaptation)` section of `WRITEUP.md` (score, what changed, which candidate was uploaded), remove the TODO lines, and update the Devpost text to match.
 7. [x] Round-two lag pairs confirmed: (1,3),(2,5),(4,7) moved to (1,4),(2,6),(3,8) (pair census and forensics).
 8. [x] Round-two Form upload recorded (`sai/master` r2/README.md); hashes in `SUBMISSIONS.md`.
 9. [ ] Add both ADAPTATION_* files to Devpost before noon.
