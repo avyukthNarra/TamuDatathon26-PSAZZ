@@ -19,6 +19,7 @@ How to add an entry (every PR):
 ## [Unreleased]
 
 ### Added
+- Round-adaptive member gate for the adapted blend (`r2/gate_members.py` + `gate.json`): drops a member only if the cross-fitted validation blend without it is better on both halves by >= 0.1; main and sims keep all members (byte-identical), a broken member is dropped (+1.3 to +3 points)
 - Shared experiment harness, master test plan, and results leaderboard under docs/sai (reproduces pooled 30.00 and pair prototype 46.07)
 - Independent system-identification forecaster with train-only fitting, cross-fitted validation, and reproducible simulator diagnostics
 - Causal residual stacking of mixer forecasts with separate prior-fold training and checkpoint-only test prediction
