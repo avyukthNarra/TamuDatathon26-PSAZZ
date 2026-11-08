@@ -2,8 +2,11 @@
 import random
 import unittest
 
-from slot_forecasting.pair_mixer import (CLASS_INDEX, PairMixer, adapt, choose_pairs, discover_pairs,
-                                         size_modes_from_targets, win_prior_from_targets)
+from slot_forecasting.pair_mixer import (CLASS_INDEX, MODE_SIZE_KEYS, PairMixer, adapt, choose_pairs,
+                                         discover_pairs, episode_kfolds, split_episodes, win_prior_from_train,
+                                         discover_size_keys, size_mode_mixture, size_modes_from_targets,
+                                         win_prior_by_type_from_targets,
+                                         win_prior_from_targets)
 from slot_forecasting.schema import PAYOUTS, Play, Query, Target
 
 MACHINES = ("e1-m0", "e1-m1", "e1-m2")
@@ -113,9 +116,50 @@ class PairMixerTest(unittest.TestCase):
         targets = [Target(f"q{i}", "e1", (0.4,) + tuple(0.6 * x for x in (small, big)[i % 2]), 0)
                    for i in range(6)]
         modes = size_modes_from_targets(targets, queries)
-        for got, want in zip(modes["balanced"], (small, big)):
+        for got, want in zip(modes["balanced"]["modes"], (small, big)):
             self.assertTrue(all(abs(a - b) < 1e-3 for a, b in zip(got, want)))
-        self.assertEqual(size_modes_from_targets(targets[:1], queries), {})  # one mode only -> fall back
+        single = size_modes_from_targets(targets[:1], queries)
+        self.assertEqual(len(single["balanced"]["modes"]), 1)
+
+    def test_two_size_modes_equal_the_sigmoid_llr(self):
+        a, b = (0.6, 0.3, 0.08, 0.02), (0.2, 0.3, 0.3, 0.2)
+        counts = (3.0, 2.0, 1.0, 0.0)
+        llr = sum(c * __import__("math").log(y / x) for c, x, y in zip(counts, a, b))
+        big = 1 / (1 + __import__("math").exp(-llr))
+        got = size_mode_mixture(counts, (a, b), (0.5, 0.5))
+        self.assertTrue(all(abs(x - ((1-big)*u + big*v)) < 1e-12
+                            for x, u, v in zip(got, a, b)))
+
+    def test_discovers_size_lags_that_moved(self):
+        """Round two may move the size rule: big mode iff lag 5 or lag 7 was a big win -> keys (5,), (7,)."""
+        small, big = (0.75, 0.2, 0.05, 0.0), (0.2, 0.3, 0.3, 0.2)
+        rng = random.Random(23)
+        queries, plays = [], []
+        for m in range(6):
+            payouts = []
+            for t in range(400):
+                mode = big if (t >= 7 and (payouts[t - 5] >= 5 or payouts[t - 7] >= 5)) else small
+                payouts.append(rng.choices(PAYOUTS[1:], mode)[0] if rng.random() < 0.6 else 0)
+            queries.append(Query(f"q{m}", "e1", f"m{m}", "steady", 0, 400))
+            plays.extend(Play("e1", f"m{m}", t, v) for t, v in enumerate(payouts))
+        self.assertEqual(discover_size_keys(tuple(queries), tuple(plays)), ((), (5,), (7,)))
+
+    def test_size_key_discovery_without_signal_keeps_the_defaults(self):
+        q = (Query("q", "e", "m", "steady", 0, 4),)
+        h = tuple(Play("e", "m", t, 1) for t in range(4))  # too few wins to score any lag
+        self.assertEqual(discover_size_keys(q, h), MODE_SIZE_KEYS)
+
+    def test_three_size_modes_from_targets_and_posterior_picks_the_right_one(self):
+        mixes = ((0.7, 0.2, 0.08, 0.02), (0.4, 0.4, 0.15, 0.05), (0.1, 0.2, 0.4, 0.3))
+        queries = tuple(Query(f"q{i}", "e1", f"m{i}", "jackpot", 0, 10) for i in range(30))
+        targets = [Target(f"q{i}", "e1", (0.5,) + tuple(0.5 * x for x in mixes[i % 3]), 0) for i in range(30)]
+        spec = size_modes_from_targets(targets, queries)["jackpot"]
+        self.assertEqual(len(spec["modes"]), 3)
+        for got, want in zip(spec["modes"], mixes):
+            self.assertTrue(all(abs(a - b) < 1e-9 for a, b in zip(got, want)))
+        # Counts drawn from the middle mode -> the posterior mixture sits on the middle mode.
+        mixed = size_mode_mixture((40, 40, 15, 5), spec["modes"], spec["weights"])
+        self.assertLess(max(abs(a - b) for a, b in zip(mixed, mixes[1])), 0.01)
 
     def test_two_mode_size_experts_learn_a_lag_rule(self):
         """Size mode = big iff the spin 2 back was a big win: the mode experts should call it at the cutoff."""
@@ -137,7 +181,9 @@ class PairMixerTest(unittest.TestCase):
         wins = [0.02, 0.03, 0.05] * 10 + [0.88, 0.9, 0.95] * 10
         targets = [Target(f"q{i}", "e1", (1 - w, w, 0.0, 0.0, 0.0), 0) for i, w in enumerate(wins)]
         prior = win_prior_from_targets(targets)
-        self.assertEqual([(c[0], c[1]) for c in prior[:2]], [(0.45, 0.03), (0.45, 0.9)])
+        self.assertAlmostEqual(prior[0][1], 0.03)
+        self.assertAlmostEqual(prior[1][1], 0.9)
+        self.assertAlmostEqual(sum(c[0] for c in prior), 1.0)
         self.assertIsNone(win_prior_from_targets(targets[:30]))  # no live side -> no prior
 
     def test_win_prior_pulls_cells_to_the_nearest_level(self):
@@ -146,6 +192,68 @@ class PairMixerTest(unittest.TestCase):
         self.assertGreater(model._cell_rate(3.0, 3.0), 0.85)
         self.assertLess(model._cell_rate(0.0, 3.0), 0.1)
         self.assertAlmostEqual(model._cell_rate(0.0, 0.0), 0.45 * 0.03 + 0.45 * 0.93 + 0.1 * 0.5, places=9)
+
+    def test_type_specific_win_priors_shrink_toward_global_levels(self):
+        queries, targets = [], []
+        levels = {"steady": (0.02, 0.90), "jackpot": (0.20, 0.70)}
+        index = 0
+        for machine_type, (dead, live) in levels.items():
+            for win in (dead,) * 30 + (live,) * 30:
+                query_id = f"q{index}"
+                queries.append(Query(query_id, "e1", f"m{index}", machine_type, 0, 1))
+                targets.append(Target(query_id, "e1", (1 - win, win, 0, 0, 0), 0))
+                index += 1
+        prior = win_prior_by_type_from_targets(targets, queries, global_shrink=0.5)
+        self.assertAlmostEqual(prior["steady"][0][1], (0.02 + 0.20) / 2, places=4)
+        self.assertAlmostEqual(prior["jackpot"][0][1], (0.20 + 0.20) / 2, places=4)
+        model = PairMixer(win_prior=prior)
+        self.assertLess(model._cell_rate(0.0, 3.0, "steady"),
+                        model._cell_rate(0.0, 3.0, "jackpot"))
+
+    def test_train_only_win_prior_is_u_shaped(self):
+        """No targets: the fallback prior must still find a dead and a live level from history."""
+        rng = random.Random(5)
+        queries, plays = [], []
+        for m in range(12):  # win iff lag 1 == lag 3 (95%): match cells ~0.97, differ cells ~0.03
+            won = []
+            for t in range(300):
+                rule = t >= 3 and rng.random() < 0.95
+                won.append(won[t - 1] == won[t - 3] if rule else rng.random() < 0.5)
+            queries.append(Query(f"q{m}", "e1", f"m{m}", "steady", 0, 300))
+            plays.extend(Play("e1", f"m{m}", t, 1 if w else 0) for t, w in enumerate(won))
+        prior = win_prior_from_train(tuple(queries), tuple(plays), pairs=((1, 3),))
+        self.assertLess(prior[0][1], 0.2)
+        self.assertGreater(prior[1][1], 0.8)
+
+    def test_episode_folds_never_mix_fit_and_heldout(self):
+        queries, history = [], []
+        conditions = {}
+        for e in range(16):
+            for m in range(2):
+                q = Query(f"e{e}-m{m}", f"e{e}", f"m{m}", "steady", 0, 3)
+                queries.append(q)
+                conditions[q.query_id] = ("stable", "drift")[e % 2]
+                history.extend(Play(f"e{e}", f"m{m}", t, 1) for t in range(3))
+        folds = episode_kfolds(queries, conditions, n_folds=4)
+        self.assertEqual(sorted(folds.values()).count(0), 4)  # 2 episodes per condition per fold
+        for fold in range(4):
+            held = {e for e, f in folds.items() if f == fold}
+            (hq, hh), (fq, fh) = split_episodes(tuple(queries), tuple(history), held)
+            self.assertFalse({q.episode_id for q in fq} & held)
+            self.assertFalse({p.episode_id for p in fh} & held)
+            self.assertEqual({q.episode_id for q in hq}, held)
+
+    def test_fold_model_ignores_heldout_labels(self):
+        """adapt() on the fit episodes must give the same forecasts whatever the held-out labels say."""
+        queries, history = make_data(seed=7, cutoff=120, rule=True)
+        fit = tuple(q for q in queries if q.machine_id != "e1-m2")
+        fit_history = tuple(p for p in history if p.machine_id != "e1-m2")
+        labels = {q.query_id: 0 for q in queries}
+        flipped = dict(labels, **{"e1-m2-next": 20})
+        quiet = lambda *_: None
+        a = adapt(fit, fit_history, {k: labels[k] for k in (q.query_id for q in fit)}, log=quiet)
+        b = adapt(fit, fit_history, {k: flipped[k] for k in (q.query_id for q in fit)}, log=quiet)
+        self.assertEqual(a.predict(queries, history), b.predict(queries, history))
 
     def test_adapts_to_new_lag_pairs(self):
         """Round two may use different pairs: rediscovery must find them and the mixer must use them."""

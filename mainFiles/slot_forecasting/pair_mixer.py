@@ -18,6 +18,7 @@ absorbed, so it only uses ticks < t. Training-time evaluation and test-time
 prediction run the same `walk` function. Standard library only.
 """
 
+import hashlib
 import itertools
 import math
 from collections import Counter
@@ -39,8 +40,37 @@ DEFAULT_SIZE_KEYS = ((), (1,), (1, 2), (2,), (2, 3))
 MODE_SIZE_KEYS = ((), (1,), (2,), (3,), (4,))
 # With a win_prior (true win chances are U-shaped: most near a "dead" or a "live" level), the
 # expert weights learn best with eta 8. Validation 54.90 -> 55.34 (halves 55.03 / 55.71).
-WIN_PRIOR_ETA = 8.0
+WIN_PRIOR_ETA = 6.0
 MIN_PROBABILITY = 1e-4
+
+
+def _normalize_size_modes(spec):
+    if isinstance(spec, dict):
+        modes = tuple(tuple(float(x) for x in mode) for mode in spec["modes"])
+        weights = tuple(float(x) for x in spec.get("weights", [1.0] * len(modes)))
+    else:
+        modes = tuple(tuple(float(x) for x in mode) for mode in spec)
+        weights = tuple([1.0 / len(modes)] * len(modes))
+    if not modes or len(weights) != len(modes) or any(w <= 0 for w in weights):
+        raise ValidationError("size_modes needs one positive prior weight per mode.")
+    if any(len(mode) != CLASSES - 1 or any(x < 0 for x in mode) or math.fsum(mode) <= 0 for mode in modes):
+        raise ValidationError("Every size mode must be a nonempty four-class probability vector.")
+    weights_sum = math.fsum(weights)
+    normalized_weights = tuple(w / weights_sum for w in weights)
+    normalized_modes = tuple(tuple(x / math.fsum(mode) for x in mode) for mode in modes)
+    return {"modes": normalized_modes, "weights": normalized_weights}
+
+
+def size_mode_mixture(counts, modes, priors, temperature=1.0, floor=1e-3):
+    """Bayesian posterior mixture over any number of payout-size modes."""
+    log_post = [math.log(prior) + temperature * math.fsum(
+        count * math.log(max(probability, floor)) for count, probability in zip(counts, mode))
+        for mode, prior in zip(modes, priors)]
+    top = max(log_post)
+    weights = [math.exp(value - top) for value in log_post]
+    total = math.fsum(weights)
+    return [math.fsum(weight * mode[k] for weight, mode in zip(weights, modes)) / total
+            for k in range(CLASSES - 1)]
 
 
 class PairMixer:
@@ -54,14 +84,22 @@ class PairMixer:
         #   rate (e.g. a "dead" level near 0.03 and a "live" level near 0.93). A cell's estimate is
         #   its posterior mean, pulled toward whichever level its counts favour, instead of toward
         #   the machine's overall win rate. None = the k_win / base smoothing.
-        self.win_prior = [(float(w), float(m) * float(k), (1 - float(m)) * float(k))
-                          for w, m, k in win_prior] if win_prior else None
+        def prepare_win_prior(components):
+            return [(float(w), float(m) * float(k), (1 - float(m)) * float(k))
+                    for w, m, k in components]
+        if isinstance(win_prior, dict):
+            self.win_prior = None
+            self.win_priors = {kind: prepare_win_prior(components)
+                               for kind, components in win_prior.items()}
+        else:
+            self.win_prior = prepare_win_prior(win_prior) if win_prior else None
+            self.win_priors = {}
         # size_modes: {machine_type: (small_mix, big_mix)}, the two exact payout-size mixes
         #   (1x, 2x, 5x, 20x) a machine of that type switches between (size_modes_from_targets).
         #   Each size cell then holds one number, P(big mode), from its decayed size counts by
         #   Bayes' rule (log-likelihood ratio x mode_temp), instead of 4 free frequencies, so it
         #   learns from far fewer wins. Without modes the size experts use free frequencies.
-        self.size_modes = {t: (tuple(a), tuple(b)) for t, (a, b) in (size_modes or {}).items()}
+        self.size_modes = {t: _normalize_size_modes(spec) for t, spec in (size_modes or {}).items()}
         self.mode_temp = mode_temp
         if size_keys is None:
             size_keys = MODE_SIZE_KEYS if self.size_modes else DEFAULT_SIZE_KEYS
@@ -138,8 +176,7 @@ class PairMixer:
         logw = list(prior)
         size_logw = [0.0] * len(self.size_keys)
         type_size = self._size_prior(machine_type)
-        modes = self.size_modes.get(machine_type)
-        mode_llr = [math.log(max(b, 1e-3) / max(a, 1e-3)) for a, b in zip(*modes)] if modes else None
+        mode_spec = self.size_modes.get(machine_type)
         a0, b0 = self.rate_prior
 
         def cell_of(t, lags, how="win"):
@@ -178,16 +215,17 @@ class PairMixer:
                 key = (agree,) if mode == "parity" else cell
                 w, n = win_tab[i].get(key, (0.0, 0.0))
                 win_keys.append(key)
-                win_preds.append(self._cell_rate(w, n) if self.win_prior else (w + self.k_win * base) / (n + self.k_win))
+                has_cell_prior = self.win_priors.get(machine_type) or self.win_prior
+                win_preds.append(self._cell_rate(w, n, machine_type) if has_cell_prior
+                                 else (w + self.k_win * base) / (n + self.k_win))
             size_cells = [cell_of(t, key, how) for key, how in zip(self.size_keys, self.size_cell)]
             size_preds = []
             for i, cell in enumerate(size_cells):
                 sc = size_tab[i].get(cell) if cell is not None else None
-                if modes is not None:
+                if mode_spec is not None:
                     counts = sc if sc is not None else machine_size
-                    llr = self.mode_temp * math.fsum(c * r for c, r in zip(counts, mode_llr))
-                    big = 1.0 / (1.0 + math.exp(-max(min(llr, 50.0), -50.0)))
-                    size_preds.append([(1.0 - big) * a + big * b for a, b in zip(*modes)])
+                    size_preds.append(size_mode_mixture(counts, mode_spec["modes"], mode_spec["weights"],
+                                                        self.mode_temp))
                 elif sc is None:
                     size_preds.append(msize)
                 else:
@@ -256,10 +294,11 @@ class PairMixer:
                     if cell is not None:
                         size_tab[i].setdefault(cell, [0.0] * sizes)[value - 1] += 1.0
 
-    def _cell_rate(self, w, n):
+    def _cell_rate(self, w, n, machine_type=None):
         """Posterior mean win rate of a cell with (decayed) w wins in n spins under the Beta-mixture prior."""
+        components = self.win_priors.get(machine_type) or self.win_prior
         logs, means = [], []
-        for weight, a, b in self.win_prior:
+        for weight, a, b in components:
             logs.append(math.log(weight) + math.lgamma(a + w) + math.lgamma(b + n - w) - math.lgamma(a + b + n)
                         - math.lgamma(a) - math.lgamma(b) + math.lgamma(a + b))
             means.append((a + w) / (a + b + n))
@@ -341,13 +380,46 @@ def choose_pairs(queries, history, min_share=0.3):
     return tuple(sorted(pair for pair, count in found if count >= min_share * top))
 
 
-def size_modes_from_targets(targets, queries):
-    """The two exact payout-size mixes per machine type, read from validation targets.csv.
+def discover_size_keys(queries, history, lags=range(1, 9), min_share=0.5, top=4, min_wins=12):
+    """Lags whose exact payout class best predicts the next win's payout size, from train history.
 
-    Every true size-given-win vector in the main round is one of two per type (a "small"
-    and a "big" mode). Returns {type: (small, big)}, small = the mode with more 1x, or {}
-    if any type doesn't show exactly two clear modes (the model then uses free frequencies).
+    Per machine, splits winning spins by the payout class `lag` spins back and measures the
+    log-likelihood gain over the machine's overall size mix, minus its chance level (half the
+    degrees of freedom), so sparse cells don't look informative. Lags scoring at least
+    min_share x the best are kept (main round: 1, 2, 4, clearly above the rest). Like
+    choose_pairs, this lets a new round move the size rule to other lags.
     """
+    indexed = index_history(queries, history)
+    gain = Counter()
+    machines = Counter()
+    for plays in indexed.values():
+        by_tick = {p.tick: p.payout for p in plays}
+        for lag in lags:
+            cells = {}
+            for tick, payout in by_tick.items():
+                if payout > 0 and tick - lag in by_tick:
+                    row = cells.setdefault(CLASS_INDEX[by_tick[tick - lag]], [0] * (CLASSES - 1))
+                    row[CLASS_INDEX[payout] - 1] += 1
+            totals = [sum(row[k] for row in cells.values()) for k in range(CLASSES - 1)]
+            n = sum(totals)
+            if n < min_wins:
+                continue
+            g = math.fsum(x * math.log(x * n / (sum(row) * total)) for row in cells.values()
+                          for x, total in zip(row, totals) if x)
+            df = (len(cells) - 1) * (sum(1 for total in totals if total) - 1)
+            gain[lag] += g - df / 2.0
+            machines[lag] += 1
+    scores = {lag: gain[lag] / machines[lag] for lag in machines}
+    best = max(scores.values(), default=0.0)
+    if best <= 0.0:
+        return MODE_SIZE_KEYS
+    kept = sorted(lag for lag, score in sorted(scores.items(), key=lambda kv: (-kv[1], kv[0]))[:top]
+                  if score >= min_share * best)
+    return ((),) + tuple((lag,) for lag in kept)
+
+
+def size_modes_from_targets(targets, queries):
+    """Cluster conditional payout-size vectors, retaining any supported number of modes."""
     machine_type = {q.query_id: q.machine_type for q in queries}
     seen = {}
     for target in targets:
@@ -355,24 +427,48 @@ def size_modes_from_targets(targets, queries):
         win = 1.0 - p[0]
         if win < 0.05 or target.query_id not in machine_type:
             continue
-        mix = tuple(round(x / win, 3) for x in p[1:])
-        seen.setdefault(machine_type[target.query_id], Counter())[mix] += 1
+        mix = tuple(x / win for x in p[1:])
+        seen.setdefault(machine_type[target.query_id], []).append(mix)
     modes = {}
-    for kind, counts in seen.items():
-        groups = []  # merge vectors that differ only by rounding, then keep the two biggest groups
-        for mix, n in counts.most_common():
-            for group in groups:
-                if max(abs(a - b) for a, b in zip(group[0], mix)) < 0.02:
-                    group[1] += n
-                    break
+    for kind, vectors in seen.items():
+        groups = []
+        # Deterministic online clustering; tolerates small target rounding noise.
+        for mix in sorted(vectors):
+            nearest = min(groups, key=lambda g: max(abs(a-b) for a,b in zip(g[0], mix)), default=None)
+            if nearest is not None and max(abs(a-b) for a,b in zip(nearest[0], mix)) < 0.025:
+                n = nearest[1]
+                nearest[0] = tuple((n*a+b)/(n+1) for a,b in zip(nearest[0], mix))
+                nearest[1] += 1
             else:
-                groups.append([mix, n])
-        groups.sort(key=lambda g: -g[1])
-        if len(groups) < 2 or sum(g[1] for g in groups[2:]) > 0.05 * sum(g[1] for g in groups):
-            return {}
-        small, big = sorted((groups[0][0], groups[1][0]), key=lambda m: -m[0])
-        modes[kind] = (tuple(x / sum(small) for x in small), tuple(x / sum(big) for x in big))
+                groups.append([mix, 1])
+        groups.sort(key=lambda g: (-g[1], g[0]))
+        if not groups:
+            continue
+        # Tiny isolated clusters are target noise; retain them only when they carry >= 5% mass.
+        groups = [g for g in groups if g[1] / len(vectors) >= 0.05 or len(groups) == 1]
+        groups.sort(key=lambda g: (-g[0][0], g[0]))
+        # Equal prior per mode: with two modes this is exactly the old sigmoid(LLR) rule.
+        modes[kind] = {"modes": [g[0] for g in groups], "weights": [1.0] * len(groups)}
     return modes
+
+
+def _u_shaped_prior(rates, strength, low=0.2, high=0.8, min_side=20):
+    """Three-component Beta mixture fitted to a set of win rates.
+
+    "dead" (< low) and "live" (> high) components sit at their cluster medians with the given
+    strength; the middle component is a flat Beta(1, 1). Each weight is its cluster's share of the
+    rates (+1 each, so none is zero). None if either side has fewer than min_side rates.
+    """
+    dead = sorted(r for r in rates if r < low)
+    live = sorted(r for r in rates if r > high)
+    middle = [r for r in rates if low <= r <= high]
+    if len(dead) < min_side or len(live) < min_side:
+        return None
+    counts = (len(dead) + 1, len(live) + 1, len(middle) + 1)
+    total = sum(counts)
+    return [(counts[0] / total, round(dead[len(dead) // 2], 4), strength),
+            (counts[1] / total, round(live[len(live) // 2], 4), strength),
+            (counts[2] / total, 0.5, 2.0)]
 
 
 def win_prior_from_targets(targets, strength=6.0):
@@ -381,6 +477,8 @@ def win_prior_from_targets(targets, strength=6.0):
     True win chances are U-shaped: most sit near a "dead" level or a "live" level. Uses the median
     true win chance below and above 0.5 as the two levels (main round: 0.044 and 0.898), each with
     weight 0.45 and the given strength, plus a weak middle component (0.1, mean 0.5, strength 2).
+    Data-driven weights (0.46 / 0.32 / 0.22 from the shares below 0.2 / above 0.8) were tried:
+    +0.03 validation but worse out of fold on train (dR +0.008 [+0.003, +0.013]), so not used.
     Returns None if either side has too few targets to estimate a level.
     """
     wins = sorted(1.0 - t.probabilities[0] for t in targets)
@@ -390,6 +488,82 @@ def win_prior_from_targets(targets, strength=6.0):
         return None
     return [(0.45, round(dead[len(dead) // 2], 4), strength), (0.45, round(live[len(live) // 2], 4), strength),
             (0.1, 0.5, 2.0)]
+
+
+def win_prior_from_train(queries, history, pairs=None, min_spins=10):
+    """Win prior from train history alone: a data-weighted mixture (_u_shaped_prior) fitted to the
+    empirical win rates of every (machine, pair, lag-outcome) cell with at least min_spins spins.
+
+    NOT used by adapt(): out of fold on train it was worse than no prior (dR +0.030 at the
+    cutoff), because whole-history cell rates mix regimes and land mostly in the middle.
+    Kept for round two, where it can be re-tested with tune_pair_mixer.py '[{"win_prior": "train"}]'.
+    """
+    pairs = pairs or choose_pairs(queries, history)
+    rates = []
+    for plays in index_history(queries, history).values():
+        won = {p.tick: p.payout > 0 for p in plays}
+        for a, b in pairs:
+            wins, spins = Counter(), Counter()
+            for tick, value in won.items():
+                if tick - a in won and tick - b in won:
+                    cell = (won[tick - a], won[tick - b])
+                    wins[cell] += value
+                    spins[cell] += 1
+            rates.extend(wins[cell] / n for cell, n in spins.items() if n >= min_spins)
+    return _u_shaped_prior(rates, 6.0)
+
+
+def win_prior_by_type_from_targets(targets, queries, strength=10.0, global_shrink=0.0):
+    """Beta-mixture win prior per machine type: {type: components}, levels read per type.
+
+    Types differ a lot (main round: jackpot is rarely live, only 10 of 265 targets above 0.8,
+    while steady is live in 149 of 269), so one round-wide pair of levels misfits them. Each
+    type gets win_prior_from_targets on its own targets, with levels optionally shrunk toward
+    the round-wide ones (global_shrink 0 = pure type levels, which tested best). A type with
+    too few targets on either side uses the round-wide prior. None if that is missing too.
+    Out of fold on train vs the round-wide prior: late-window dR -0.011 [-0.015, -0.008];
+    cross-fitted validation 55.47 -> 56.12.
+    """
+    global_prior = win_prior_from_targets(targets, strength)
+    if global_prior is None or not 0.0 <= global_shrink <= 1.0:
+        return None
+    machine_type = {q.query_id: q.machine_type for q in queries}
+    by_type = {}
+    for target in targets:
+        kind = machine_type.get(target.query_id)
+        if kind is not None:
+            by_type.setdefault(kind, []).append(target)
+    priors = {}
+    for kind in sorted(by_type):
+        own = win_prior_from_targets(by_type[kind], strength)
+        if own is None:
+            priors[kind] = global_prior
+            continue
+        priors[kind] = [(w, round((1.0 - global_shrink) * m + global_shrink * g[1], 4), k)
+                        for (w, m, k), g in zip(own, global_prior)]
+    return priors
+
+
+def episode_kfolds(queries, conditions, n_folds=8):
+    """{episode_id: fold} with whole episodes per fold, spread evenly within each condition
+    (episodes ordered by a hash of their id, so the split is fixed and label-blind)."""
+    by_condition = {}
+    for query in queries:
+        by_condition.setdefault(conditions[query.query_id], set()).add(query.episode_id)
+    folds = {}
+    for condition in sorted(by_condition):
+        ordered = sorted(by_condition[condition], key=lambda e: hashlib.sha256(e.encode()).hexdigest())
+        for index, episode_id in enumerate(ordered):
+            folds[episode_id] = index % n_folds
+    return folds
+
+
+def split_episodes(queries, history, episodes):
+    """(queries, history) inside the given episodes, then (queries, history) outside them."""
+    inside = tuple(q for q in queries if q.episode_id in episodes)
+    outside = tuple(q for q in queries if q.episode_id not in episodes)
+    return ((inside, tuple(p for p in history if p.episode_id in episodes)),
+            (outside, tuple(p for p in history if p.episode_id not in episodes)))
 
 
 def cutoff_brier(model, queries, history, labels):
@@ -403,14 +577,18 @@ def adapt(queries, history, labels=None, log=print, size_modes=None, win_prior=N
     """Round-two helper: rediscover the lag pairs and pick the cell mode on this round's train data.
 
     size_modes: from size_modes_from_targets on this round's validation targets, if available.
-    win_prior: from win_prior_from_targets on the same targets, if available.
+    win_prior: from win_prior_by_type_from_targets (or win_prior_from_targets) on the same
+      targets, if available; a {type: components} dict or one component list.
     """
     pairs = choose_pairs(queries, history)
     log(f"lag pairs found on train: {pairs}")
-    log(f"payout-size modes: {'two per type, from validation targets' if size_modes else 'none (free frequencies)'}")
-    log(f"win-cell prior: {[tuple(c) for c in win_prior] if win_prior else 'none (smooth toward base rate)'}")
+    size_keys = discover_size_keys(queries, history)
+    log(f"payout-size keys discovered: {size_keys}")
+    log(f"payout-size modes: {'target-derived mixture' if size_modes else 'none (free frequencies)'}")
+    log(f"win-cell prior: {win_prior if win_prior else 'none (smooth toward base rate)'}")
     extra = {"win_prior": win_prior, "eta": WIN_PRIOR_ETA} if win_prior else {}
-    candidates = [PairMixer(pairs=pairs, cell_mode=mode, size_modes=size_modes, **extra).fit(queries, history)
+    candidates = [PairMixer(pairs=pairs, cell_mode=mode, size_modes=size_modes, size_keys=size_keys,
+                            **extra).fit(queries, history)
                   for mode in ("parity", "full")]
     if labels is None:
         return candidates[0]

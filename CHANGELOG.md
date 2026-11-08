@@ -23,6 +23,8 @@ How to add an entry (every PR):
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 
 ### Changed
+- Pair mixer reads typical win levels per machine type, finds which earlier spins drive payout size from train history (main round: 1, 2 and 4 back), and supports any number of size modes per type; validation 55.34 -> 56.12 / 60 (cross-fitted 56.12)
+- Model tuning scores train out of fold (8 episode folds, plus a late-window score) and validation cross-fitted (each half's priors from the other half); `run_pair_mixer.py --cv-val` reports the cross-fitted score
 - Pair mixer pulls each noisy win estimate toward the nearer typical level (dead ~0.04 / live ~0.90, read from validation targets); validation 54.90 -> 55.34 / 60
 - Pair mixer predicts payout size as a switch between two exact size mixes per machine type (read from validation targets), keyed on the last four spins; validation 54.21 -> 54.90 / 60
 - Pair mixer's payout-size experts now read the exact earlier payouts (lags 1, 2, (1,2), (2,3)); validation 53.75 -> 54.21 / 60

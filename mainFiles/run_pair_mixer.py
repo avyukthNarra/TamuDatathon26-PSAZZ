@@ -19,7 +19,7 @@ from time import perf_counter
 
 from slot_forecasting.contest import score_contest_files
 from slot_forecasting.io import load_inputs, read_labels, read_submission, read_targets, write_json, write_submission
-from slot_forecasting.pair_mixer import adapt, size_modes_from_targets, win_prior_from_targets
+from slot_forecasting.pair_mixer import adapt, size_modes_from_targets, win_prior_by_type_from_targets
 from slot_forecasting.rounds import VERSION, round_metadata
 from slot_forecasting.starter import public_directory
 from slot_forecasting.submission_contract import package_code
@@ -30,6 +30,7 @@ MODULES = ("__init__.py", "schema.py", "io.py", "pair_mixer.py")
 parser = argparse.ArgumentParser()
 parser.add_argument("--data", default=str(HERE / "public"))
 parser.add_argument("--out", default="runs/pair-mixer")
+parser.add_argument("--cv-val", action="store_true", help="also score validation halves with opposite-half priors")
 args = parser.parse_args()
 
 started = perf_counter()
@@ -38,10 +39,11 @@ out = Path(args.out).expanduser().resolve()
 out.mkdir(parents=True, exist_ok=True)
 train_queries, train_history = load_inputs(public / "train")
 val_targets = read_targets(public / "validation/targets.csv")
-size_modes = size_modes_from_targets(val_targets, load_inputs(public / "validation")[0])
-win_prior = win_prior_from_targets(val_targets)
-model = adapt(train_queries, train_history, read_labels(public / "train/labels.csv", train_queries),
-              size_modes=size_modes, win_prior=win_prior)
+val_queries, val_history = load_inputs(public / "validation")
+train_labels = read_labels(public / "train/labels.csv", train_queries)
+size_modes = size_modes_from_targets(val_targets, val_queries)
+win_prior = win_prior_by_type_from_targets(val_targets, val_queries)
+model = adapt(train_queries, train_history, train_labels, size_modes=size_modes, win_prior=win_prior)
 files = {"validation": out / "validation_predictions.csv", "test": out / "submission.csv"}
 for split, path in files.items():
     queries, history = load_inputs(public / split)
@@ -73,6 +75,29 @@ for name, row in report["by_condition"].items():
     print(f"{name:<15}{row['error']:>8.4f}{row['reference_error']:>10.4f}{row['loss_ratio']:>8.3f}"
           f"{win / n:>10.4f}{size / n:>11.4f}")
 print(f"R = {report['mean_loss_ratio']:.4f}  ->  {report['technical_points']:.2f} / {report['max_points']:g} points")
+if args.cv_val:
+    from slot_forecasting.experiments import episode_folds, subset_score
+    from slot_forecasting.io import read_rows
+    val_groups = {r["query_id"]: r["condition"] for r in read_rows(val / "conditions.csv", ("query_id", "condition"))}
+    tuning, audit = episode_folds(val_targets, val_groups)
+    crossfit = {}
+    for scored, prior_episode_ids in ((tuning, audit), (audit, tuning)):
+        prior_targets = tuple(t for t in val_targets if t.episode_id in prior_episode_ids)
+        fold_model = adapt(train_queries, train_history, train_labels,
+                           size_modes=size_modes_from_targets(prior_targets, val_queries),
+                           win_prior=win_prior_by_type_from_targets(prior_targets, val_queries), log=lambda *_: None)
+        fold_queries = tuple(q for q in val_queries if q.episode_id in scored)
+        fold_keys = {(q.episode_id, q.machine_id) for q in fold_queries}
+        fold_history = tuple(p for p in val_history if (p.episode_id, p.machine_id) in fold_keys)
+        crossfit.update(fold_model.predict(fold_queries, fold_history))
+    write_submission(out / "crossfit_validation_predictions.csv", crossfit)
+    halves = [subset_score(crossfit, val_targets, val_groups,
+                           read_submission(val / "reference.csv"), episodes,
+                           event["max_points"]) for episodes in (tuning, audit)]
+    crossfit_report = {"tuning_using_audit_priors": halves[0], "audit_using_tuning_priors": halves[1]}
+    write_json(out / "crossfit_validation_score.json", crossfit_report)
+    print(f"Cross-fitted validation: tuning {halves[0]['technical_points']:.2f} / {event['max_points']:g}; "
+          f"audit {halves[1]['technical_points']:.2f} / {event['max_points']:g}")
 
 # --- entry folder + ZIP ---
 entry = out / "entry"
