@@ -114,13 +114,14 @@ metadata = json.loads((public / "metadata.json").read_text(encoding="utf-8"))
 sha = hashlib.sha256(files["test"].read_bytes()).hexdigest()
 commit = subprocess.run(["git", "-C", str(HERE), "rev-parse", "--short", "HEAD"],
                         capture_output=True, text=True).stdout.strip() or "unknown"
-(entry / "README.md").write_text(f"""# House Edge entry: lag-pair mixer
+(entry / "README.md").write_text(f"""# House Edge entry: lag-pair mixer + hidden-rule HMM
 
 - Round: {metadata.get('round', 'main')}
 - Season ID: {metadata.get('season_id', 'see public/metadata.json')}
 - Forecast SHA-256: {sha}
 - Code version: git {commit} (built by mainFiles/run_pair_mixer.py)
-- Environment: `python` image, Python standard library only (tested on Python {platform.python_version()})
+- Environment: `python` image, Python standard library only, no extra dependencies
+  (tested on Python {platform.python_version()}; needs 3.11+)
 - Validation: {report['technical_points']:.2f} / {report['max_points']:g} points (R = {report['mean_loss_ratio']:.4f})
 
 ## Recreate the forecast
@@ -131,17 +132,21 @@ Run from the archive root:
 python predict.py --data /data --out /output/submission.csv
 ```
 
-- What it does: on `/data/train` it rediscovers which lag pairs drive wins, picks
-  match/differ (2-cell) vs 4-cell experts by Brier on `train/labels.csv` at the
-  cutoff, fits payout-size priors per machine type, and reads two priors from
-  `/data/validation/targets.csv`: the two exact payout-size mixes per type and the
-  dead/live win-chance levels (copy in `priors.json`); then it predicts every
-  `/data/test` query with a per-machine online mixture of lag-pair experts. Each expert tracks, with exponential forgetting, how often the machine
-  won when its results at two earlier lags matched vs differed; experts are
-  weighted by their recent squared error. Only ticks before each cutoff are read.
-- Model files: none (the command refits in about a second).
-- Seeds/settings: deterministic, no randomness; settings are the `PairMixer`
-  defaults in `slot_forecasting/pair_mixer.py`.
+- Data used: `/data/train` (history, queries, labels), `/data/validation` (queries and
+  `targets.csv`), `/data/test` (history, queries). If `validation/targets.csv` is missing,
+  the same priors are read from `priors.json` in this archive. Writes only `--out`.
+- Training details (all refit at run time, about 2 minutes):
+  1. On train history: find the lag pairs whose match/differ drives wins, and the lags
+     whose exact payout drives payout size.
+  2. From validation targets: the payout-size modes per machine type, and a win-chance
+     prior with dead / live / middle levels per machine type and signal.
+  3. Pick 2-cell (match/differ) vs 4-cell win experts by Brier on `train/labels.csv`.
+- Prediction: per machine, an online mixture of lag-pair experts (three memory lengths)
+  gives the win chance and payout sizes; 30% of the win chance comes from a hidden-rule
+  HMM that tracks rule switches. Only ticks before each cutoff are read.
+- Model files: `priors.json` (fallback copy of the validation-derived priors).
+- Seeds/settings: deterministic, no randomness; settings are the defaults in
+  `slot_forecasting/pair_mixer.py` and `slot_forecasting/rule_hmm.py`.
 - Runtime: about {perf_counter() - started:.0f} s for train + validation + test on one CPU core.
 """, encoding="utf-8")
 zip_path = out / "entry.zip"
