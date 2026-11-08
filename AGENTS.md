@@ -426,6 +426,7 @@ A task is done only when **all** are true:
 ## 12. Learnings & gotchas (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): what happened → what to do instead -->
 - YYYY-MM-DD (@handle): _example: the shared cluster restarts at 02:00; save work before then._
+- 2026-11-07 (@Codex): generated `counts_per_condition` metadata maps split names to integer counts; keep synthetic test truth under `_truth` and remove it before mounting data for an entry.
 
 ## 13. Decision log (append-only)
 <!-- Format: - YYYY-MM-DD (@handle): DECISION, because REASON. Alternatives: X, Y. -->

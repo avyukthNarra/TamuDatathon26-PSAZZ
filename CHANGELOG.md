@@ -19,6 +19,7 @@ How to add an entry (every PR):
 ## [Unreleased]
 
 ### Added
+- Method-agnostic evaluation suite (`python -m eval_suite run --entry DIR`) that checks any entry against all 88 documented requirements and scores it with the official metric (#19)
 - Agent playbook: drop-in protocol, branch and commit conventions, PR template, and release scripts
 
 ### Changed
@@ -32,5 +33,6 @@ How to add an entry (every PR):
 ### Removed
 
 ### Fixed
+- Local-mode answer-isolation checks are reported as NOT RUN, and omitted mode selects Docker when available (#19)
 
 ### Security
