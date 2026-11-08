@@ -1,0 +1,8 @@
+test_hmm_forward_likelihood_matches_hidden_path_enumeration (test_discover.DiscoveryTests.test_hmm_forward_likelihood_matches_hidden_path_enumeration) ... ok
+test_rules_polarities_missing_values_and_causality (test_discover.DiscoveryTests.test_rules_polarities_missing_values_and_causality) ... ok
+test_vector_size_head_matches_mixer6_walk (test_discover.DiscoveryTests.test_vector_size_head_matches_mixer6_walk) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.011s
+
+OK

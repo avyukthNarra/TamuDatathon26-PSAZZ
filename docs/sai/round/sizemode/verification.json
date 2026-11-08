@@ -1,0 +1,9 @@
+{
+  "two_run_train_artifacts_identical": true,
+  "score_array_max_abs_diff": 0.0,
+  "eligible_machines": 730,
+  "deterministic_rules": 368,
+  "families": 10,
+  "dev_candidates_tuned": 0,
+  "train_gate_passed": false
+}
