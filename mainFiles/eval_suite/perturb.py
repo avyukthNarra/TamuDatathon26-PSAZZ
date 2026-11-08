@@ -455,9 +455,10 @@ def compare(base_csv, variant_csv, variant, tol=1e-9) -> CheckResult:
 def compare_missing_vs_zero(missing_csv, zero_csv, tol=1e-9) -> CheckResult:
     """Compare predictions from the -missing and -zero variants.
 
-    Docs say a missing tick is unknown, not a zero payout. An entry that gives
-    identical predictions for both gets a warning (passed=True, severity "warn").
-    An entry that separates them gets an info result. A misaligned pair fails.
+    Docs say a missing tick is unknown, not a zero payout. Identical predictions
+    on this selected sample get an informational warning, but do not establish
+    general missing-value behavior: selected outcomes may already be zero, or
+    the entry may ignore those rows. A misaligned pair fails.
     """
     try:
         missing = _load_predictions(missing_csv)
@@ -474,7 +475,7 @@ def compare_missing_vs_zero(missing_csv, zero_csv, tol=1e-9) -> CheckResult:
     if not differing:
         return CheckResult(
             MISSING_VS_ZERO_ID, True, "warn",
-            "entry treats a missing tick the same as a zero payout; docs say missing is unknown, not a loss",
+            "no forecast change on selected rows; probe is inconclusive (outcomes may already be zero or rows may be ignored)",
             details)
     return CheckResult(
         MISSING_VS_ZERO_ID, True, "info",

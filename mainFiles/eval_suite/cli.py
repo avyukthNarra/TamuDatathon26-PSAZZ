@@ -465,8 +465,11 @@ class Suite:
             "Reproducibility: the suite runs each entry with `python -m eval_suite run`; every number is "
             "recomputed from the CSVs it writes, and predictions are kept under predictions/.",
             "Real-validation score is a k-fold stitch: each fold's entry sees the other folds' validation answers "
-            "as training data and never its own scored episodes. This is comparable across entries but is not "
+            "as training data and does not mount answer files for its own scored episodes. This is comparable "
+            "across entries but is not "
             "identical to training on all of validation.",
+            "Scored-fold answer files are withheld from each mounted dataset, but packaged weights or priors may "
+            "already encode validation information; training provenance and prior exposure are not verified.",
             "The kit test run mounts train and test only, with no validation answers. It checks format and "
             "runtime; it never scores anything (EXP-03: test answers are private).",
             "Fold datasets are partial by design (validation holds only visible episodes, test holds the scored "
@@ -480,7 +483,8 @@ class Suite:
             "CAU-CROSS-EPISODE randomises payouts of the other scored episodes' history in the scored split only. "
             "Train and validation labels are not touched, since changing them would legitimately change every "
             "prediction.",
-            "CAU-MISSING-PROBE is information only. A WARN means the entry treats a missing tick as a zero payout.",
+            "CAU-MISSING-PROBE is information only. Identical forecasts after deleting versus zeroing sampled rows "
+            "are inconclusive: sampled outcomes may already be zero, or the entry may ignore those rows.",
             "A variant the entry refuses (non-zero exit) is recorded as WARN ('refused'), not PASS and not FAIL.",
             "Requirements marked MANUAL (deadlines, form process, provenance) have no file check; see REQUIREMENTS.md.",
             "Generator presets are spec-derived approximations of the organizer's data, not the organizer's data.",
@@ -494,7 +498,7 @@ class Suite:
         else:
             items.insert(0, "Docker mode is the organizer emulation. Peak memory is sampled with `docker stats` "
                             "every 0.5 s, so it is an estimate, and Docker VM memory may differ from the host. "
-                            "The /tmp and /output quotas are not enforced by entry.py.")
+                            "The 128 MiB /tmp and 32 MiB /output tmpfs quotas are applied and recorded by docker inspect.")
         if self.compare is None:
             items.append("No --compare entry was given, so no paired comparison was made.")
         return items

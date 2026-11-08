@@ -27,8 +27,8 @@ Options: `--seed` (default 0), `--k` (validation folds, default 4),
 `--keep-work` (keep mounted dataset copies for debugging). Exit status is 0 for no FAIL,
 1 for any FAIL, 2 for a suite error with no FAIL.
 
-Tests: `python3 -m unittest discover -s eval_suite/tests -t . -v` (the protocol and runner
-tests use a two-episodes-per-condition kit subset and finish in about 10 seconds).
+Tests: `python3 -m unittest discover -s eval_suite/tests -t . -v` (158 tests; the latest full
+run completed in about 126 seconds on the development host; runtime is host-dependent).
 
 ## What each level runs
 
@@ -44,7 +44,7 @@ tests use a two-episodes-per-condition kit subset and finish in about 10 seconds
 | Packaging: `package_entry` then `check_zip` (needs `datachecks.py`) | no | yes | PKG-* |
 | Dataset checks on the kit and on each generator preset (needs `datachecks.py`) | no | yes | DAT-*, CON-ROUND-METADATA |
 | Mount checks: no answers at the mount root or `test/`, no forecast file (needs `datachecks.py`; a suite-internal check always runs) | partial | yes | ROB-MOUNT-NO-ANSWERS, ROB-NO-FORECAST-INPUT |
-| Generator presets (`main_like`, `round2_shift`, `all_lags`, `neighbour_heavy`, `hidden_state_heavy`, `fast_drift`, `edge_cases`): generated with `episodes-per-condition` from metadata (24), scored against `_truth` | no | yes (needs `generator.py`) | GEN-* (not emitted by the suite), presets are scores |
+| Generator presets (`main_like`, `round2_shift`, `all_lags`, `neighbour_heavy`, `hidden_state_heavy`, `fast_drift`, `edge_cases`): generated with `episodes-per-condition` from metadata (24), scored against `_truth` | no | yes | DAT-*, CON-ROUND-METADATA; GEN-* checks remain NOT RUN (the suite scores presets but does not emit generator-specific checks) |
 | `--compare`: the second entry runs the same datasets, and `paired_compare` reports the points difference | k-fold only | k-fold and presets | paired table |
 
 Docker-only limits (`ROB-OFFLINE`, `ROB-CPU-LIMIT`, `ROB-MEM-LIMIT`, `ROB-READONLY-MOUNTS`,
@@ -52,7 +52,8 @@ Docker-only limits (`ROB-OFFLINE`, `ROB-CPU-LIMIT`, `ROB-MEM-LIMIT`, `ROB-READON
 they are NOT RUN with the reason.
 
 Scores are never computed on the kit test split, because its answers are private.
-Every score comes from validation or from generated `_truth`.
+Every score comes from validation or from generated `_truth`. For synthetic presets, `_truth/test`
+is kept outside the mounted copy; the suite reads it only after the entry produces its forecast.
 
 ## How to read `report.md`
 
@@ -61,8 +62,10 @@ Every score comes from validation or from generated `_truth`.
 2. **Requirement coverage.** One row for every requirement in `requirements.py`, so none
    is silently dropped. Status is the worst status of its check IDs:
    - PASS, INFO: verified (INFO is information only, for example ENT-MAIN-DATA-MOUNT).
-   - WARN: a soft rule failed (for example PKG-README-SEASON, or a missing-vs-zero
-     treatment). A refused variant is also WARN, not PASS.
+   - WARN: a soft rule failed (for example PKG-README-SEASON). An identical missing-vs-zero
+     probe result is inconclusive: the selected outcomes may already be zero, or the entry may
+     ignore those rows; it does not prove that missing values are treated as losses. A refused
+     variant is also WARN, not PASS.
    - FAIL: the entry violates the requirement. The evidence column names the check.
    - NOT RUN: a check did not run. The reason is always given: quick level, local mode,
      missing module, or rule-level (no file check exists).
@@ -102,9 +105,15 @@ recomputed without rerunning the entry.
 
 - Local mode is not the organizer's environment. It has no network block, no read-only mounts,
   no CPU or memory limits, and no requirements install. Use docker mode for authoritative runs.
-- `entry.py` maps `"image": "python"` to `python:3.12-slim`, but the rules say the base
-  environment is Python 3.13 (GDE-21). ENT-BASE-PY313 is therefore not probed, and docker runs
-  use 3.12 until `entry.py` changes.
+- `entry.py` maps `"image": "python"` to `python:3.13-slim`, matching GDE-21. ENT-BASE-PY313
+  remains NOT RUN because the fixed mapping is not a separate runtime verification.
 - The k-fold score is comparable across entries but is not identical to training on all of
-  validation. Each fold's entry sees the other folds' validation answers as training data.
+  validation. Each fold's entry sees the other folds' validation answers as training data. The
+  suite withholds scored-fold answer files from the mounted dataset, but cannot remove information
+  already encoded in packaged weights or priors; it does not verify training provenance or prior
+  exposure to validation.
 - The generator presets are spec-derived approximations, not the organizer's data.
+- `main_like` calibration is partial: the maximum train lag-correlation gap is 0.1337 at lag 7.
+  The preset is not claimed to match every observed temporal statistic.
+- Docker mode applies 128 MiB `/tmp` and 32 MiB `/output` tmpfs mounts. `docker inspect` records
+  the applied mounts; Docker VM memory can still differ from the host.
