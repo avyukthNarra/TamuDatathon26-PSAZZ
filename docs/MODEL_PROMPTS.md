@@ -4,6 +4,79 @@ A running log of the requests (to Claude Code or any coding agent) that led to
 real score gains, and the ones that didn't. Use it to steer the next agent fast,
 especially in round two. Validation points are out of 60; the pooled baseline is 30.
 
+## At a glance: everything that lowered the error (30 -> 56.19)
+
+Each step was kept only because it helped; from step 9 on, it also had to help out of fold on
+train AND on both cross-fitted validation halves. Details and prompts are in the round sections.
+
+| # | What changed | Error it removed | Validation |
+|---|---|---|---|
+| 0 | Starter "pooled" model (= the reference) | - | 30.00 |
+| 1 | Learn from every past spin, no lookahead | first per-machine signal | 31.96 |
+| 2 | Per-machine online mixer of lag-PAIR experts (1,3), (2,5), (4,7) | win chance: wins follow two earlier spins | 50.29 |
+| 3 | Experts keep 2 cells: did the two lags MATCH or DIFFER | win chance: the rule is XNOR/XOR | 52.92 |
+| 4 | Tune at the query cutoff tick (train labels.csv), not history ticks | settings that only looked good mid-history | 53.35 |
+| 5 | Two memory lengths per pair (half-lives 12 and 40) | machines that change speed | 53.56 |
+| 6 | Payout-size experts keyed on earlier spins | size given a win | 53.75 |
+| 7 | Size cells read the EXACT earlier payout, not just win/loss | size: it copies earlier sizes | 54.21 |
+| 8 | Size = a switch between two exact mixes per type, P(big mode) by Bayes | size: few free numbers to learn | 54.90 |
+| 9 | Win cells pulled toward "dead" / "live" levels (Beta-mixture prior) | win: true chances are U-shaped | 55.34 |
+| 10 | Size lags found from train (1, 2, 4; lag 3 was noise) | size: a noisy expert | 55.45 |
+| 11 | Dead / live levels per machine TYPE | win: jackpot is almost never live | 56.12 |
+| 12 | Third win memory (half-life 100) + slower size re-weighting (size_eta 4) | short_history size error | **56.19** |
+
+Honest evaluation (round 4) is what made steps 10-12 trustworthy: cross-fitted validation (each
+half's priors from the other half), 8-fold episode-grouped train scoring, and a late-window
+train score (cutoff + last 10 spins) for ~4x tighter intervals. Ideas rejected under it:
+data-driven prior weights, a train-history prior, blending another team's rule model,
+leave-one-out expert scoring, gap decay, coarse or pooled size cells (see the round sections).
+
+## Where the 56.19 model is strong and where it is weak
+
+Cross-fitted validation, 768 queries. Error = 5-class squared error per query, split into the
+part from the win chance and the part from payout size (error left if the win chance were
+exact). Ratio = our error / the reference model's (lower is better; R = mean of the 4
+condition ratios = 0.068).
+
+| Slice | Error | Win part | Size part | Ratio |
+|---|---|---|---|---|
+| drift | 0.0096 | 0.0068 | 0.0027 | **0.050** (best condition) |
+| stable | 0.0109 | 0.0082 | 0.0027 | 0.056 |
+| shared_change | 0.0121 | 0.0070 | 0.0051 | 0.059 |
+| short_history | 0.0190 | 0.0095 | 0.0095 | **0.107** (worst condition) |
+| balanced type | 0.0124 | 0.0055 | 0.0069 | 0.056 |
+| steady type | 0.0137 | 0.0070 | 0.0067 | 0.056 |
+| jackpot type | 0.0125 | 0.0108 | 0.0017 | **0.110** |
+| true win < 0.2 ("dead") | 0.0039 | 0.0038 | 0.0001 | **0.026** |
+| true win > 0.8 ("live") | 0.0178 | 0.0054 | 0.0123 | 0.067 |
+| true win 0.2-0.8 ("middle") | 0.0243 | 0.0198 | 0.0046 | **0.137** |
+
+Best cells: drift/steady 0.035, stable/balanced 0.037, shared_change/steady 0.045.
+Worst cells: short_history/jackpot 0.181, stable/jackpot 0.129, short_history/steady 0.099.
+
+**Strong:** dead machines (ratio 0.026: once a machine is cold the model knows it), drift and
+stable episodes, and balanced / steady machines in long histories. The online mixer tracks
+rule changes well, which is why drift is the best condition.
+
+**Weak:**
+- **Middle win chances (0.2-0.8):** 22% of queries, 81% of their error is the win chance. The
+  dead/live prior pulls these toward 0.03 or 0.93 when the truth is in between.
+- **Jackpot machines:** ratio 0.110, twice the other types, almost all win error. The reference
+  does unusually well on them (its error is half that on other types), so each mistake costs
+  more ratio; worst in short_history (0.181).
+- **Payout size on live machines:** the live slice's error is 69% size (0.0123), and
+  short_history/steady and short_history/balanced are mostly size error (0.0157, 0.0112).
+  Too few wins in 40 spins to tell the size mode apart.
+
+**What could still improve it (not yet tried or not yet passing):**
+1. A middle-level component per type (the per-type prior only has dead/live levels; a
+   jackpot-specific middle may fit its 0.2-0.8 machines better).
+2. Size-mode lags per machine TYPE (the lags that switch the mode may differ by type).
+3. A per-type prior that also depends on the signal column (tried once on a weaker model:
+   no gain; worth a re-test with the window score).
+4. Ceiling check: a perfect win chance alone would score 58.40, perfect sizes alone 57.57
+   (round-4 model), so 57+ needs a new discovery, not tuning.
+
 ## Paste-ready prompt (rebuilds the 56.19 model from the starter kit)
 
 Copy everything inside the box into a fresh coding agent opened in the repo root.
