@@ -59,3 +59,14 @@ logit term adds +0.03 validation, train within noise, not adopted) and size vs "
 
 Conclusion: after the peer effect, every residual test (population, per machine, win, size,
 calibration) is at chance level. v10 (56.59) is the best verified model.
+
+## Round 5 (branch `pranav/deep-hunt`, no change)
+- New residual families on v10 (`research/residuals3.py`): peer payout size, peer 5x/20x shares,
+  same- vs other-type peers, peers at lags 9-20 and 21-60, own win/loss streaks, spins since the
+  last win / 5x+, own win share at lags 9-20, own mean payout. None has |z| > 2 on both splits with
+  the same sign; several flip sign between splits (e.g. peers lags 9-20: validation -2.6, train +1.1).
+- Joint grid of log-odds pool weight x peer strength (`research/joint_grid.py`): a plateau;
+  e.g. mixer 0.6 / HMM 0.4, peers 1.0: validation 56.58 (56.59 / 56.58) vs v10 56.55 (56.52 / 56.60)
+  in the cache, train window -0.0005 [-0.0012, +0.0001]. Halves move in opposite directions.
+- HMM with an extra "live at the type's middle level" state family (`research/hmm_middle.py`):
+  validation 56.56-56.57 with the tuning half down, train cutoff +0.0020 to +0.0028. Not adopted.
